@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>シミュレーション並走 — 実績 vs 推奨</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:12px}
+  .bL .badge{font-size:11px;font-weight:900;letter-spacing:.06em;background:var(--g5);color:var(--g2);padding:6px 12px;border-radius:999px}
+  .bL h1{font-size:19px;font-weight:900}.bL .sub{font-size:12.5px;color:var(--g2)}
+  .bR{display:flex;align-items:center;gap:10px}
+  .ghost{font-size:13px;font-weight:800;color:var(--g2);border:1.5px solid var(--g4);background:#fff;border-radius:11px;padding:10px 16px;cursor:pointer}
+  .go{font-size:14px;font-weight:900;color:#fff;background:var(--ink);border:none;border-radius:11px;padding:11px 18px;cursor:pointer}
+  /* KPI band */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 28px 6px}
+  .kpi{border:1.5px solid var(--g4);border-radius:14px;padding:14px 16px}
+  .kpi small{font-size:11.5px;color:var(--g2);font-weight:700}
+  .kpi b{display:block;font-size:26px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;margin-top:4px}
+  .kpi.good b{color:var(--ink)} .kpi.warn b{color:var(--time)}
+  .kpi .d{font-size:11.5px;font-weight:900;margin-top:3px}
+  .kpi .d.t{color:var(--time)}.kpi .d.g{color:#3a6a2a}
+  /* main */
+  .main{flex:1;display:grid;grid-template-columns:1fr 330px;min-height:0}
+  .left{padding:14px 28px;overflow:auto}
+  .lh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .lh b{font-size:14px;font-weight:900}.lh .leg{display:flex;gap:14px;font-size:11.5px;color:var(--g2)}
+  .lh .leg span{display:inline-flex;align-items:center;gap:6px}
+  .lh .leg i{width:16px;height:10px;border-radius:3px;display:inline-block}
+  .i-real{background:var(--g3)}.i-sugg{background:var(--ink)}
+  /* table */
+  .row{display:grid;grid-template-columns:150px 1fr 110px;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--g4)}
+  .row .nm{font-size:15px;font-weight:700}.row .nm small{display:block;font-size:11px;color:var(--g2);font-weight:700}
+  /* paired bars */
+  .bars{display:flex;flex-direction:column;gap:6px}
+  .b{display:flex;align-items:center;gap:9px}
+  .b .tag{font-size:10px;font-weight:900;width:34px;color:var(--g2)}
+  .b .track{flex:1;height:16px;background:var(--g5);border-radius:5px;overflow:hidden}
+  .b .fill{height:100%;border-radius:5px}
+  .b.real .fill{background:var(--g3)}.b.sugg .fill{background:var(--ink)}
+  .b .val{width:64px;text-align:right;font-size:12.5px;font-weight:900;font-variant-numeric:tabular-nums}
+  .delta{text-align:right;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}
+  .delta.save{color:#3a6a2a}.delta.short{color:var(--time)}
+  .delta small{display:block;font-size:10.5px;color:var(--g2);font-weight:700}
+  /* right: summary / decision */
+  .panel{border-left:1px solid var(--g4);padding:20px;background:#fcfcfd;display:flex;flex-direction:column;min-height:0}
+  .panel h3{font-size:15px;font-weight:900}
+  .panel .ph{font-size:12px;color:var(--g2);margin:5px 0 14px}
+  .verdict{border:1.5px solid var(--ink);border-radius:14px;padding:16px;text-align:center}
+  .verdict .big{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums}
+  .verdict .lab{font-size:12px;color:var(--g2);font-weight:700;margin-top:2px}
+  .verdict .sub2{font-size:12px;color:#3a6a2a;font-weight:900;margin-top:8px}
+  .mini{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px dashed var(--g4);font-size:13px}
+  .mini .k{color:var(--g2)}.mini .v{font-weight:900;font-variant-numeric:tabular-nums}
+  .acc{font-size:12px;color:var(--g2);margin-top:14px;line-height:1.6}
+  .apply{margin-top:auto;height:58px;border:none;border-radius:14px;background:var(--ink);color:#fff;font-family:var(--font);font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+  .applynote{font-size:11px;color:var(--g2);text-align:center;margin-top:9px}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>シミュレーション並走（FR-39）</b><span>本番適用前に「実際の仕込み量」と「PrepFlow推奨量」を並走比較。差を見て信頼を得てから本適用＋係数を初期化</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><span class="badge">SIMULATION ・ 14日間</span><div><h1>実績 vs 推奨</h1><div class="sub">鮨 はやし ・ 6/1〜6/14（過去予約14日分で試算）</div></div></div>
+      <div class="bR"><button class="ghost">期間を変更</button><button class="go">本適用する</button></div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi good"><small>推奨で減らせた食材量</small><b>−12.4%</b><div class="d g">過剰仕込みの平均</div></div>
+      <div class="kpi good"><small>推定の食材ロス削減</small><b>¥38,000</b><div class="d g">14日換算</div></div>
+      <div class="kpi warn"><small>品切れリスク（推奨が実績未満）</small><b>2件</b><div class="d t">要・安全係数の上乗せ</div></div>
+      <div class="kpi"><small>推奨の的中率</small><b>88%</b><div class="d">±10%以内</div></div>
+    </div>
+
+    <div class="main">
+      <div class="left">
+        <div class="lh"><b>仕込みアイテム別（14日平均・1営業あたり）</b>
+          <div class="leg"><span><i class="i-real"></i>実際に作った量</span><span><i class="i-sugg"></i>PrepFlow推奨</span></div>
+        </div>
+
+        <div class="row">
+          <div class="nm">煮切り<small>共有・per_cover</small></div>
+          <div class="bars">
+            <div class="b real"><span class="tag">実績</span><div class="track"><div class="fill" style="width:82%"></div></div><span class="val">240ml</span></div>
+            <div class="b sugg"><span class="tag">推奨</span><div class="track"><div class="fill" style="width:68%"></div></div><span class="val">200ml</span></div>
+          </div>
+          <div class="delta save">−40ml<small>余り18%→</small></div>
+        </div>
+
+        <div class="row">
+          <div class="nm">シャリ<small>fixed_batch</small></div>
+          <div class="bars">
+            <div class="b real"><span class="tag">実績</span><div class="track"><div class="fill" style="width:78%"></div></div><span class="val">2.2升</span></div>
+            <div class="b sugg"><span class="tag">推奨</span><div class="track"><div class="fill" style="width:71%"></div></div><span class="val">2.0升</span></div>
+          </div>
+          <div class="delta save">−0.2升<small>端数最適化</small></div>
+        </div>
+
+        <div class="row">
+          <div class="nm">出汁<small>fixed_batch</small></div>
+          <div class="bars">
+            <div class="b real"><span class="tag">実績</span><div class="track"><div class="fill" style="width:60%"></div></div><span class="val">5.0L</span></div>
+            <div class="b sugg"><span class="tag">推奨</span><div class="track"><div class="fill" style="width:62%"></div></div><span class="val">5.0L</span></div>
+          </div>
+          <div class="delta"><small>差なし</small></div>
+        </div>
+
+        <div class="row">
+          <div class="nm">百合根ピュレ<small>per_cover</small></div>
+          <div class="bars">
+            <div class="b real"><span class="tag">実績</span><div class="track"><div class="fill" style="width:55%"></div></div><span class="val">12客</span></div>
+            <div class="b sugg"><span class="tag">推奨</span><div class="track"><div class="fill" style="width:64%"></div></div><span class="val">14客</span></div>
+          </div>
+          <div class="delta short">＋2客<small>品切れ回避</small></div>
+        </div>
+
+        <div class="row">
+          <div class="nm">ツメ<small>煮切り由来</small></div>
+          <div class="bars">
+            <div class="b real"><span class="tag">実績</span><div class="track"><div class="fill" style="width:70%"></div></div><span class="val">110ml</span></div>
+            <div class="b sugg"><span class="tag">推奨</span><div class="track"><div class="fill" style="width:50%"></div></div><span class="val">80ml</span></div>
+          </div>
+          <div class="delta save">−30ml<small>余り27%→</small></div>
+        </div>
+      </div>
+
+      <!-- decision panel -->
+      <div class="panel">
+        <h3>結果サマリー</h3>
+        <div class="ph">14日間の予約実績に対して、推奨量を当てたときの差。</div>
+        <div class="verdict">
+          <div class="big">−12.4%</div>
+          <div class="lab">過剰仕込みの平均削減</div>
+          <div class="sub2">＝ 食材ロス 約¥38,000／14日</div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="mini"><span class="k">推奨が的中（±10%）</span><span class="v">88%</span></div>
+          <div class="mini"><span class="k">作りすぎを削減</span><span class="v">11品</span></div>
+          <div class="mini"><span class="k">品切れリスク</span><span class="v">2品</span></div>
+        </div>
+        <div class="acc">品切れリスクの2品は安全係数を+10%して本適用します。各アイテムの係数（1人前量）は、この14日でそのまま初期化されます。</div>
+        <button class="apply"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff"><path d="M5 13l4 4L19 7"/></svg>この係数で本適用する</button>
+        <div class="applynote">本適用後も実績から自動補正が続きます（FR-09）</div>
+      </div>
+    </div>
+  </div>
+</body></html>

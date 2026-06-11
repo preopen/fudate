@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>仕込みアイテム編集 — スケール則・自己補正・合算</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:12px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 14px;font-size:13px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .crumb{font-size:13.5px;color:var(--g2)}.crumb b{color:var(--ink)}
+  .save{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer}
+  .body{display:grid;grid-template-columns:270px 1fr 300px;min-height:0;flex:1}
+  /* tree */
+  .tree{border-right:1px solid var(--g4);padding:14px 12px;background:#fcfcfd;overflow:auto}
+  .th{font-size:10.5px;font-weight:900;letter-spacing:.08em;color:var(--g2);padding:8px 8px 6px}
+  .ti{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;font-size:13.5px;cursor:pointer}
+  .ti.dish{font-weight:900}
+  .ti.item{padding-left:24px;color:var(--g2)}
+  .ti.item.sel{background:var(--ink);color:#fff;font-weight:700}
+  .ti.shared{padding-left:24px}
+  .ti .shareb{font-size:9.5px;font-weight:900;background:var(--time-s);color:var(--time);padding:2px 7px;border-radius:999px;margin-left:auto}
+  .ti.item.sel .shareb{background:rgba(255,255,255,.2);color:#fff}
+  .addrow{font-size:12.5px;color:var(--time);border:1px dashed var(--time-s);border-radius:9px;padding:8px;margin:6px 0 0 24px;text-align:center;cursor:pointer}
+  /* detail */
+  .detail{padding:20px 26px;overflow:auto}
+  .dt{display:flex;align-items:center;gap:10px}
+  .dt h2{font-size:21px;font-weight:900}
+  .shared-tag{font-size:11px;font-weight:900;background:var(--time);color:#fff;padding:5px 11px;border-radius:999px}
+  .used{font-size:12px;color:var(--g2);margin-top:6px}
+  .grp{margin-top:20px}
+  .lbl{font-size:11.5px;font-weight:900;letter-spacing:.04em;color:var(--g2);margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  /* scale mode seg */
+  .seg{display:flex;gap:8px}
+  .sopt{flex:1;border:1.5px solid var(--g4);border-radius:13px;padding:13px;cursor:pointer;background:#fff}
+  .sopt.sel{border-color:var(--ink);border-width:2.5px}
+  .sopt b{font-size:14px;font-weight:900;display:block}
+  .sopt small{font-size:11px;color:var(--g2);display:block;margin-top:3px}
+  .sopt .ex{font-size:11px;color:var(--time);font-weight:700;margin-top:6px}
+  /* coeff row (auto) */
+  .auto-row{display:flex;align-items:center;gap:12px;border:1.5px solid var(--g4);border-radius:13px;padding:14px 16px;margin-top:10px}
+  .auto-row .field{display:flex;align-items:center;gap:8px}
+  .auto-row .field .k{font-size:12.5px;color:var(--g2)}
+  .moneybox{display:inline-flex;align-items:center;border:1.5px solid var(--g4);border-radius:10px;overflow:hidden}
+  .moneybox .v{width:64px;text-align:right;padding:9px 10px;font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
+  .moneybox .u{padding:0 10px;color:var(--g2);font-weight:700;background:var(--g5);align-self:stretch;display:flex;align-items:center;font-size:12px}
+  .toggle{width:118px;flex:none}
+  .tg{display:inline-flex;border:1.5px solid var(--g4);border-radius:10px;overflow:hidden}
+  .tg button{border:none;background:#fff;font-family:var(--font);font-size:12.5px;font-weight:800;color:var(--g2);padding:9px 13px;cursor:pointer}
+  .tg button.on{background:var(--ink);color:#fff}
+  /* self-correct card */
+  .sc{border:1.5px solid var(--time);border-radius:14px;background:var(--time-s);padding:15px 16px;margin-top:10px}
+  .sc .top{display:flex;align-items:center;gap:9px}
+  .sc .top b{font-size:13.5px;font-weight:900;color:#9a3a0e}
+  .sc .top .auto{margin-left:auto;font-size:11px;font-weight:900;color:#9a3a0e}
+  .sc .body2{display:flex;align-items:center;gap:14px;margin-top:11px}
+  .sc .now{font-size:13px;color:#9a3a0e}
+  .sc .now b{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums}
+  .sc .arrow{color:var(--time)}
+  .sc .sug{font-size:13px;color:#9a3a0e}
+  .sc .sug b{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums}
+  .sc .apply{margin-left:auto;background:var(--time);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-family:var(--font);font-weight:900;font-size:13px;cursor:pointer}
+  .sc .hist{font-size:11px;color:#9a3a0e;margin-top:10px;display:flex;align-items:center;gap:6px;opacity:.85}
+  .spark{display:inline-flex;align-items:flex-end;gap:2px;height:18px}
+  .spark i{width:5px;background:var(--time);border-radius:1px;opacity:.7}
+  /* small fields grid */
+  .fg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+  .fld{border:1.5px solid var(--g4);border-radius:11px;padding:10px 12px}
+  .fld small{font-size:11px;color:var(--g2);font-weight:700}
+  .fld .v{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;margin-top:2px}
+  .media{display:flex;gap:8px;margin-top:10px}
+  .mth{width:60px;height:46px;border-radius:8px;background:repeating-linear-gradient(45deg,#eceeec,#eceeec 7px,#f6f7f6 7px,#f6f7f6 14px);display:grid;place-items:center;font-size:10px;color:var(--g3);border:1px solid var(--g4)}
+  .mth.add{border:1.5px dashed var(--g3);background:#fff;color:var(--g2);font-weight:900}
+  /* right: aggregation preview */
+  .prev{border-left:1px solid var(--g4);padding:18px;background:#fcfcfd;overflow:auto}
+  .prev h3{font-size:14px;font-weight:900}
+  .prev .ph{font-size:11.5px;color:var(--g2);margin:4px 0 14px}
+  .agg{border:1.5px solid var(--time);border-radius:13px;overflow:hidden;margin-bottom:14px}
+  .agg .ah{background:var(--time);color:#fff;padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
+  .agg .ah b{font-size:14px;font-weight:900}.agg .ah .tot{font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+  .agg .ar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--g4);font-size:12.5px;background:#fff}
+  .agg .ar:last-child{border-bottom:none}
+  .agg .ar .src{color:var(--g2)}.agg .ar .q{font-weight:900;font-variant-numeric:tabular-nums}
+  .agg .note{font-size:11px;color:var(--g2);padding:9px 14px;background:var(--g5)}
+  .single{border:1.5px solid var(--g4);border-radius:13px;padding:13px 14px;background:#fff}
+  .single .sh{font-size:11.5px;font-weight:900;color:var(--g2);margin-bottom:6px}
+  .single .v{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
+  .single small{font-size:11px;color:var(--g2)}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>仕込みアイテム編集（FR-37/38/09）</b><span>スケール則（人数連動/1人前×人数/固定バッチ）・自動/手動・自己補正レシピ・共有半製品の合算プレビュー。材料登録は無し</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">←</button><span class="crumb">本日のおまかせ / <b>煮切り（共有）</b></span></div>
+      <button class="save">保存</button>
+    </div>
+    <div class="body">
+      <!-- tree -->
+      <div class="tree">
+        <div class="th">コース構成</div>
+        <div class="ti dish">▾ おまかせ握り</div>
+        <div class="ti item">シャリ <span class="shareb" style="background:var(--g5);color:var(--g2)">固定</span></div>
+        <div class="ti item sel">煮切り <span class="shareb">共有3</span></div>
+        <div class="ti item">ネタの仕込み</div>
+        <div class="ti dish" style="margin-top:6px">▾ 焼き穴子</div>
+        <div class="ti shared item">煮切り <span class="shareb" style="background:var(--g5);color:var(--g2)">→共有</span></div>
+        <div class="ti dish" style="margin-top:6px">▾ 玉子</div>
+        <div class="ti shared item">ツメ <span class="shareb" style="background:var(--g5);color:var(--g2)">煮切り由来</span></div>
+        <div class="addrow">＋ 仕込みアイテムを追加</div>
+      </div>
+
+      <!-- detail -->
+      <div class="detail">
+        <div class="dt"><h2>煮切り</h2><span class="shared-tag">共有半製品</span></div>
+        <div class="used">使用：おまかせ握り・焼き穴子・玉子（ツメの素）の3料理で共有 ＝ <b>1タスクに合算</b></div>
+
+        <div class="grp">
+          <div class="lbl">スケール則（出力量の決め方）<svg viewBox="0 0 24 24" width="14" height="14" stroke="#9d9a93"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8.5v.1"/></svg></div>
+          <div class="seg">
+            <div class="sopt sel"><b>人数連動</b><small>per_cover</small><div class="ex">例：14名 → 200ml</div></div>
+            <div class="sopt"><b>1人前×人数</b><small>per_portion</small><div class="ex">例：14貫</div></div>
+            <div class="sopt"><b>固定バッチ</b><small>fixed_batch</small><div class="ex">例：5L 端数切上</div></div>
+          </div>
+          <div class="auto-row">
+            <div class="field"><span class="k">1人前あたり</span><div class="moneybox"><span class="v">14</span><span class="u">ml</span></div></div>
+            <div class="field"><span class="k">歩留り</span><div class="moneybox"><span class="v">95</span><span class="u">%</span></div></div>
+            <div class="toggle"><div class="tg"><button class="on">自動</button><button>手動</button></div></div>
+          </div>
+        </div>
+
+        <!-- self-correct -->
+        <div class="grp">
+          <div class="lbl">自己補正レシピ（実績から自動で育つ）</div>
+          <div class="sc">
+            <div class="top"><svg viewBox="0 0 24 24" width="16" height="16" stroke="#9a3a0e"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg><b>直近10回の実績から補正を提案</b><span class="auto">毎週月曜 自動補正：ON</span></div>
+            <div class="body2">
+              <div class="now">現在<br><b>14<span style="font-size:12px">ml/人</span></b></div>
+              <svg class="arrow" viewBox="0 0 24 24" width="22" height="22" stroke="#bb4d1b"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              <div class="sug">提案（余り平均18%）<br><b>12<span style="font-size:12px">ml/人</span></b></div>
+              <button class="apply">この値に更新</button>
+            </div>
+            <div class="hist">直近の余り率：<span class="spark"><i style="height:60%"></i><i style="height:80%"></i><i style="height:70%"></i><i style="height:90%"></i><i style="height:75%"></i><i style="height:65%"></i><i style="height:55%"></i><i style="height:50%"></i></span> 下降＝過剰が縮小</div>
+          </div>
+        </div>
+
+        <!-- basics -->
+        <div class="grp">
+          <div class="lbl">段取り・手順</div>
+          <div class="fg">
+            <div class="fld"><small>担当</small><div class="v" style="font-size:14px">親方</div></div>
+            <div class="fld"><small>所要</small><div class="v">40分</div></div>
+            <div class="fld"><small>着手リード</small><div class="v">180分前</div></div>
+          </div>
+          <div class="media"><div class="mth">手順1</div><div class="mth">完成</div><div class="mth">動画</div><div class="mth add">＋</div></div>
+        </div>
+      </div>
+
+      <!-- aggregation preview -->
+      <div class="prev">
+        <h3>合算プレビュー（FR-38）</h3>
+        <div class="ph">本日14名・この共有半製品が複数料理で使われる場合の合計。仕込みボードには<b>1タスク</b>で出ます。</div>
+        <div class="agg">
+          <div class="ah"><b>煮切り 合計</b><span class="tot">290ml</span></div>
+          <div class="ar"><span class="src">おまかせ握り（14名）</span><span class="q">200ml</span></div>
+          <div class="ar"><span class="src">焼き穴子（仕上げ）</span><span class="q">60ml</span></div>
+          <div class="ar"><span class="src">玉子（ツメの素）</span><span class="q">30ml</span></div>
+          <div class="note">歩留り95%込み・固定バッチは端数切上げ。重複登録なし＝二度作りを防止。</div>
+        </div>
+        <div class="single">
+          <div class="sh">ボード表示（当日）</div>
+          <div class="v">煮切り 290ml <small>／ 全コース分</small></div>
+          <small>15:00 着手・40分・親方</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>

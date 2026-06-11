@@ -61,6 +61,8 @@
 | Direct設定・店舗側（アロットメント/デポジット/コース公開） | `p3-wireframe-direct-settings.html/.png` | FR-35/36 |
 | コース手動割当モーダル（予約ハブ） | `p2-wireframe-course-assign.html/.png` | FR-34 |
 | Direct確定メール＋ゲストマイページ | `p3-wireframe-direct-mypage.html/.png` | FR-35（リマインド・キャンセル動線） |
+| 仕込みアイテム編集（スケール則/自動手動/自己補正/合算） | `p1-wireframe-prepitem-editor.html/.png` | FR-37/38/09 |
+| シミュレーション並走（実績 vs 推奨） | `p0-wireframe-simulation.html/.png` | FR-39 |
 
 ---
 

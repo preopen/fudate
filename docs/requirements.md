@@ -286,6 +286,8 @@ Restaurant ─┬─ Section ─── Staff
 | Direct設定・店舗側 | `design/p3-wireframe-direct-settings.html` | FR-35/36 |
 | コース手動割当モーダル | `design/p2-wireframe-course-assign.html` | FR-34 |
 | Direct確定メール＋ゲストマイページ | `design/p3-wireframe-direct-mypage.html` | FR-35 |
+| 仕込みアイテム編集（スケール則/自動手動/自己補正/合算） | `design/p1-wireframe-prepitem-editor.html` | FR-37/38/09 |
+| シミュレーション並走（実績 vs 推奨） | `design/p0-wireframe-simulation.html` | FR-39 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 
