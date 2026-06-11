@@ -236,6 +236,12 @@ Restaurant ─┬─ Section ─── Staff
 | 仕込みボード 確定3テーマ（INK/帳票/朱1色） | `design/redesign2-1-ink.html` / `redesign2-2-passsheet.html` / `redesign2-3-oneaccent.html` | §13・FR-04/05 |
 | 営業中サービスボード | `design/p2-wireframe-service-board.html` | FR-19/21/22 |
 | パスビュー（卓×コース） | `design/p4-wireframe-passview.html` | FR-24/25/27 |
+| 皿ごとビュー（確定テーマ） | `design/p1-wireframe-view-dishes.html` | FR-04/05 |
+| 担当ビュー（確定テーマ） | `design/p1-wireframe-view-staff.html` | FR-07 |
+| ホール側UI（ハンディ＋タッチパネル） | `design/p4-wireframe-hall-handy.html` | FR-25/26/27/28 |
+| 状態バリエーション（遅延/点検NG/全画面） | `design/p2-wireframe-state-alerts.html` | FR-22 |
+
+> 成果物の全体インデックスは `design/README.md` を参照。
 
 ---
 

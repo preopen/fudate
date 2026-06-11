@@ -1,18 +1,63 @@
-# PrepFlow — 設計ドラフト（design）
+# PrepFlow design/ — 成果物インデックス
 
-軽量版PrepFlow（コース・予約主体の中〜高級飲食店向け 仕込み管理SaaS）の検討用ドラフト一式。
+軽量版PrepFlow（コース・予約主体の中〜高級飲食店向け 仕込み管理SaaS）の画面設計・図版一式。
+各成果物は **自己完結HTML＋PNG** のペア（HTMLはブラウザで直接開けます）。
+要件定義本文は [`../docs/requirements.md`](../docs/requirements.md)（v0.3）。
 
-## 成果物
-| ファイル | 内容 |
-|---|---|
-| `competitive-positioning.html` / `.png` | 競合ポジショニング図（V-Manage / カミナシ / PrepFlow）。2軸マップ＋機能マップ比較表 |
-| `p0-wireframe-todaytask.html` / `.png` | P0ワイヤーフレーム：今日のタスク（仕込みボード）＋手順メディア添付。番号①〜⑦は要件定義v0.2のFRに対応 |
+## 確定デザイン言語
+- **白基調＋黒文字＋グレー**、アクセントは**朱 `#c2410c` 1色のみ＝「時間/NOW/遅延/緊急」専用**
+- 3つ星運営思想：**T−逆算表記・開店カウントダウン・ライン点検ゲート**
+- 3ビュー切替（今これ／皿ごと／担当）、タブレット特化（1180×812想定）、大タッチ領域・最小文字
+- アラート3段階：トースト → バナー → 全画面反転＋音（FR-22）
 
-HTMLは自己完結（元プロトタイプと同じデザイントークン）。ブラウザで直接開けます。
+---
+
+## 1. 図版（リサーチ・全体設計）
+
+| 成果物 | ファイル | 内容 |
+|---|---|---|
+| 競合ポジショニング図 | `competitive-positioning.html/.png` | V-Manage／カミナシ／PrepFlowの2軸マップ＋機能比較表 |
+| 画面遷移図（フロー） | `flow-screen-map.html/.png` | ①初回セットアップ ②日次運用ループ ③振り返り・管理の3レーン |
+
+## 2. 初期ワイヤーフレーム（v0.2世代・ティール基調）
+
+| 画面 | ファイル | 対応FR |
+|---|---|---|
+| オンボーディング（業態テンプレ選択） | `p0-wireframe-onboarding.html/.png` | NFR-07 |
+| 本日のサービス設定／予約メール取込 | `p0-wireframe-service-setup.html/.png` | FR-02/10 |
+| 今日のタスク（仕込みボード） | `p0-wireframe-todaytask.html/.png` | FR-01/03/05/06/11/17 |
+| コーステンプレ編集 | `p1-wireframe-template-editor.html/.png` | FR-01/03/06 |
+| ダッシュボード | `p1-wireframe-dashboard.html/.png` | FR-11/09/17 |
+| HACCP電子チェックシート | `p2-wireframe-haccp-checklist.html/.png` | FR-16 |
+
+## 3. リデザイン探求（3案×2世代）
+
+| 世代 | ファイル | 内容 |
+|---|---|---|
+| 第1世代（白基調＋2色） | `redesign-A-bigcard` / `redesign-B-kanban` / `redesign-C-focus` | ビッグカード／担当カンバン／フォーカス |
+| 第2世代（確定・配色削減） | `redesign2-1-ink` / `redesign2-2-passsheet` / `redesign2-3-oneaccent` | INK（完全モノクロ）／PASS SHEET（帳票）／ONE ACCENT（朱1色）— **3テーマとも採用（要件§13）** |
+
+## 4. 確定テーマの画面（モノクロ＋朱）
+
+| 画面 | ファイル | 対応FR / Ph |
+|---|---|---|
+| 今これビュー（フォーカス） | `redesign2-3-oneaccent.html/.png` | FR-04/05/06 |
+| 皿ごとビュー | `p1-wireframe-view-dishes.html/.png` | FR-04/05（皿の自動ロールアップ俯瞰） |
+| 担当ビュー | `p1-wireframe-view-staff.html/.png` | FR-07（セクション別負荷） |
+| 営業中サービスボード | `p2-wireframe-service-board.html/.png` | FR-19/21/22（P2） |
+| 状態バリエーション（遅延／点検NG／全画面） | `p2-wireframe-state-alerts.html/.png` | FR-22（アラート3段階） |
+| パスビュー（卓×コース） | `p4-wireframe-passview.html/.png` | FR-24/25/27（P4 Service Sync） |
+| ホール側UI（ハンディ＋タッチパネル） | `p4-wireframe-hall-handy.html/.png` | FR-25/26/27/28（P4 Service Sync） |
+
+---
 
 ## PNGの再生成
+
 ```bash
 cd design
-npm i            # puppeteer を取得（node_modules はコミット対象外）
-node render.mjs  # competitive-positioning.png / p0-wireframe-todaytask.png を生成
+npm i                                   # puppeteer（node_modules はコミット対象外）
+npx puppeteer browsers install chrome
+node render-batch4.mjs                  # 各 render-*.mjs が対象PNGを出力（幅1240・2x・fullPage）
 ```
+
+render スクリプト対応：`render.mjs`（図版2点）/ `render-add.mjs`（初期3画面）/ `render-one.mjs`・`render-onb.mjs`・`render-flow.mjs`（単発）/ `render-redesign.mjs`・`render-redesign2.mjs`（リデザイン各3案）/ `render-v03.mjs`（営業中・パス）/ `render-batch4.mjs`（皿ごと・担当・ホール・状態）

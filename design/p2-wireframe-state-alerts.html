@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>状態バリエーション — 朱が出る瞬間</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .sec{max-width:1180px;margin:0 auto 30px}
+  .sec .lbl{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sec .lbl .n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:900}
+  .sec .lbl b{font-size:15px}.sec .lbl span{font-size:12.5px;color:#8a8a8a}
+  .frame{background:#fff;border-radius:22px;box-shadow:0 24px 50px rgba(0,0,0,.14);overflow:hidden;position:relative}
+  svg{stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  /* ---- A: delay ---- */
+  .bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 26px;border-bottom:1px solid var(--g4)}
+  .bL h1{font-size:17px;font-weight:900}.bL .sub{font-size:11.5px;color:var(--g2)}
+  .sw{display:inline-flex;background:var(--g5);border-radius:999px;padding:3px;gap:2px;justify-self:center}
+  .sw button{border:none;background:none;font-family:var(--font);font-size:13px;font-weight:700;color:var(--g2);padding:8px 18px;border-radius:999px}
+  .sw button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .cd{justify-self:end;display:flex;align-items:center;gap:9px;background:var(--time-s);border-radius:12px;padding:7px 13px}
+  .cd small{display:block;font-size:9.5px;color:var(--time);font-weight:700;letter-spacing:.08em}
+  .cd b{font-size:17px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  .banner{display:flex;align-items:center;gap:12px;margin:14px 26px;background:var(--time);color:#fff;border-radius:13px;padding:13px 16px}
+  .banner .ic{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
+  .banner b{font-size:15px;font-weight:900}
+  .banner small{display:block;font-size:12px;color:#f6d6c8;font-weight:700}
+  .banner .x{margin-left:auto;border:1.5px solid rgba(255,255,255,.6);background:none;color:#fff;border-radius:10px;padding:9px 15px;font-family:var(--font);font-weight:900;font-size:13px}
+  .rowzone{padding:0 26px 20px;display:flex;flex-direction:column;gap:10px}
+  .trow{display:flex;align-items:center;gap:14px;border:1.5px solid var(--g4);border-radius:15px;padding:13px 16px}
+  .trow.late{border-color:var(--time);background:var(--time-s)}
+  .tick{width:48px;height:48px;border-radius:50%;border:2.5px solid var(--g3);flex:none;display:grid;place-items:center;background:#fff}
+  .tick.on{background:var(--ink);border-color:var(--ink)}
+  .tick svg{width:23px;height:23px;stroke:#fff}
+  .trow h3{font-size:16.5px;font-weight:700;flex:1}
+  .trow.late h3{font-weight:900}
+  .lateflag{font-size:12px;font-weight:900;color:#fff;background:var(--time);border-radius:999px;padding:5px 11px;font-variant-numeric:tabular-nums}
+  .tmm{font-size:12.5px;color:var(--g2);font-variant-numeric:tabular-nums}
+  /* ---- B: line check NG ---- */
+  .scrim{position:absolute;inset:0;background:rgba(21,23,26,.5)}
+  .modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:620px;background:#fff;border-radius:22px;box-shadow:0 30px 70px rgba(0,0,0,.3);padding:26px}
+  .modal .mh{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+  .modal h2{font-size:22px;font-weight:900}
+  .modal .mh span{font-size:15px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  .modal p{font-size:13px;color:var(--g2);margin-bottom:16px}
+  .chk{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+  .ci{display:flex;align-items:center;gap:12px;border:1.5px solid var(--g4);border-radius:13px;padding:11px 14px}
+  .ci .m{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none}
+  .ci .m.ok{background:var(--ink)}
+  .ci .m.ng{background:var(--time)}
+  .ci .m svg{width:18px;height:18px;stroke:#fff}
+  .ci b{font-size:15.5px;flex:1}
+  .ci.ng{border-color:var(--time);background:var(--time-s)}
+  .ci small{font-size:12px;color:var(--g2);font-variant-numeric:tabular-nums}
+  .ci.ng small{color:var(--time);font-weight:900}
+  .macts{display:flex;gap:12px}
+  .open{flex:1;height:62px;border:none;border-radius:15px;background:var(--g4);color:var(--g3);font-family:var(--font);font-size:18px;font-weight:900;cursor:not-allowed}
+  .goto{width:220px;height:62px;border:none;border-radius:15px;background:var(--time);color:#fff;font-family:var(--font);font-size:16px;font-weight:900;cursor:pointer}
+  /* ---- C: fullscreen ---- */
+  .fs{background:var(--ink);height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative}
+  .fs .tag{font-size:12px;font-weight:900;letter-spacing:.2em;color:#fff;background:var(--time);padding:8px 16px;border-radius:999px}
+  .fs h2{font-size:54px;font-weight:900;color:#fff;letter-spacing:-.02em}
+  .fs h2 small{font-size:22px;color:#9aa0a6;font-weight:700;margin-left:14px}
+  .fs .acts{display:flex;gap:14px;margin-top:8px}
+  .fs button{border:none;border-radius:14px;padding:18px 34px;font-family:var(--font);font-size:18px;font-weight:900;cursor:pointer}
+  .fs .ok{background:var(--time);color:#fff}
+  .fs .hold{background:transparent;color:#fff;border:2px solid #494c4f}
+  .fs .edge{position:absolute;inset:0;border:6px solid var(--time);border-radius:22px;pointer-events:none}
+</style></head>
+<body>
+  <div class="cap"><b>状態バリエーション — 朱が出る瞬間</b><span>FR-22 アラート3段階：①遅延バナー ②ライン点検NGゲート ③全画面割込み（最上位）</span></div>
+
+  <!-- A 遅延 -->
+  <div class="sec">
+    <div class="lbl"><span class="n">1</span><b>遅延（バナー＝第2段階）</b><span>着手予定を過ぎた瞬間、行とバナーにのみ朱が走る。他要素は無彩色のまま</span></div>
+    <div class="frame">
+      <div class="bar">
+        <div class="bL"><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜 ・ 14名</div></div>
+        <div class="sw"><button class="on">今これ</button><button>皿ごと</button><button>担当</button></div>
+        <div class="cd"><div><small>SERVICE 18:00</small><b>T−2:48</b></div></div>
+      </div>
+      <div class="banner">
+        <div class="ic"><svg viewBox="0 0 24 24" width="19" height="19" stroke="#fff"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div><b>煮切り仕込み — 着手予定を12分超過</b><small>このまま遅れると 椀物の開始が T−0:48 にずれます</small></div>
+        <button class="x">今やる</button>
+      </div>
+      <div class="rowzone">
+        <div class="trow late"><div class="tick"></div><h3>煮切り仕込み</h3><span class="tmm">15:00 予定</span><span class="lateflag">+0:12 超過</span></div>
+        <div class="trow"><div class="tick on"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><h3 style="color:var(--g3);text-decoration:line-through">ネタの仕込み</h3><span class="tmm">T−4:30 ・ 完了</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B ライン点検 NG -->
+  <div class="sec">
+    <div class="lbl"><span class="n">2</span><b>ライン点検 NG（開店ゲート）</b><span>1皿でも未完了なら「OPEN」は解錠されない。NG行だけが朱</span></div>
+    <div class="frame" style="height:430px">
+      <div class="bar">
+        <div class="bL"><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜</div></div>
+        <div class="sw"><button class="on">今これ</button><button>皿ごと</button><button>担当</button></div>
+        <div class="cd"><div><small>SERVICE 18:00</small><b>T−0:30</b></div></div>
+      </div>
+      <div class="scrim"></div>
+      <div class="modal">
+        <div class="mh"><h2>ライン点検</h2><span>T−0:30</span></div>
+        <p>シェフが各皿をタップして承認。全皿そろうと OPEN が解錠されます。</p>
+        <div class="chk">
+          <div class="ci"><div class="m ok"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><b>先付け</b><small>承認 17:26</small></div>
+          <div class="ci"><div class="m ok"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><b>おまかせ握り</b><small>承認 17:27</small></div>
+          <div class="ci ng"><div class="m ng"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div><b>椀物</b><small>吸地 未完了 1/2</small></div>
+          <div class="ci"><div class="m ok"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><b>水菓子</b><small>承認 17:28</small></div>
+        </div>
+        <div class="macts"><button class="open">OPEN — 解錠待ち</button><button class="goto">残タスクへ（椀物）</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C 全画面 -->
+  <div class="sec">
+    <div class="lbl"><span class="n">3</span><b>全画面割込み（第3段階・最上位）</b><span>ファイア／期限切れのみ。反転＋朱縁＋音。2タップ以内で必ず戻れる</span></div>
+    <div class="frame">
+      <div class="fs">
+        <div class="edge"></div>
+        <span class="tag">FIRE ・ ハンディから</span>
+        <h2>卓3 ・ 握り<small>4名 ・ 席2 甲殻類（参考）</small></h2>
+        <div class="acts"><button class="ok">キッチンへ反映</button><button class="hold">ホールド</button></div>
+      </div>
+    </div>
+  </div>
+</body></html>
