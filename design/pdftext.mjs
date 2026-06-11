@@ -1,0 +1,10 @@
+import fs from 'fs';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pdf = require('pdf-parse');
+const f = process.argv[2];
+const buf = fs.readFileSync(f);
+const data = await pdf(buf);
+console.log("PAGES:", data.numpages);
+console.log("=====TEXT=====");
+console.log(data.text);
