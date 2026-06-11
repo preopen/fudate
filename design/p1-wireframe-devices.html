@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>端末管理 設定</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 14px;font-size:13px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .bL h1{font-size:19px;font-weight:900}
+  .addbtn{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:11px 18px;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer}
+  .cont{flex:1;overflow:auto;padding:22px 30px;display:flex;flex-direction:column;gap:20px}
+  .intro{font-size:12px;color:var(--g2);background:var(--g5);border-radius:11px;padding:12px 14px}
+  .intro b{color:var(--ink)}
+  /* device card */
+  .dev{border:1.5px solid var(--g4);border-radius:16px;overflow:hidden;margin-bottom:2px}
+  .dev.this{border-color:var(--ink);border-width:2px}
+  .dh{display:flex;align-items:center;gap:14px;padding:15px 18px}
+  .ic{width:46px;height:46px;border-radius:13px;background:var(--g5);display:grid;place-items:center;flex:none}
+  .ic svg{width:24px;height:24px;stroke:var(--ink)}
+  .dh .nm{flex:1}
+  .dh .nm b{font-size:16px;font-weight:900;display:block}
+  .dh .nm small{font-size:11.5px;color:var(--g2)}
+  .thisbadge{font-size:10px;font-weight:900;background:var(--ink);color:#fff;padding:4px 10px;border-radius:999px}
+  .sync{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;padding:5px 10px;border-radius:999px}
+  .sync.ok{background:var(--ok-s);color:var(--ok)}
+  .sync.off{background:var(--time-s);color:var(--time)}
+  .sync .dot{width:7px;height:7px;border-radius:50%}
+  .sync.ok .dot{background:var(--ok)}.sync.off .dot{background:var(--time)}
+  .db{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 18px 16px}
+  .fld label{font-size:11px;font-weight:900;color:var(--g2);display:block;margin-bottom:5px}
+  .sel{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--g4);border-radius:10px;background:#fff;padding:10px 13px;font-size:13.5px;font-weight:800}
+  .sel .ar{color:var(--g3)}
+  .dfoot{display:flex;align-items:center;gap:14px;padding:11px 18px;border-top:1px solid var(--g4);background:var(--g5);font-size:11.5px;color:var(--g2)}
+  .dfoot .cache{display:inline-flex;align-items:center;gap:6px}
+  .dfoot .cache svg{width:14px;height:14px;stroke:var(--g2)}
+  .dfoot .rm{margin-left:auto;font-size:12px;font-weight:900;color:var(--time);background:none;border:none;cursor:pointer}
+  /* add panel */
+  .addp{border:1.5px dashed var(--g3);border-radius:16px;padding:18px;display:flex;align-items:center;gap:18px}
+  .qr{width:84px;height:84px;border-radius:10px;flex:none;background:
+     conic-gradient(#15171a 25%,#fff 0 50%,#15171a 0 75%,#fff 0),
+     conic-gradient(#15171a 25%,#fff 0 50%,#15171a 0 75%,#fff 0);
+     background-size:28px 28px,28px 28px;background-position:0 0,14px 14px;border:3px solid #15171a}
+  .addp .t b{font-size:15px;font-weight:900;display:block}
+  .addp .t p{font-size:12px;color:var(--g2);margin-top:5px;line-height:1.6}
+  .addp .code{font-size:18px;font-weight:900;letter-spacing:.2em;background:var(--g5);border-radius:9px;padding:9px 14px;font-variant-numeric:tabular-nums;margin-left:auto}
+  .note{font-size:11px;color:var(--g2);display:flex;gap:8px;line-height:1.6}
+  .note svg{width:15px;height:15px;stroke:var(--g2);flex:none;margin-top:1px}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>端末管理 設定（FR-53/12）</b><span>この店の端末を登録し、表示するボード（厨房/フロア）を割当。各端末の同期・オフラインキャッシュ状態を確認</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">← 設定</button><h1>端末管理</h1></div>
+      <button class="addbtn">＋ 端末を追加</button>
+    </div>
+    <div class="cont">
+      <div class="intro">端末ごとに<b>名前と表示するボード</b>を決められます（FR-12 複数厨房）。ログインは不要・端末はQRコードで追加します。</div>
+
+      <!-- this device -->
+      <div class="dev this">
+        <div class="dh">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg></div>
+          <div class="nm"><b>厨房タブレット 1</b><small>iPad 11" ・ 追加 2026/04/01</small></div>
+          <span class="thisbadge">この端末</span>
+          <span class="sync ok"><span class="dot"></span>同期済み ・ 今</span>
+        </div>
+        <div class="db">
+          <div class="fld"><label>表示するボード</label><div class="sel">メイン厨房 <span class="ar">⌄</span></div></div>
+          <div class="fld"><label>既定ビュー（この端末）</label><div class="sel">今これ <span class="ar">⌄</span></div></div>
+          <div class="fld"><label>テーマ（この端末）</label><div class="sel">店の既定に従う <span class="ar">⌄</span></div></div>
+        </div>
+        <div class="dfoot"><span class="cache"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 21h14"/></svg>オフラインキャッシュ：当日分＋手順メディア 〔最新〕</span></div>
+      </div>
+
+      <!-- hall tablet -->
+      <div class="dev">
+        <div class="dh">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg></div>
+          <div class="nm"><b>ホールタブレット</b><small>iPad mini ・ 追加 2026/04/01</small></div>
+          <span class="sync ok"><span class="dot"></span>同期済み ・ 2分前</span>
+        </div>
+        <div class="db">
+          <div class="fld"><label>表示するボード</label><div class="sel">ホールパネル（P4） <span class="ar">⌄</span></div></div>
+          <div class="fld"><label>既定ビュー</label><div class="sel">パス <span class="ar">⌄</span></div></div>
+          <div class="fld"><label>テーマ</label><div class="sel">店の既定に従う <span class="ar">⌄</span></div></div>
+        </div>
+        <div class="dfoot"><span class="cache"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 21h14"/></svg>オフラインキャッシュ：当日分 〔最新〕</span><button class="rm">この端末を解除</button></div>
+      </div>
+
+      <!-- offline device -->
+      <div class="dev">
+        <div class="dh">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+          <div class="nm"><b>大将のスマホ</b><small>iPhone ・ 確認・通知用</small></div>
+          <span class="sync off"><span class="dot"></span>オフライン ・ 昨日 23:40</span>
+        </div>
+        <div class="db">
+          <div class="fld"><label>表示するボード</label><div class="sel">メイン厨房（閲覧） <span class="ar">⌄</span></div></div>
+          <div class="fld"><label>既定ビュー</label><div class="sel">皿ごと <span class="ar">⌄</span></div></div>
+          <div class="fld"><label>テーマ</label><div class="sel">INK（ダーク） <span class="ar">⌄</span></div></div>
+        </div>
+        <div class="dfoot"><span class="cache"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 21h14"/></svg>オフラインキャッシュ：昨日分 〔復帰時に自動同期〕</span><button class="rm">この端末を解除</button></div>
+      </div>
+
+      <!-- add -->
+      <div class="addp">
+        <div class="qr"></div>
+        <div class="t"><b>端末を追加</b><p>新しい端末のブラウザで prepflow.app/join を開き、このQRを読むか、コードを入力してください。ログイン情報は不要です。</p></div>
+        <span class="code">7K4-PF2</span>
+      </div>
+
+      <div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>端末を解除すると、その端末からはアクセスできなくなります（紛失時の対策）。設定の変更にはオーナーPINが必要です（FR-54）。</div>
+    </div>
+  </div>
+</body></html>

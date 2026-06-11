@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **42画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **44画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -76,6 +76,8 @@
 | ├ 営業帯・T−規律 | `p1-wireframe-service-periods.html/.png` | FR-41/22 |
 | ├ 仕込み・数量の既定 | `p1-wireframe-prep-defaults.html/.png` | FR-09/19/40/42 |
 | ├ プラン・支払い／データ | `p1-wireframe-billing-data.html/.png` | FR-14/15 |
+| ├ 端末管理 | `p1-wireframe-devices.html/.png` | FR-53/12 |
+| 席番アレルゲン・ラベル | `p3-wireframe-allergen-labels.html/.png` | FR-47（参考表示） |
 
 ---
 

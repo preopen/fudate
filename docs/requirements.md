@@ -400,6 +400,8 @@ Restaurant ─┬─ Section ─── Staff
 | 営業帯・T−規律 設定 | `design/p1-wireframe-service-periods.html` | FR-41/22 |
 | 仕込み・数量の既定 設定 | `design/p1-wireframe-prep-defaults.html` | FR-09/19/40/42 |
 | プラン・支払い／データ 設定 | `design/p1-wireframe-billing-data.html` | FR-14/15 |
+| 端末管理 設定 | `design/p1-wireframe-devices.html` | FR-53/12 |
+| 席番アレルゲン・ラベル | `design/p3-wireframe-allergen-labels.html` | FR-47 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 
