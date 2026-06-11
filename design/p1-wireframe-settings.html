@@ -26,6 +26,16 @@
   .sec h2{font-size:15px;font-weight:900;margin-bottom:10px;display:flex;align-items:baseline;gap:10px}
   .sec h2 small{font-size:11.5px;color:var(--g2);font-weight:700}
   /* theme cards */
+  .viewseg{display:inline-flex;gap:10px;flex-wrap:wrap}
+  .viewseg button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;border:1.5px solid var(--g4);background:#fff;border-radius:14px;padding:14px 22px;font-family:var(--font);cursor:pointer;min-width:160px}
+  .viewseg button .vt{font-size:15.5px;font-weight:900;color:var(--ink)}
+  .viewseg button .vd{font-size:11.5px;color:var(--g2);font-weight:600}
+  .viewseg button.on{background:var(--ink);border-color:var(--ink)}
+  .viewseg button.on .vt{color:#fff}.viewseg button.on .vd{color:#9aa0a6}
+  .hint{font-size:12px;color:var(--g2);margin-top:9px;display:flex;align-items:center;gap:7px}
+  .hint .chipmini{display:inline-flex;background:var(--g5);border-radius:999px;padding:3px;gap:2px}
+  .hint .chipmini i{font-style:normal;font-size:10.5px;font-weight:700;color:var(--g2);padding:4px 9px;border-radius:999px}
+  .hint .chipmini i.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
   .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .th{border:1.5px solid var(--g4);border-radius:16px;padding:12px;cursor:pointer;position:relative}
   .th.sel{border-color:var(--ink);border-width:2.5px}
@@ -98,7 +108,7 @@
       <div class="cont">
         <!-- theme -->
         <div class="sec">
-          <h2>テーマ <small>3テーマ採用（§13）— 店の文化に合わせて切替。レイアウトは共通</small></h2>
+          <h2>デフォルトのテーマ <small>起動時に適用される既定。レイアウトは共通で、いつでも変更できます</small></h2>
           <div class="themes">
             <div class="th">
               <div class="pv"><div class="l1"></div><div class="l2"></div><div class="l3"></div></div>
@@ -116,10 +126,20 @@
             </div>
             <div class="th oa sel">
               <div class="pv"><div class="l1"></div><div class="dot"><s></s><u></u></div><div class="l3"></div></div>
-              <h3>ONE ACCENT</h3><p>朱＝時間のみ。現在の選択</p>
+              <h3>ONE ACCENT</h3><p>朱＝時間のみ。既定（選択中）</p>
               <div class="ck"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
             </div>
           </div>
+        </div>
+        <!-- default view -->
+        <div class="sec">
+          <h2>デフォルトのビュー <small>起動時に開くボード。仕込み中の主作業に合わせて選択</small></h2>
+          <div class="viewseg">
+            <button class="on"><span class="vt">今これ</span><span class="vd">次の1つに集中（新人・少人数向け）</span></button>
+            <button><span class="vt">皿ごと</span><span class="vd">皿の進捗を俯瞰（オーナー確認）</span></button>
+            <button><span class="vt">担当</span><span class="vd">セクション別（多人数の厨房）</span></button>
+          </div>
+          <p class="hint">各ボード上部のスイッチ <span class="chipmini"><i class="on">今これ</i><i>皿ごと</i><i>担当</i></span> でワンタップ切替できます（この設定は“最初に開く”だけ）</p>
         </div>
         <!-- T- discipline -->
         <div class="sec">

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrepFlow — パイロット店向け資料</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#6f747a;--g3:#bcc0c4;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdedf;color:var(--ink);-webkit-font-smoothing:antialiased;padding:24px;line-height:1.45}
+  .sheet{width:880px;margin:0 auto;background:#fff;border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.16);overflow:hidden}
+  /* hero */
+  .hero{background:var(--ink);color:#fff;padding:32px 40px 28px}
+  .brand{display:flex;align-items:center;gap:13px}
+  .logo{width:34px;height:34px;color:#fff}
+  .brand b{font-size:24px;font-weight:900;letter-spacing:-.01em}
+  .brand .badge{margin-left:auto;font-size:11px;font-weight:900;letter-spacing:.12em;color:var(--ink);background:#fff;padding:7px 13px;border-radius:999px}
+  .hero h1{font-size:34px;font-weight:900;letter-spacing:-.02em;margin-top:20px;line-height:1.12}
+  .hero h1 em{font-style:normal;color:#f0a070}
+  .hero p{font-size:15px;color:#aeb3b8;margin-top:10px}
+  /* body */
+  .pad{padding:30px 40px}
+  .kicker{font-size:12px;font-weight:900;letter-spacing:.14em;color:var(--time);margin-bottom:14px}
+  /* problems */
+  .probs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .prob{border:1.5px solid var(--g4);border-radius:14px;padding:16px}
+  .prob b{font-size:16px;font-weight:900;display:block}
+  .prob p{font-size:12.5px;color:var(--g2);margin-top:6px}
+  .prob .stat{font-size:12px;font-weight:900;color:var(--time);margin-top:9px}
+  /* value line */
+  .value{margin:26px 0 4px;background:var(--g5);border-radius:16px;padding:22px 24px;font-size:20px;font-weight:900;line-height:1.4}
+  .value em{font-style:normal;border-bottom:4px solid var(--time);padding-bottom:1px}
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px}
+  .step{position:relative;padding-top:6px}
+  .step .n{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:16px;font-weight:900}
+  .step b{display:block;font-size:15.5px;font-weight:900;margin-top:11px}
+  .step p{font-size:12.5px;color:var(--g2);margin-top:5px}
+  /* screens */
+  .shots{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}
+  .shot{border:1.5px solid var(--g4);border-radius:14px;overflow:hidden;background:var(--g5)}
+  .shot img{width:100%;display:block}
+  .shot .lab{display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
+  .shot .lab b{font-size:14px;font-weight:900}
+  .shot .lab span{font-size:11.5px;color:var(--g2)}
+  /* why */
+  .why{display:flex;gap:14px;align-items:flex-start;margin-top:24px;border-left:5px solid var(--time);padding:4px 0 4px 18px}
+  .why b{font-size:17px;font-weight:900;display:block}
+  .why p{font-size:13.5px;color:var(--g2);margin-top:5px}
+  /* pricing */
+  .price{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+  .pc{border:1.5px solid var(--g4);border-radius:14px;padding:16px 14px;text-align:center;position:relative}
+  .pc.best{border-color:var(--ink);border-width:2.5px}
+  .pc .nm{font-size:13px;font-weight:900;color:var(--g2)}
+  .pc .pr{font-size:22px;font-weight:900;margin-top:6px;font-variant-numeric:tabular-nums}
+  .pc .pr small{font-size:11px;color:var(--g2);font-weight:700}
+  .pc .tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:900;color:#fff;background:var(--ink);padding:4px 10px;border-radius:999px;white-space:nowrap}
+  /* offer */
+  .offer{margin:28px 40px 0;background:var(--time);color:#fff;border-radius:18px;padding:24px 28px;display:flex;align-items:center;gap:22px}
+  .offer .l b{font-size:22px;font-weight:900;display:block}
+  .offer .l p{font-size:13.5px;color:#fbe2d5;margin-top:6px}
+  .offer .r{margin-left:auto;text-align:right;flex:none}
+  .offer .r .big{font-size:30px;font-weight:900;line-height:1}
+  .offer .r small{font-size:12px;color:#fbe2d5}
+  /* footer */
+  .foot{padding:20px 40px 30px;display:flex;align-items:center;gap:16px;color:var(--g2);font-size:12.5px}
+  .foot .mail{font-weight:900;color:var(--ink)}
+  .foot .qr{margin-left:auto;width:64px;height:64px;border-radius:10px;background:repeating-linear-gradient(45deg,#15171a,#15171a 4px,#fff 4px,#fff 8px)}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+<div class="sheet">
+  <div class="hero">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 48 48" fill="none"><rect x="6" y="7" width="16" height="34" rx="8" stroke="currentColor" stroke-width="4"/><path d="M24 11h7c6.6 0 12 5.4 12 12s-5.4 12-12 12h-7" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M24 24h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+      <b>PrepFlow</b>
+      <span class="badge">無料パイロット募集</span>
+    </div>
+    <h1>予約から逆算する、<em>仕込みの司令塔。</em></h1>
+    <p>コース料理を出す高級店・専門店のための、仕込み（mise-en-place）管理アプリ。タブレット1台で。</p>
+  </div>
+
+  <div class="pad">
+    <div class="kicker">こんな悩み、ありませんか</div>
+    <div class="probs">
+      <div class="prob"><b>人手が足りない</b><p>限られた人数で、仕込みの抜け漏れが怖い。</p><div class="stat">飲食店倒産は2024年に過去最多</div></div>
+      <div class="prob"><b>あの人しかできない</b><p>段取りも味も属人化。新人が育たない。</p><div class="stat">技術の継承が課題</div></div>
+      <div class="prob"><b>作りすぎ・足りない</b><p>予約が読めず、食材ロスと品切れ。</p><div class="stat">外食の食品ロスは年66万t</div></div>
+    </div>
+
+    <div class="value">予約人数から <em>「誰が・何を・いつ・どれだけ」</em> 仕込むかを自動で並べ、<br>チェックするだけで開店に間に合う。</div>
+
+    <div class="kicker" style="margin-top:26px">使い方は3ステップ</div>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><b>予約人数を入れる</b><p>手入力、または予約サイトの通知メールを転送するだけ。</p></div>
+      <div class="step"><div class="n">2</div><b>仕込みが自動で並ぶ</b><p>開店時刻から逆算し、時間順に・担当別に・必要量つきで。</p></div>
+      <div class="step"><div class="n">3</div><b>チェックで皿が完成</b><p>全部そろうと「開店OK」。営業中は残りも自動で見える。</p></div>
+    </div>
+
+    <div class="kicker" style="margin-top:28px">実際の画面</div>
+    <div class="shots">
+      <div class="shot"><img src="pilot-shot-now.png" alt=""><div class="lab"><b>今これ</b><span>次の1つに集中</span></div></div>
+      <div class="shot"><img src="pilot-shot-dishes.png" alt=""><div class="lab"><b>皿ごと</b><span>進捗をひと目で</span></div></div>
+      <div class="shot"><img src="pilot-shot-service.png" alt=""><div class="lab"><b>営業中</b><span>残数と追い仕込み</span></div></div>
+      <div class="shot"><img src="pilot-shot-pass.png" alt=""><div class="lab"><b>全卓パス</b><span>将来：POS連携</span></div></div>
+    </div>
+
+    <div class="why">
+      <div><b>“予約と仕込みがつながる”のはPrepFlowだけ。</b>
+      <p>タスク管理ツールやPOSにはない、予約人数からの「数量」と「段取り」の自動計算。高級店の現場に最適化。</p></div>
+    </div>
+
+    <div class="kicker" style="margin-top:26px">料金（税別）</div>
+    <div class="price">
+      <div class="pc"><div class="nm">Free</div><div class="pr">¥0</div></div>
+      <div class="pc"><div class="nm">Lite</div><div class="pr">¥5,800<small>/月</small></div></div>
+      <div class="pc best"><div class="tag">おすすめ</div><div class="nm">Standard</div><div class="pr">¥9,800<small>/月</small></div></div>
+      <div class="pc"><div class="nm">Pro</div><div class="pr">¥19,800<small>/月</small></div></div>
+    </div>
+  </div>
+
+  <div class="offer">
+    <div class="l"><b>無料パイロット、先着10店</b><p>導入サポート込み・3か月無料。現場の声を一緒に育てていただける店舗を募集します。</p></div>
+    <div class="r"><div class="big">¥0</div><small>3か月 / 初期費用なし</small></div>
+  </div>
+  <div class="foot">
+    <div>お問い合わせ：<span class="mail">hello@prepflow.app</span> ／ オンラインで5分のデモ</div>
+    <div class="qr"></div>
+  </div>
+</div>
+</body></html>
