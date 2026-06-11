@@ -2,7 +2,7 @@
 
 軽量版PrepFlow（コース・予約主体の中〜高級飲食店向け 仕込み管理SaaS）の画面設計・図版一式。
 各成果物は **自己完結HTML＋PNG** のペア（HTMLはブラウザで直接開けます）。
-要件定義本文は [`../docs/requirements.md`](../docs/requirements.md)（v0.3）。
+要件定義本文は [`../docs/requirements.md`](../docs/requirements.md)（v0.9）。
 
 ## 確定デザイン言語
 - **白基調＋黒文字＋グレー**、アクセントは**朱 `#c2410c` 1色のみ＝「時間/NOW/遅延/緊急」専用**
@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **37画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **38画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -71,6 +71,7 @@
 | 冷蔵庫QRレンズ／点検モード | `p2-wireframe-fridge-lens.html/.png` | FR-49/50 |
 | モード設定（ラベル/HACCP・冷蔵庫登録） | `p2-wireframe-modes-settings.html/.png` | FR-48/49/51・モード制 |
 | HACCPモード設定（チェック項目・基準温度） | `p2-wireframe-haccp-settings.html/.png` | FR-16/51 |
+| 設定ホーム（ハブ・1機能1場所） | `p1-wireframe-settings-home.html/.png` | FR-52/54・§4.7 |
 
 ---
 
