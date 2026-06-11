@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>設定画面</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 15px;font-size:13.5px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .bL h1{font-size:19px;font-weight:900}
+  .save{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer}
+  .main{flex:1;display:grid;grid-template-columns:250px 1fr;min-height:0}
+  /* nav */
+  .nav{border-right:1px solid var(--g4);padding:16px 14px;display:flex;flex-direction:column;gap:3px;background:#fcfcfd}
+  .ni{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:12px;font-size:14.5px;font-weight:700;color:var(--g2);cursor:pointer}
+  .ni.on{background:var(--ink);color:#fff}
+  .ni small{margin-left:auto;font-size:11px;color:var(--g3)}
+  /* content */
+  .cont{padding:22px 30px;overflow:auto;display:flex;flex-direction:column;gap:22px}
+  .sec h2{font-size:15px;font-weight:900;margin-bottom:10px;display:flex;align-items:baseline;gap:10px}
+  .sec h2 small{font-size:11.5px;color:var(--g2);font-weight:700}
+  /* theme cards */
+  .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .th{border:1.5px solid var(--g4);border-radius:16px;padding:12px;cursor:pointer;position:relative}
+  .th.sel{border-color:var(--ink);border-width:2.5px}
+  .th .pv{height:86px;border-radius:10px;background:var(--g5);margin-bottom:10px;padding:9px;display:flex;flex-direction:column;gap:5px;overflow:hidden}
+  .pv .l1{height:11px;border-radius:4px;background:var(--ink);width:62%}
+  .pv .l2{height:8px;border-radius:4px;background:var(--g3);width:84%}
+  .pv .l3{height:8px;border-radius:4px;background:var(--g3);width:50%}
+  /* passsheet preview: lines */
+  .th.ps .pv{gap:0;padding:9px 9px 0}
+  .th.ps .pv .r{display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--g3);padding:5px 0}
+  .th.ps .pv .r i{width:18px;height:6px;border-radius:3px;background:var(--g3)}
+  .th.ps .pv .r b{flex:1;height:6px;border-radius:3px;background:var(--ink);max-width:46%}
+  .th.ps .pv .r.inv{background:var(--ink);border-radius:5px;border-bottom:none;padding:5px 6px}
+  .th.ps .pv .r.inv i,.th.ps .pv .r.inv b{background:#fff}
+  /* oneaccent preview */
+  .th.oa .pv .l1{width:54%}
+  .th.oa .pv .dot{display:flex;align-items:center;gap:6px}
+  .th.oa .pv .dot s{width:34px;height:11px;border-radius:5px;background:var(--time);text-decoration:none}
+  .th.oa .pv .dot u{flex:1;height:8px;border-radius:4px;background:var(--g3);text-decoration:none;max-width:58%}
+  .th h3{font-size:14.5px;font-weight:900}
+  .th p{font-size:11.5px;color:var(--g2);margin-top:3px}
+  .th .ck{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:var(--ink);display:none;place-items:center}
+  .th.sel .ck{display:grid}
+  .th .ck svg{width:13px;height:13px;stroke:#fff}
+  /* setting rows */
+  .rows{border:1.5px solid var(--g4);border-radius:16px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--g4);background:#fff}
+  .row:last-child{border-bottom:none}
+  .row .t{flex:1}
+  .row .t b{font-size:15px;font-weight:700;display:block}
+  .row .t small{font-size:12px;color:var(--g2)}
+  .val{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;background:var(--g5);border-radius:10px;padding:9px 16px}
+  .val.t-{color:var(--time);background:var(--time-s)}
+  .toggle{width:58px;height:32px;border-radius:999px;background:var(--ink);position:relative;flex:none}
+  .toggle:after{content:"";position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--g3)}
+  .toggle.off:after{right:auto;left:3px}
+  .copybtn{font-size:12.5px;font-weight:900;color:var(--ink);border:1.5px solid var(--g4);background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer}
+  .mail{font-size:13.5px;font-weight:700;color:var(--g2);font-variant-numeric:tabular-nums}
+  .plan{display:flex;align-items:center;gap:14px;border:1.5px solid var(--g4);border-radius:16px;padding:18px}
+  .plan .pn b{font-size:18px;font-weight:900;display:block}
+  .plan .pn small{font-size:12px;color:var(--g2)}
+  .plan .pr{margin-left:auto;font-size:20px;font-weight:900;font-variant-numeric:tabular-nums}
+  .plan .pr small{font-size:12px;color:var(--g2);font-weight:700}
+  .stripe{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:13px 20px;font-family:var(--font);font-size:13.5px;font-weight:900;cursor:pointer}
+  .danger{font-size:12.5px;color:var(--g2)}
+  .danger a{color:var(--time);font-weight:900;text-decoration:none}
+  svg{stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>設定画面（確定テーマ）</b><span>FR-14 課金セルフサーブ ／ FR-15 エクスポート ／ §13 テーマ切替 ／ FR-10 メール取込 ／ T−規律の既定値</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">← 今日へ</button><h1>設定</h1></div>
+      <button class="save">保存</button>
+    </div>
+    <div class="main">
+      <!-- nav -->
+      <div class="nav">
+        <div class="ni">店舗情報</div>
+        <div class="ni on">テーマ・表示</div>
+        <div class="ni">営業・T−規律</div>
+        <div class="ni">セクション・スタッフ</div>
+        <div class="ni">通知・アラート</div>
+        <div class="ni">連携<small>メール取込</small></div>
+        <div class="ni">プラン・支払い</div>
+        <div class="ni">データ</div>
+      </div>
+      <!-- content -->
+      <div class="cont">
+        <!-- theme -->
+        <div class="sec">
+          <h2>テーマ <small>3テーマ採用（§13）— 店の文化に合わせて切替。レイアウトは共通</small></h2>
+          <div class="themes">
+            <div class="th">
+              <div class="pv"><div class="l1"></div><div class="l2"></div><div class="l3"></div></div>
+              <h3>INK</h3><p>完全モノクロ。反転＝いま</p>
+              <div class="ck"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div class="th ps">
+              <div class="pv">
+                <div class="r"><i></i><b></b></div>
+                <div class="r inv"><i></i><b></b></div>
+                <div class="r"><i></i><b></b></div>
+              </div>
+              <h3>PASS SHEET</h3><p>3つ星厨房の帳票スタイル</p>
+              <div class="ck"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div class="th oa sel">
+              <div class="pv"><div class="l1"></div><div class="dot"><s></s><u></u></div><div class="l3"></div></div>
+              <h3>ONE ACCENT</h3><p>朱＝時間のみ。現在の選択</p>
+              <div class="ck"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <!-- T- discipline -->
+        <div class="sec">
+          <h2>営業・T−規律 <small>T＝サービス開始。すべての逆算の基準</small></h2>
+          <div class="rows">
+            <div class="row"><div class="t"><b>夜営業の開始（T=0）</b><small>逆算タイムライン・カウントダウンの基準</small></div><span class="val">18:00</span></div>
+            <div class="row"><div class="t"><b>ライン点検</b><small>全皿承認の開店ゲート</small></div><span class="val t-">T−0:30</span></div>
+            <div class="row"><div class="t"><b>遅延バナーの猶予</b><small>着手予定からこの時間を超えたら朱</small></div><span class="val t-">+10分</span></div>
+            <div class="row"><div class="t"><b>夜厨房モード（ダーク）</b><small>INKを反転して表示</small></div><div class="toggle off"></div></div>
+          </div>
+        </div>
+        <!-- alerts -->
+        <div class="sec">
+          <h2>通知・アラート <small>FR-22 3段階（トースト→バナー→全画面＋音）</small></h2>
+          <div class="rows">
+            <div class="row"><div class="t"><b>アラート音</b><small>全画面割込み（ファイア・期限切れ）のみ鳴動</small></div><div class="toggle"></div></div>
+            <div class="row"><div class="t"><b>追い仕込みの自動生成</b><small>残数の閾値割れで作成（FR-19）</small></div><div class="toggle"></div></div>
+          </div>
+        </div>
+        <!-- integration -->
+        <div class="sec">
+          <h2>連携 <small>FR-10 予約メール取込（人数・時刻のみ自動抽出）</small></h2>
+          <div class="rows">
+            <div class="row"><div class="t"><b>予約メール転送先</b><small>各予約サイトの通知をこの宛先へ転送</small></div><span class="mail">hayashi-yoyaku@in.prepflow.app</span><button class="copybtn">コピー</button></div>
+            <div class="row"><div class="t"><b>公式予約API（TableCheck / トレタ）</b><small>P3で提供予定</small></div><span class="val" style="color:var(--g3)">準備中</span></div>
+          </div>
+        </div>
+        <!-- plan -->
+        <div class="sec">
+          <h2>プラン・支払い <small>FR-14 請求・解約までセルフサーブ</small></h2>
+          <div class="plan">
+            <div class="pn"><b>Standard</b><small>数量自動算出・逆算タイムライン・廃棄/パー履歴</small></div>
+            <div class="pr">¥9,800<small> /月・税別（年払い ¥98,000）</small></div>
+            <button class="stripe">支払い管理（Stripe）</button>
+          </div>
+        </div>
+        <!-- data -->
+        <div class="sec">
+          <h2>データ <small>FR-15</small></h2>
+          <div class="rows">
+            <div class="row"><div class="t"><b>全データのエクスポート</b><small>テンプレ・実績・HACCP記録をCSV/JSONで</small></div><button class="copybtn">書き出す</button></div>
+          </div>
+          <p class="danger" style="margin-top:10px">アカウントの削除は <a href="#">こちら</a>（エクスポート後に実行できます）</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>

@@ -48,6 +48,7 @@
 | 状態バリエーション（遅延／点検NG／全画面） | `p2-wireframe-state-alerts.html/.png` | FR-22（アラート3段階） |
 | パスビュー（卓×コース） | `p4-wireframe-passview.html/.png` | FR-24/25/27（P4 Service Sync） |
 | ホール側UI（ハンディ＋タッチパネル） | `p4-wireframe-hall-handy.html/.png` | FR-25/26/27/28（P4 Service Sync） |
+| 設定画面 | `p1-wireframe-settings.html/.png` | FR-14/15/10・§13テーマ切替・T−規律既定値 |
 
 ---
 

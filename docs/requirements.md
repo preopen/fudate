@@ -240,6 +240,7 @@ Restaurant ─┬─ Section ─── Staff
 | 担当ビュー（確定テーマ） | `design/p1-wireframe-view-staff.html` | FR-07 |
 | ホール側UI（ハンディ＋タッチパネル） | `design/p4-wireframe-hall-handy.html` | FR-25/26/27/28 |
 | 状態バリエーション（遅延/点検NG/全画面） | `design/p2-wireframe-state-alerts.html` | FR-22 |
+| 設定画面 | `design/p1-wireframe-settings.html` | FR-14/15/10・§13・T−規律 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 
