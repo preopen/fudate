@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>モード設定 — ラベル/HACCP・冷蔵庫登録</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 14px;font-size:13px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .bL h1{font-size:19px;font-weight:900}
+  .save{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer}
+  .body{display:grid;grid-template-columns:220px 1fr;min-height:0;flex:1}
+  .nav{border-right:1px solid var(--g4);padding:16px 14px;display:flex;flex-direction:column;gap:3px;background:#fcfcfd}
+  .ni{padding:13px 14px;border-radius:12px;font-size:14px;font-weight:700;color:var(--g2);cursor:pointer}
+  .ni.on{background:var(--ink);color:#fff}
+  .cont{padding:22px 28px;overflow:auto;display:flex;flex-direction:column;gap:20px}
+  .intro{font-size:12.5px;color:var(--g2);background:var(--g5);border-radius:12px;padding:13px 15px}
+  .intro b{color:var(--ink)}
+  /* mode card */
+  .mode{border:1.5px solid var(--g4);border-radius:16px;overflow:hidden}
+  .mode.on{border-color:var(--ink)}
+  .mh{display:flex;align-items:center;gap:14px;padding:16px 18px}
+  .mh .ic{width:44px;height:44px;border-radius:12px;background:var(--g5);display:grid;place-items:center;flex:none}
+  .mh .ic svg{width:23px;height:23px;stroke:var(--ink)}
+  .mode.on .mh .ic{background:var(--ink)}.mode.on .mh .ic svg{stroke:#fff}
+  .mh .t{flex:1}.mh .t b{font-size:16px;font-weight:900;display:block}.mh .t small{font-size:12px;color:var(--g2)}
+  .toggle{width:56px;height:32px;border-radius:999px;background:var(--ink);position:relative;flex:none}
+  .toggle:after{content:"";position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--g3)}.toggle.off:after{right:auto;left:3px}
+  .feats{padding:0 18px 16px;display:flex;flex-wrap:wrap;gap:7px}
+  .feat{font-size:11.5px;font-weight:700;color:var(--g2);background:var(--g5);border-radius:999px;padding:6px 11px}
+  .mode.on .feat{color:var(--ink)}
+  .cfg{border-top:1px solid var(--g4);padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--g2)}
+  .cfg a{color:var(--ink);font-weight:900;text-decoration:underline;cursor:pointer;margin-left:auto}
+  /* fridge units */
+  .sec h2{font-size:15px;font-weight:900;margin-bottom:4px}
+  .sec .d{font-size:12px;color:var(--g2);margin-bottom:12px}
+  .unit{display:flex;align-items:center;gap:13px;border:1.5px solid var(--g4);border-radius:13px;padding:13px 15px;margin-bottom:9px;background:#fff}
+  .unit .ic{width:40px;height:40px;border-radius:11px;background:var(--g5);display:grid;place-items:center;flex:none}
+  .unit .ic svg{width:21px;height:21px;stroke:var(--ink)}
+  .unit .nm b{font-size:15px;font-weight:900;display:block}.unit .nm small{font-size:11.5px;color:var(--g2)}
+  .zone{font-size:11px;font-weight:900;padding:5px 10px;border-radius:999px;background:var(--g5);color:var(--g2)}
+  .zone.cold{background:#e4ecf2;color:#2a5a86}.zone.frozen{background:#e7eef2;color:#2a6a86}.zone.ambient{background:#f0ece4;color:#7a6327}
+  .temp{font-size:12px;color:var(--g2);font-variant-numeric:tabular-nums}
+  .qrbtn{font-size:11.5px;font-weight:900;border:1.5px solid var(--g4);border-radius:10px;padding:9px 12px;background:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .qrbtn svg{width:14px;height:14px;stroke:var(--ink)}
+  .addp{width:100%;border:1.5px dashed var(--g3);border-radius:12px;padding:13px;font-family:var(--font);font-size:13px;font-weight:800;color:var(--ink);background:#fff;cursor:pointer}
+  .scopebar{display:flex;align-items:center;gap:10px;background:var(--time-s);border-radius:12px;padding:12px 15px;font-size:12px;color:#9a3a0e}
+  .scopebar svg{width:17px;height:17px;stroke:#9a3a0e;flex:none}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>モード設定（v0.8）</b><span>任意機能を「ラベルモード／HACCPモード」に切り分け（既定OFF）。冷蔵庫を登録するとQRレンズが使える</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">← 設定</button><h1>モード</h1></div>
+      <button class="save">保存</button>
+    </div>
+    <div class="body">
+      <div class="nav">
+        <div class="ni on">モード</div>
+        <div class="ni">冷蔵庫（保管場所）</div>
+        <div class="ni">プリンタ</div>
+        <div class="ni">温度・期限の基準</div>
+      </div>
+      <div class="cont">
+        <div class="intro">PrepFlowの<b>コア機能（仕込み数量・逆算・ボード）はモード不要</b>で使えます。下の任意機能は、必要な店だけONにしてください（既定OFF）。</div>
+
+        <!-- label mode -->
+        <div class="mode on">
+          <div class="mh">
+            <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/></svg></div>
+            <div class="t"><b>ラベルモード</b><small>ラベルが「印刷物」かつ「残量入力デバイス」に</small></div>
+            <div class="toggle"></div>
+          </div>
+          <div class="feats"><span class="feat">完了→自動ラベル発行</span><span class="feat">使用期限の自動印字</span><span class="feat">QRで残量記録</span><span class="feat">今ある半製品ビュー</span><span class="feat">点検モード</span></div>
+          <div class="cfg">プリンタ・用紙・FIFO色 などの詳細設定<a>プリンタ設定へ →</a></div>
+        </div>
+
+        <!-- haccp mode -->
+        <div class="mode on">
+          <div class="mh">
+            <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <div class="t"><b>HACCPモード</b><small>衛生チェック・温度記録（紙の置換／監査対応）</small></div>
+            <div class="toggle"></div>
+          </div>
+          <div class="feats"><span class="feat">衛生 電子チェックシート</span><span class="feat">冷蔵庫の温度記録</span><span class="feat">加熱の中心温度（CCP）</span><span class="feat">PDF出力・履歴</span></div>
+          <div class="cfg">チェック項目・基準温度の設定<a>HACCP設定へ →</a></div>
+        </div>
+
+        <!-- fridges -->
+        <div class="sec">
+          <h2>冷蔵庫（保管場所）</h2>
+          <div class="d">登録するとQRを発行でき、かざすと「その庫の在庫＋期限＋温度記録」が開きます（FR-49レンズ）。位置はゾーン単位。</div>
+          <div class="unit">
+            <div class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 10h12M10 5v2M10 13v3"/></svg></div>
+            <div class="nm"><b>冷蔵1</b><small>カウンター下</small></div>
+            <span class="zone cold">冷蔵</span><span class="temp">基準 ≤4℃</span>
+            <button class="qrbtn"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>QRを印刷</button>
+          </div>
+          <div class="unit">
+            <div class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 10h12M10 5v2M10 13v3"/></svg></div>
+            <div class="nm"><b>冷蔵2</b><small>仕込み場</small></div>
+            <span class="zone cold">冷蔵</span><span class="temp">基準 ≤4℃</span>
+            <button class="qrbtn"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>QRを印刷</button>
+          </div>
+          <div class="unit">
+            <div class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 10h12M10 5v2M10 13v3"/></svg></div>
+            <div class="nm"><b>冷凍庫</b><small>バックヤード</small></div>
+            <span class="zone frozen">冷凍</span><span class="temp">基準 ≤−15℃</span>
+            <button class="qrbtn"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>QRを印刷</button>
+          </div>
+          <button class="addp">＋ 冷蔵庫・保管場所を追加</button>
+        </div>
+
+        <div class="scopebar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>冷蔵庫QRは“レンズ（読み取り）”です。しまう/出すたびのスキャンはしません＝在庫・WMS管理には踏み込みません。</div>
+      </div>
+    </div>
+  </div>
+</body></html>

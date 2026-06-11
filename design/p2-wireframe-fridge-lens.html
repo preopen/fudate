@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>冷蔵庫QR＝レンズ ／ 点検モード</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:24px;line-height:1.42}
+  .head{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .head b{font-size:18px}.head span{font-size:13px;color:#8a8a8a}
+  .stage{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .lbl{font-size:12px;font-weight:900;color:var(--time);margin:0 0 8px 4px;letter-spacing:.04em}
+  /* phone frame */
+  .phone{background:#fff;border-radius:26px;box-shadow:0 24px 56px rgba(0,0,0,.16);overflow:hidden;height:660px;display:flex;flex-direction:column}
+  .pbar{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--g4)}
+  .pbar .back{width:30px;height:30px;border-radius:9px;border:1.5px solid var(--g4);display:grid;place-items:center}
+  .pbar .back svg{width:16px;height:16px;stroke:var(--ink)}
+  .pbar b{font-size:15px;font-weight:900}.pbar small{display:block;font-size:11px;color:var(--g2)}
+  .pbar .mode{margin-left:auto;font-size:10px;font-weight:900;color:var(--time);background:var(--time-s);padding:5px 9px;border-radius:999px}
+  .pbody{flex:1;overflow:auto;padding:14px 16px}
+  /* fridge header (lens) */
+  .fhead{display:flex;align-items:center;gap:12px;background:var(--ink);color:#fff;border-radius:14px;padding:14px 16px}
+  .fhead .ic{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+  .fhead .ic svg{width:22px;height:22px;stroke:#fff}
+  .fhead b{font-size:17px;font-weight:900}.fhead small{display:block;font-size:11.5px;color:#a8acb0}
+  .fhead .qrtag{margin-left:auto;font-size:10px;font-weight:900;background:#fff;color:var(--ink);padding:5px 9px;border-radius:999px}
+  /* temp entry */
+  .temp{display:flex;align-items:center;gap:12px;border:1.5px solid var(--g4);border-radius:13px;padding:12px 14px;margin-top:12px}
+  .temp .t b{font-size:13.5px;font-weight:900;display:block}.temp .t small{font-size:11px;color:var(--g2)}
+  .temp .now{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .tval{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums}
+  .tval.ok{color:var(--ok)}
+  .logbtn{font-size:12px;font-weight:900;border:1.5px solid var(--g4);border-radius:10px;padding:9px 12px;background:#fff;cursor:pointer}
+  .sechd{font-size:11px;font-weight:900;letter-spacing:.06em;color:var(--g2);margin:16px 4px 8px;display:flex;align-items:center;gap:10px}
+  .sechd .ln{flex:1;height:1px;background:var(--g4)}
+  .sechd.exp{color:var(--time)}
+  /* stock item */
+  .si{display:grid;grid-template-columns:7px 1fr auto;gap:11px;align-items:center;padding:11px 12px;border:1.5px solid var(--g4);border-radius:12px;margin-bottom:8px;background:#fff}
+  .si.exp{border-color:var(--time);background:var(--time-s)}
+  .si .sw{width:7px;height:34px;border-radius:4px;background:var(--ink)}
+  .si.exp .sw{background:var(--time)}
+  .si .nm b{font-size:14px;font-weight:700}.si .nm small{display:block;font-size:11px;color:var(--g2)}
+  .si .ex{text-align:right}.si .ex .e{font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}.si .ex small{font-size:10.5px;color:var(--g2)}
+  .si.exp .ex .e{color:var(--time)}.si.exp .ex small{color:var(--time)}
+  .lensnote{font-size:11px;color:var(--g2);margin-top:14px;display:flex;gap:8px;line-height:1.6}
+  .lensnote svg{width:15px;height:15px;stroke:var(--g2);flex:none;margin-top:1px}
+  /* inspection mode */
+  .ihead{display:flex;align-items:center;justify-content:space-between;background:var(--g5);border-radius:13px;padding:13px 15px}
+  .ihead .t b{font-size:15px;font-weight:900;display:block}.ihead .t small{font-size:11.5px;color:var(--g2)}
+  .ihead .prog{text-align:right}.ihead .prog b{font-size:17px;font-weight:900;font-variant-numeric:tabular-nums}.ihead .prog small{font-size:10.5px;color:var(--g2);display:block}
+  .ii{display:flex;align-items:center;gap:11px;padding:12px;border:1.5px solid var(--g4);border-radius:12px;margin-bottom:8px;background:#fff}
+  .ii .nm{flex:1}.ii .nm b{font-size:14px;font-weight:700}.ii .nm small{display:block;font-size:11px;color:var(--g2)}
+  .seg{display:inline-flex;border:1.5px solid var(--g4);border-radius:10px;overflow:hidden}
+  .seg button{border:none;background:#fff;font-family:var(--font);font-size:12.5px;font-weight:900;padding:9px 14px;cursor:pointer;color:var(--g2)}
+  .seg button.yes{background:var(--ink);color:#fff}
+  .seg button.no{background:var(--time);color:#fff}
+  .ii.gone{opacity:.6}
+  .ii.gone .nm b{text-decoration:line-through;color:var(--g3)}
+  .ifoot{position:sticky;bottom:0;background:#fff;padding-top:8px;margin-top:auto}
+  .finish{width:100%;height:50px;border:none;border-radius:13px;background:var(--ink);color:#fff;font-family:var(--font);font-size:15px;font-weight:900;cursor:pointer}
+  .scanall{font-size:12px;font-weight:900;color:var(--ink);border:1.5px solid var(--g4);border-radius:11px;padding:11px;background:#fff;width:100%;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+  .scanall svg{width:16px;height:16px;stroke:var(--ink)}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="head"><b>冷蔵庫QR＝“レンズ”（FR-49）／ 点検モード（FR-50）</b><span>かざすと“その庫の在庫＋期限＋温度記録入口”。出し入れスキャンは不要。点検は時々の突き合わせだけ</span></div>
+  <div class="stage">
+
+    <!-- LEFT: fridge lens -->
+    <div>
+      <div class="lbl">① 冷蔵庫QRをかざした画面（レンズ）</div>
+      <div class="phone">
+        <div class="pbar"><div class="back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></div><div><b>冷蔵2（冷蔵）</b><small>QRレンズ ・ 4℃以下で管理</small></div><span class="mode">ラベル＋HACCP</span></div>
+        <div class="pbody">
+          <div class="fhead">
+            <div class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 10h12M10 5v2M10 13v3"/></svg></div>
+            <div><b>冷蔵2</b><small>この庫にあるはず・期限が近い順</small></div>
+            <span class="qrtag">QR読取</span>
+          </div>
+
+          <div class="temp">
+            <div class="t"><b>庫内温度を記録</b><small>HACCPモード・基準 ≤4℃</small></div>
+            <div class="now"><span class="tval ok">3℃</span><button class="logbtn">記録</button></div>
+          </div>
+
+          <div class="sechd exp">本日中に使い切り <span class="ln"></span></div>
+          <div class="si exp"><div class="sw"></div><div class="nm"><b>出汁ジュ</b><small>6/10 ・ 残40%</small></div><div class="ex"><div class="e">本日まで</div><small>残6h</small></div></div>
+
+          <div class="sechd">期限内（古い順） <span class="ln"></span></div>
+          <div class="si"><div class="sw"></div><div class="nm"><b>煮切り</b><small>6/11 ・ 残100%</small></div><div class="ex"><div class="e">6/14</div><small>あと3日</small></div></div>
+          <div class="si"><div class="sw"></div><div class="nm"><b>ツメ</b><small>6/10 ・ 残70%</small></div><div class="ex"><div class="e">6/13</div><small>あと2日</small></div></div>
+          <div class="si"><div class="sw"></div><div class="nm"><b>柑橘オイル</b><small>6/09 ・ 残85%</small></div><div class="ex"><div class="e">6/16</div><small>あと5日</small></div></div>
+
+          <div class="lensnote"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>これは“読み取りレンズ”です。しまう・出すたびのスキャンは不要。位置はゾーン（冷蔵）単位で表示しています。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: inspection mode -->
+    <div>
+      <div class="lbl">② 点検モード（時々の突き合わせ）</div>
+      <div class="phone">
+        <div class="pbar"><div class="back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></div><div><b>点検モード</b><small>6/11 開店前 ・ 整合チェック</small></div><span class="mode">任意</span></div>
+        <div class="pbody" style="display:flex;flex-direction:column">
+          <div class="ihead">
+            <div class="t"><b>“今ある半製品”の突き合わせ</b><small>あるものはそのまま・無いものをタップ</small></div>
+            <div class="prog"><b>10/12</b><small>確認済み</small></div>
+          </div>
+
+          <button class="scanall" style="margin-top:12px"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-7"/></svg>まとめてQR読み取り（任意）</button>
+
+          <div style="margin-top:6px">
+            <div class="ii"><div class="nm"><b>煮切り</b><small>冷蔵2 ・ 6/14まで</small></div><div class="seg"><button class="yes">ある</button><button>無い</button></div></div>
+            <div class="ii"><div class="nm"><b>ツメ</b><small>冷蔵2 ・ 6/13まで</small></div><div class="seg"><button class="yes">ある</button><button>無い</button></div></div>
+            <div class="ii gone"><div class="nm"><b>百合根ピュレ</b><small>冷蔵1 ・ 期限切れ</small></div><div class="seg"><button>ある</button><button class="no">無い</button></div></div>
+            <div class="ii"><div class="nm"><b>柑橘オイル</b><small>冷蔵2 ・ 6/16まで</small></div><div class="seg"><button class="yes">ある</button><button>無い</button></div></div>
+            <div class="ii gone"><div class="nm"><b>焦がしバターパン粉</b><small>常温 ・ 6/11まで</small></div><div class="seg"><button>ある</button><button class="no">無い</button></div></div>
+          </div>
+
+          <div class="ifoot">
+            <div style="font-size:11px;color:var(--g2);margin-bottom:8px">差異 2件（消えていた）→ 廃棄/消費として処理し、残量データを補正します。</div>
+            <button class="finish">点検を完了（差異2件を反映）</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body></html>

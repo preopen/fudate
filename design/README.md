@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **34画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **36画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -68,6 +68,8 @@
 | ラベル運用フロー（完了→印刷→QR残量→繰越） | `p2-wireframe-label-flow.html/.png` | FR-20/42/45/46 |
 | 「今ある半製品」ビュー（作り置き・残量・期限） | `p2-wireframe-prep-larder.html/.png` | FR-45（ラベルモード） |
 | ラベルモード設定（プリンタ接続） | `p2-wireframe-label-settings.html/.png` | FR-48 |
+| 冷蔵庫QRレンズ／点検モード | `p2-wireframe-fridge-lens.html/.png` | FR-49/50 |
+| モード設定（ラベル/HACCP・冷蔵庫登録） | `p2-wireframe-modes-settings.html/.png` | FR-48/49/51・モード制 |
 
 ---
 
