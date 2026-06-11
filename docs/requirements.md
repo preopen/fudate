@@ -312,6 +312,8 @@ Restaurant ─┬─ Section ─── Staff
 | Direct確定メール＋ゲストマイページ | `design/p3-wireframe-direct-mypage.html` | FR-35 |
 | 仕込みアイテム編集（スケール則/自動手動/自己補正/合算） | `design/p1-wireframe-prepitem-editor.html` | FR-37/38/09 |
 | シミュレーション並走（実績 vs 推奨） | `design/p0-wireframe-simulation.html` | FR-39 |
+| 複数日デイレール（今日提供＋前倒し） | `design/p1-wireframe-dayrail-multiday.html` | FR-40/41 |
+| 営業日カレンダー設定 | `design/p1-wireframe-calendar.html` | FR-17/40・設定追加 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 

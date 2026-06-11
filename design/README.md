@@ -63,6 +63,8 @@
 | Direct確定メール＋ゲストマイページ | `p3-wireframe-direct-mypage.html/.png` | FR-35（リマインド・キャンセル動線） |
 | 仕込みアイテム編集（スケール則/自動手動/自己補正/合算） | `p1-wireframe-prepitem-editor.html/.png` | FR-37/38/09 |
 | シミュレーション並走（実績 vs 推奨） | `p0-wireframe-simulation.html/.png` | FR-39 |
+| 複数日デイレール（今日提供＋前倒し） | `p1-wireframe-dayrail-multiday.html/.png` | FR-40/41 |
+| 営業日カレンダー設定 | `p1-wireframe-calendar.html/.png` | FR-17/40の基礎（設定追加） |
 
 ---
 
