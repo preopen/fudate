@@ -49,6 +49,8 @@
 | パスビュー（卓×コース） | `p4-wireframe-passview.html/.png` | FR-24/25/27（P4 Service Sync） |
 | ホール側UI（ハンディ＋タッチパネル） | `p4-wireframe-hall-handy.html/.png` | FR-25/26/27/28（P4 Service Sync） |
 | 設定画面 | `p1-wireframe-settings.html/.png` | FR-14/15/10・§13テーマ切替・T−規律既定値 |
+| デイレール（業務×仕込み 1日ビュー） | `p1-wireframe-dayrail.html/.png` | FR-31/32（業務フローを同じT−軸に混在） |
+| Direct予約ページ（ゲスト直販動線） | `p3-wireframe-direct-booking.html/.png` | FR-35（コース事前選択・アレルギー・事前決済） |
 
 ---
 

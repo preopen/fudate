@@ -262,6 +262,8 @@ Restaurant ─┬─ Section ─── Staff
 | ホール側UI（ハンディ＋タッチパネル） | `design/p4-wireframe-hall-handy.html` | FR-25/26/27/28 |
 | 状態バリエーション（遅延/点検NG/全画面） | `design/p2-wireframe-state-alerts.html` | FR-22 |
 | 設定画面 | `design/p1-wireframe-settings.html` | FR-14/15/10・§13・T−規律 |
+| デイレール（業務×仕込み 1日ビュー） | `design/p1-wireframe-dayrail.html` | FR-31/32 |
+| Direct予約ページ（ゲスト直販） | `design/p3-wireframe-direct-booking.html` | FR-35 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 
