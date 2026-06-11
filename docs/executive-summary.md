@@ -1,7 +1,7 @@
 # PrepFlow 事業サマリー（経営判断用）
 
 > コース料理を出す高級店・専門店のための「仕込み（mise-en-place）管理SaaS」。一人開発・運営前提。
-> 版：2026-06-11 ／ 詳細：[`requirements.md`](./requirements.md)（v0.3）・[`../design/README.md`](../design/README.md)
+> 版：2026-06-11（要件 v0.5 時点に更新） ／ 詳細：[`requirements.md`](./requirements.md)（v0.5）・[`../design/README.md`](../design/README.md)
 
 ---
 
@@ -61,20 +61,22 @@
 
 | Ph | 内容 | 課金 |
 |---|---|---|
-| P0 | コア検証・10店パイロット | 無料 |
-| P1 | 逆算・担当・廃棄／Lite・Standard | ¥5,800/¥9,800 |
-| P2(＋2.5) | 営業中モード・HACCP・分析・ラベル／コース版管理 | ¥19,800 |
+| P0 | コア検証・10店パイロット＋**シミュレーション並走(FR-39)** | 無料 |
+| P1 | 逆算・担当・廃棄・スケール則／Lite・Standard | ¥5,800/¥9,800 |
+| P1.5 | **Ops Flow（デイレール＝業務×仕込み統合）**・サブレシピ合算 | Liteに含む |
+| P2(＋2.5) | **自己補正レシピ**・営業中モード・HACCP・予約ハブ・分析・ラベル／コース版管理 | ¥19,800 |
 | P3 | 公式API・多言語・サービスリプレイ | ¥29,800〜 |
+| P3.5 | **PrepFlow Direct（直販予約ページ・送客手数料ゼロ）** | アドオン +¥9,800 |
 | P4 | **Service Sync**（自社POS／ハンディ→厨房反映） | Connect上位 |
 
 ## 7. これまでの成果物（リポジトリ格納）
 
-- **市場調査レポート**（需要・TAM/SAM/SOM・競合・価格・solo feasibility）
-- **要件定義 v0.3**：`docs/requirements.md`（FR-01〜30・NFR-01〜10・3テーマ・イベント駆動方針・ベンチマーク）
-- **全画面設計**：`design/`（3テーマ＝INK/帳票/朱、3ビュー、営業中、パス、ホールUI、設定、オンボーディング、サービス設定、テンプレ編集、ダッシュボード、HACCP、状態バリエーション）
-- **競合ポジショニング図・画面遷移図**
+- **市場調査レポート**（需要・TAM/SAM/SOM・競合・価格・solo feasibility）＋ Smart Rabbitベンチマーク（`note-smartrabbit.md`）
+- **要件定義 v0.5**：`docs/requirements.md`（FR-01〜39・NFR-01〜10・3テーマ・Ops Flow/予約ハブ/Direct・軽量レシピ層・イベント駆動方針・ベンチマーク）
+- **全画面設計 29画面**：`design/`（一覧＝`overview-gallery`。3テーマ、3ビュー、デイレール、営業中、パス、ホールUI、予約ハブ、Direct一式、仕込みアイテム編集、シミュレーション 等）
 - **動くインタラクティブ・プロトタイプ**：`design/prototype-interactive.html`（3ビュー切替＋自動ロールアップ）
 - **パイロット店向け資料**：2ページ（概要＋導入の流れ/FAQ）
+- **承認済み提案**：`proposal-opsflow-direct.md`（Ops Flow＋予約ハブ＋Direct、v0.4反映）
 
 ## 8. 次の意思決定（GO / NO-GO）
 
