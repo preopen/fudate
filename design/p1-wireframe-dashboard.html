@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ワイヤーフレーム — ダッシュボード</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f6f2;--surface:#f9f8f5;--surface2:#fbfbf9;--offset:#f3f0ec;--offset2:#edeae5;
+    --border:#d4d1ca;--divider:#dcd9d5;--text:#28251d;--muted:#6b6963;--faint:#9d9a93;
+    --primary:#01696f;--primary-hi:#cedcd8;--success:#437a22;--success-hi:#d4dfcc;--warning:#964219;--warning-hi:#ddcfc6;
+    --r:.5rem;--r-lg:.75rem;--r-xl:1rem;--r-full:9999px;--shadow:0 8px 24px rgba(40,37,29,.08);--font:'Satoshi',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;padding:clamp(.8rem,2.5vw,2rem)}
+  .wrap{max-width:1080px;margin:0 auto;display:grid;gap:1.2rem}
+  .eyebrow{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  h1{font-size:clamp(1.35rem,1rem+1.4vw,2rem);line-height:1.12;margin:.25rem 0}
+  .sub{color:var(--muted);font-size:.95rem;max-width:64ch}
+  .ann{display:inline-grid;place-items:center;min-width:1.35rem;height:1.35rem;padding:0 .35rem;border-radius:var(--r-full);background:var(--primary);color:#fff;font-size:.72rem;font-weight:700;vertical-align:middle;margin-left:.3rem}
+  .device{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);overflow:hidden}
+  .appbar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.85rem 1rem;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 80%,transparent)}
+  .brand{display:flex;align-items:center;gap:.6rem}
+  .logo{width:24px;height:24px;color:var(--primary)}
+  .brand b{font-size:.98rem}
+  .range{display:inline-flex;border:1px solid var(--border);border-radius:var(--r-full);overflow:hidden}
+  .range span{font-size:.74rem;padding:.34rem .7rem;color:var(--muted)}
+  .range span.on{background:var(--primary);color:#fff;font-weight:700}
+  .pad{padding:1.1rem}
+  /* kpi */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+  .kpi{background:var(--offset);border-radius:var(--r-lg);padding:.8rem .85rem}
+  .kpi b{display:block;font-size:1.4rem;font-variant-numeric:tabular-nums;line-height:1.1}
+  .kpi span{font-size:.74rem;color:var(--muted)}
+  .kpi .delta{font-size:.72rem;font-weight:700;margin-top:.2rem;display:inline-block}
+  .up{color:var(--success)} .down{color:var(--warning)}
+  .kpi.warn b{color:var(--warning)}
+  /* layout cols */
+  .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:1rem;margin-top:1rem}
+  .card{border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface2)}
+  .card h3{font-size:.92rem;padding:.7rem .8rem;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}
+  .card .c{padding:.8rem}
+  .muted{color:var(--muted);font-size:.78rem;font-weight:400}
+  /* progress rows */
+  .prow{display:grid;grid-template-columns:96px 1fr 44px;gap:.5rem;align-items:center;margin-bottom:.55rem;font-size:.82rem}
+  .bar{height:9px;background:var(--offset2);border-radius:999px;overflow:hidden}
+  .fill{height:100%;background:linear-gradient(90deg,var(--primary),color-mix(in srgb,var(--primary) 65%,white))}
+  .pct{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+  /* late/undone list */
+  .li{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.5rem .6rem;border:1px solid var(--divider);border-radius:var(--r);background:#fff;margin-bottom:.45rem;font-size:.82rem}
+  .li .tags{display:flex;gap:.35rem}
+  .badge{font-size:.68rem;padding:.18rem .45rem;border-radius:999px;font-weight:700}
+  .b-late{background:var(--warning-hi);color:var(--warning)}
+  .b-sec{background:var(--offset2);color:var(--muted)}
+  /* charts */
+  svg{display:block;width:100%;height:auto}
+  .chart-cap{font-size:.74rem;color:var(--faint);margin-top:.3rem}
+  /* over-prep table */
+  .op{display:grid;grid-template-columns:1fr auto auto;gap:.4rem .6rem;align-items:center;font-size:.82rem}
+  .op .h{font-size:.72rem;color:var(--faint);font-weight:700}
+  .op .sug{font-size:.72rem;color:var(--primary);background:var(--primary-hi);padding:.12rem .45rem;border-radius:999px;font-weight:700;white-space:nowrap}
+  .legend{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);padding:1.1rem 1.2rem}
+  .legend h3{font-size:1.05rem;margin-bottom:.7rem}
+  .legend ul{list-style:none;display:grid;gap:.55rem}
+  .legend li{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem}
+  .legend .n{flex:none;display:inline-grid;place-items:center;min-width:1.5rem;height:1.5rem;border-radius:50%;background:var(--primary);color:#fff;font-size:.76rem;font-weight:700}
+  .fr{display:inline-block;font-size:.68rem;color:var(--primary);background:var(--primary-hi);padding:.05rem .4rem;border-radius:999px;font-weight:700;margin-left:.3rem}
+  @media(max-width:760px){.kpis{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="eyebrow">Wireframe · 追加画面 3</div>
+    <h1>ダッシュボード</h1>
+    <p class="sub">当日の達成率・未実施・遅延をひと目で把握し、過去の推移と「過剰仕込み（余り）」の傾向から1人前量の見直しを提案。オーナーシェフの“数字での振り返り”を支える。</p>
+  </div>
+
+  <div class="device">
+    <div class="appbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="6" y="7" width="16" height="34" rx="8" stroke="currentColor" stroke-width="4"/><path d="M24 11h7c6.6 0 12 5.4 12 12s-5.4 12-12 12h-7" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M24 24h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+        <b>ダッシュボード</b>
+      </div>
+      <div class="range"><span class="on">本日</span><span>2週間</span><span>月</span></div>
+    </div>
+
+    <div class="pad">
+      <!-- KPI row -->
+      <div class="kpis">
+        <div class="kpi"><b>35%</b><span>本日の達成率 <span class="ann">1</span></span><span class="delta up">▲ 前週比 +4pt</span></div>
+        <div class="kpi warn"><b>5</b><span>未実施タスク <span class="ann">1</span></span><span class="delta">うち遅延 1</span></div>
+        <div class="kpi warn"><b>8.2%</b><span>過剰仕込み率（余り） <span class="ann">2</span></span><span class="delta down">▲ 目標5%超</span></div>
+        <div class="kpi"><b>14名</b><span>本日の予約</span><span class="delta">前週 12名</span></div>
+      </div>
+
+      <div class="cols">
+        <!-- left: today's progress + late list -->
+        <div class="card">
+          <h3>当日の進捗 <span class="muted">皿・構成要素別 <span class="ann">1</span></span></h3>
+          <div class="c">
+            <div class="prow"><span>先付け</span><div class="bar"><div class="fill" style="width:100%"></div></div><span class="pct">100%</span></div>
+            <div class="prow"><span>おまかせ握り</span><div class="bar"><div class="fill" style="width:66%"></div></div><span class="pct">66%</span></div>
+            <div class="prow"><span>椀物</span><div class="bar"><div class="fill" style="width:0%"></div></div><span class="pct">0%</span></div>
+            <div class="prow"><span>水菓子</span><div class="bar"><div class="fill" style="width:0%"></div></div><span class="pct">0%</span></div>
+
+            <h3 style="border:none;padding:.6rem 0 .4rem;font-size:.82rem">未実施・遅延 <span class="ann">3</span></h3>
+            <div class="li"><span>煮切り仕込み</span><div class="tags"><span class="badge b-late">15:00 着手超過</span><span class="badge b-sec">親方</span></div></div>
+            <div class="li"><span>吸地を引く</span><div class="tags"><span class="badge b-sec">17:00 予定</span><span class="badge b-sec">親方</span></div></div>
+            <div class="li"><span>水菓子の仕込み</span><div class="tags"><span class="badge b-sec">16:30 予定</span><span class="badge b-sec">ガルド</span></div></div>
+          </div>
+        </div>
+
+        <!-- right: trends -->
+        <div class="card">
+          <h3>達成率の推移 <span class="muted">過去2週間</span></h3>
+          <div class="c">
+            <svg viewBox="0 0 320 110" role="img" aria-label="達成率推移">
+              <line x1="8" y1="92" x2="312" y2="92" stroke="#e3dfd9"/>
+              <line x1="8" y1="50" x2="312" y2="50" stroke="#efece7" stroke-dasharray="3 4"/>
+              <polyline fill="none" stroke="#01696f" stroke-width="2.5"
+                points="14,70 36,60 58,66 80,48 102,52 124,40 146,46 168,36 190,42 212,30 234,34 256,28 278,33 300,26"/>
+              <circle cx="300" cy="26" r="3.5" fill="#01696f"/>
+              <text x="300" y="18" text-anchor="end" font-family="Satoshi" font-size="9" fill="#01696f" font-weight="700">92%</text>
+            </svg>
+            <div class="chart-cap">営業前の仕込み完了率（開店時点）。直近は上昇傾向。</div>
+
+            <h3 style="border:none;padding:.7rem 0 .3rem;font-size:.82rem">過剰仕込み（余り量）の推移 <span class="ann">2</span></h3>
+            <svg viewBox="0 0 320 90" role="img" aria-label="余り推移">
+              <line x1="8" y1="74" x2="312" y2="74" stroke="#e3dfd9"/>
+              <g fill="#bb7a4a">
+                <rect x="16" y="40" width="14" height="34" rx="2"/><rect x="40" y="46" width="14" height="28" rx="2"/>
+                <rect x="64" y="32" width="14" height="42" rx="2"/><rect x="88" y="50" width="14" height="24" rx="2"/>
+                <rect x="112" y="44" width="14" height="30" rx="2"/><rect x="136" y="38" width="14" height="36" rx="2"/>
+                <rect x="160" y="52" width="14" height="22" rx="2"/><rect x="184" y="34" width="14" height="40" rx="2"/>
+                <rect x="208" y="48" width="14" height="26" rx="2"/><rect x="232" y="42" width="14" height="32" rx="2"/>
+                <rect x="256" y="56" width="14" height="18" rx="2"/><rect x="280" y="58" width="14" height="16" rx="2"/>
+              </g>
+            </svg>
+            <div class="chart-cap">予約数に対する“作りすぎ”の量。下降＝歩留り改善。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- over-prep suggestions -->
+      <div class="card" style="margin-top:1rem">
+        <h3>過剰仕込みTOP・見直し提案 <span class="muted">直近10営業日の平均 <span class="ann">4</span></span></h3>
+        <div class="c">
+          <div class="op">
+            <div class="h">品目</div><div class="h">平均余り</div><div class="h">提案</div>
+            <div>煮切り</div><div>18%</div><div class="sug">1人前 14ml → 12ml に</div>
+            <div>シャリ</div><div>11%</div><div class="sug">1人前 0.14升 → 0.13升 に</div>
+            <div>水菓子のソース</div><div>9%</div><div class="sug">歩留り 90% → 93% に</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <h3>番号の対応（要件定義 v0.2 のFR）</h3>
+    <ul>
+      <li><span class="n">1</span><div><b>達成率・未実施の可視化</b>：当日の完了率を皿・構成要素別に、未実施数とともに表示。<span class="fr">FR-11 ダッシュボード</span></div></li>
+      <li><span class="n">2</span><div><b>過剰仕込み率の推移</b>：予約数に対する“作りすぎ”を時系列で把握。<span class="fr">FR-11 / FR-08 廃棄記録</span></div></li>
+      <li><span class="n">3</span><div><b>遅延の検知</b>：着手目安時刻を過ぎたタスクを一覧。<span class="fr">FR-17 アラート</span></div></li>
+      <li><span class="n">4</span><div><b>1人前量の見直し提案</b>：余り実績から数量・歩留りの補正を提案（自動適用しない）。<span class="fr">FR-09 学習提案</span></div></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

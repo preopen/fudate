@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ワイヤーフレーム — コーステンプレ編集</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f6f2;--surface:#f9f8f5;--surface2:#fbfbf9;--offset:#f3f0ec;--offset2:#edeae5;
+    --border:#d4d1ca;--divider:#dcd9d5;--text:#28251d;--muted:#6b6963;--faint:#9d9a93;
+    --primary:#01696f;--primary-hover:#0c4e54;--primary-hi:#cedcd8;--success:#437a22;--success-hi:#d4dfcc;--warning:#964219;--warning-hi:#ddcfc6;
+    --r:.5rem;--r-lg:.75rem;--r-xl:1rem;--r-full:9999px;--shadow:0 8px 24px rgba(40,37,29,.08);--font:'Satoshi',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;padding:clamp(.8rem,2.5vw,2rem)}
+  .wrap{max-width:1080px;margin:0 auto;display:grid;gap:1.2rem}
+  .eyebrow{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  h1{font-size:clamp(1.35rem,1rem+1.4vw,2rem);line-height:1.12;margin:.25rem 0}
+  .sub{color:var(--muted);font-size:.95rem;max-width:64ch}
+  .ann{display:inline-grid;place-items:center;min-width:1.35rem;height:1.35rem;padding:0 .35rem;border-radius:var(--r-full);background:var(--primary);color:#fff;font-size:.72rem;font-weight:700;vertical-align:middle;margin-left:.3rem}
+  .device{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);overflow:hidden}
+  .appbar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.85rem 1rem;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 80%,transparent)}
+  .brand{display:flex;align-items:center;gap:.6rem}
+  .logo{width:24px;height:24px;color:var(--primary)}
+  .crumb{font-size:.84rem;color:var(--muted)}
+  .crumb b{color:var(--text)}
+  .actions{display:flex;gap:.5rem}
+  .btn{font-size:.78rem;border-radius:var(--r);padding:.5rem .8rem;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--surface)}
+  .btn.pri{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .body{display:grid;grid-template-columns:300px 1fr;gap:0;min-height:520px}
+  .tree{border-right:1px solid var(--border);padding:1rem;background:var(--surface2)}
+  .tree h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:.6rem}
+  .node{border-radius:var(--r);margin-bottom:.25rem}
+  .n-dish{display:flex;align-items:center;gap:.4rem;padding:.5rem .55rem;font-weight:700;font-size:.9rem;background:var(--offset);border-radius:var(--r)}
+  .n-comp{display:flex;align-items:center;gap:.4rem;padding:.4rem .5rem .4rem 1.3rem;font-size:.84rem;color:var(--text)}
+  .n-task{display:flex;align-items:center;gap:.4rem;padding:.34rem .5rem .34rem 2.1rem;font-size:.8rem;color:var(--muted);border-radius:var(--r)}
+  .n-task.sel{background:var(--primary-hi);color:var(--primary);font-weight:700}
+  .dot{width:.45rem;height:.45rem;border-radius:50%;background:var(--primary);flex:none}
+  .dot.amber{background:var(--warning)}
+  .add{display:block;width:100%;text-align:left;font-size:.76rem;color:var(--primary);background:none;border:1px dashed var(--primary-hi);border-radius:var(--r);padding:.4rem .5rem;margin-top:.35rem;cursor:pointer}
+  .add.sub{margin-left:1.6rem;width:calc(100% - 1.6rem)}
+  .detail{padding:1.1rem 1.2rem}
+  .detail h2{font-size:1.05rem;margin-bottom:.15rem}
+  .detail .path{font-size:.76rem;color:var(--faint);margin-bottom:1rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+  .field{display:grid;gap:.3rem;margin-bottom:.9rem}
+  .field label{font-size:.76rem;color:var(--muted);font-weight:700}
+  .input{border:1px solid var(--border);border-radius:var(--r);background:#fff;padding:.55rem .65rem;font-size:.86rem;color:var(--text)}
+  .input.ph{color:var(--faint)}
+  .row-inline{display:flex;gap:.5rem}
+  .row-inline .input{flex:1}
+  .unit{display:inline-flex;align-items:center;padding:0 .6rem;background:var(--offset);border:1px solid var(--border);border-radius:var(--r);font-size:.8rem;color:var(--muted)}
+  .hint{font-size:.72rem;color:var(--faint)}
+  .media{border:1px solid var(--primary-hi);border-radius:var(--r-lg);padding:.8rem;background:#fff;margin-top:.3rem}
+  .media h4{font-size:.82rem;color:var(--primary);margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+  .thumbs{display:flex;gap:.6rem;flex-wrap:wrap}
+  .thumb{width:84px;height:64px;border-radius:8px;background:repeating-linear-gradient(45deg,#eceae5,#eceae5 7px,#f4f2ee 7px,#f4f2ee 14px);display:grid;place-items:center;color:var(--faint);font-size:.68rem;position:relative;text-align:center}
+  .thumb .vbadge{position:absolute;bottom:4px;right:4px;background:rgba(40,37,29,.78);color:#fff;font-size:.6rem;padding:.08rem .3rem;border-radius:999px}
+  .thumb.add{border:1.5px dashed var(--primary-hi);background:#fff;color:var(--primary);font-weight:700}
+  .legend{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);padding:1.1rem 1.2rem}
+  .legend h3{font-size:1.05rem;margin-bottom:.7rem}
+  .legend ul{list-style:none;display:grid;gap:.55rem}
+  .legend li{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem}
+  .legend .num{flex:none;display:inline-grid;place-items:center;min-width:1.5rem;height:1.5rem;border-radius:50%;background:var(--primary);color:#fff;font-size:.76rem;font-weight:700}
+  .fr{display:inline-block;font-size:.68rem;color:var(--primary);background:var(--primary-hi);padding:.05rem .4rem;border-radius:999px;font-weight:700;margin-left:.3rem}
+  @media(max-width:760px){.body{grid-template-columns:1fr}.tree{border-right:none;border-bottom:1px solid var(--border)}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="eyebrow">Wireframe · 追加画面 1</div>
+    <h1>コーステンプレ編集</h1>
+    <p class="sub">料理 → 構成要素 → サブ仕込みの階層を組み、各サブ仕込みに「1人前量・歩留り（数量算出の元）」「所要・着手リード（逆算の元）」「手順メディア」を設定。当日ボードはこのテンプレから生成される。</p>
+  </div>
+
+  <div class="device">
+    <div class="appbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="6" y="7" width="16" height="34" rx="8" stroke="currentColor" stroke-width="4"/><path d="M24 11h7c6.6 0 12 5.4 12 12s-5.4 12-12 12h-7" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M24 24h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+        <span class="crumb">テンプレート / <b>本日のおまかせ・握り</b></span>
+      </div>
+      <div class="actions"><button class="btn">当日ボードでプレビュー</button><button class="btn pri">保存</button></div>
+    </div>
+
+    <div class="body">
+      <!-- tree -->
+      <div class="tree">
+        <h3>構成（階層）<span class="ann">1</span></h3>
+        <div class="node">
+          <div class="n-dish">▾ 🍣 本日のおまかせ・握り</div>
+          <div class="n-comp"><span class="dot"></span>構成要素：シャリ</div>
+          <div class="n-task"><span class="dot"></span>米を炊く・赤酢で合わせる</div>
+          <div class="n-comp"><span class="dot amber"></span>構成要素：煮切り・ツメ</div>
+          <div class="n-task sel"><span class="dot amber"></span>煮切り仕込み（編集中）</div>
+          <div class="n-comp"><span class="dot"></span>構成要素：ネタの仕込み</div>
+          <div class="n-task"><span class="dot"></span>白身の昆布締め・赤身の漬け</div>
+          <button class="add sub">＋ サブ仕込みを追加</button>
+        </div>
+        <button class="add">＋ 構成要素を追加</button>
+        <button class="add">＋ 料理を追加</button>
+      </div>
+
+      <!-- detail -->
+      <div class="detail">
+        <h2>煮切り仕込み</h2>
+        <div class="path">本日のおまかせ・握り › 煮切り・ツメ</div>
+
+        <div class="grid2">
+          <div class="field"><label>サブ仕込み名</label><div class="input">煮切り仕込み</div></div>
+          <div class="field"><label>担当セクション</label><div class="input">親方</div></div>
+        </div>
+
+        <div class="grid2">
+          <div class="field"><label>1人前の必要量 <span class="ann">2</span></label>
+            <div class="row-inline"><div class="input">14</div><span class="unit">ml / 人</span></div>
+            <span class="hint">予約人数 × この値 ÷ 歩留りで当日の必要量を自動算出</span>
+          </div>
+          <div class="field"><label>歩留り <span class="ann">2</span></label>
+            <div class="row-inline"><div class="input">95</div><span class="unit">%</span></div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field"><label>所要時間 <span class="ann">3</span></label>
+            <div class="row-inline"><div class="input">40</div><span class="unit">分</span></div>
+          </div>
+          <div class="field"><label>着手リード（開店の何分前） <span class="ann">3</span></label>
+            <div class="row-inline"><div class="input">180</div><span class="unit">分前</span></div>
+            <span class="hint">開店18:00 − (リード+所要) → 着手目安 15:00 を自動表示</span>
+          </div>
+        </div>
+
+        <div class="field"><label>手順テキスト</label>
+          <div class="input ph">酒・みりんを煮切り、たまり・濃口を加えてひと煮立ち。塩度◯%／とろみ◯で火を止め冷暗所へ。</div>
+        </div>
+
+        <div class="field"><label>手順メディア <span class="ann">4</span></label>
+          <div class="media">
+            <h4>▦ 写真・動画（親方の基準を残す＝脱属人化）</h4>
+            <div class="thumbs">
+              <div class="thumb">手順写真1</div>
+              <div class="thumb">手順写真2</div>
+              <div class="thumb">完成見本<div class="vbadge">写真</div></div>
+              <div class="thumb">動画<div class="vbadge">▶ 1:20</div></div>
+              <div class="thumb add">＋ 追加</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <h3>番号の対応（要件定義 v0.2 のFR）</h3>
+    <ul>
+      <li><span class="num">1</span><div><b>階層エディタ</b>：料理→構成要素→サブ仕込みを自由な深さで作成・並べ替え・再利用。<span class="fr">FR-01</span></div></li>
+      <li><span class="num">2</span><div><b>1人前量・歩留り</b>：当日の数量自動算出の元データ。<span class="fr">FR-03 数量算出</span></div></li>
+      <li><span class="num">3</span><div><b>所要時間・着手リード</b>：来店時刻からの逆算タイムラインの元データ。<span class="fr">FR-06 逆算</span></div></li>
+      <li><span class="num">4</span><div><b>手順メディア添付</b>：写真・動画・テキストで“親方の基準”を記録（脱属人化・新人教育）。<span class="fr">FR-01 メディア</span></div></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
