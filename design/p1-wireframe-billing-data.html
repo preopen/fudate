@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>プラン・支払い／データ 設定</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 14px;font-size:13px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .bL h1{font-size:19px;font-weight:900}
+  .body{display:grid;grid-template-columns:1fr 320px;min-height:0;flex:1}
+  .main{padding:22px 28px;overflow:auto;display:flex;flex-direction:column;gap:22px}
+  .side{border-left:1px solid var(--g4);padding:22px;background:#fcfcfd;overflow:auto;display:flex;flex-direction:column;gap:18px}
+  .sec h2{font-size:14.5px;font-weight:900;margin-bottom:11px}
+  /* current plan */
+  .plan{border:2px solid var(--ink);border-radius:16px;overflow:hidden}
+  .pt{display:flex;align-items:center;gap:14px;padding:16px 18px}
+  .pt .nm b{font-size:19px;font-weight:900;display:block}.pt .nm small{font-size:12px;color:var(--g2)}
+  .pt .pr{margin-left:auto;text-align:right}.pt .pr b{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}.pt .pr small{font-size:11px;color:var(--g2);display:block}
+  .pf{display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 14px}
+  .feat{font-size:11px;font-weight:700;color:var(--ink);background:var(--g5);border-radius:999px;padding:5px 11px}
+  .addon{display:flex;align-items:center;gap:12px;padding:13px 18px;border-top:1px solid var(--g4);background:var(--g5)}
+  .addon .t{flex:1}.addon .t b{font-size:14px;font-weight:900;display:block}.addon .t small{font-size:11.5px;color:var(--g2)}
+  .addon .on2{font-size:11px;font-weight:900;color:var(--ok);background:var(--ok-s);padding:5px 10px;border-radius:999px}
+  /* billing rows */
+  .rows{border:1.5px solid var(--g4);border-radius:14px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--g4);background:#fff}
+  .row:last-child{border-bottom:none}
+  .row .t{flex:1}.row .t b{font-size:14px;font-weight:700;display:block}.row .t small{font-size:11.5px;color:var(--g2)}
+  .row .v{font-size:13.5px;font-weight:800;color:var(--g2);font-variant-numeric:tabular-nums}
+  .lk{font-size:12.5px;font-weight:900;color:var(--ink);text-decoration:underline;cursor:pointer}
+  .stripe{background:var(--ink);color:#fff;border:none;border-radius:12px;padding:14px;font-family:var(--font);font-size:14px;font-weight:900;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px}
+  .stripe svg{width:17px;height:17px;stroke:#fff}
+  .sublink{font-size:11.5px;color:var(--g2);text-align:center;margin-top:9px}
+  /* data section */
+  .dbtn{display:flex;align-items:center;gap:12px;border:1.5px solid var(--g4);border-radius:13px;padding:14px 16px;margin-bottom:9px;background:#fff;cursor:pointer;width:100%;text-align:left}
+  .dbtn .ic{width:38px;height:38px;border-radius:11px;background:var(--g5);display:grid;place-items:center;flex:none}
+  .dbtn .ic svg{width:20px;height:20px;stroke:var(--ink)}
+  .dbtn .t{flex:1}.dbtn .t b{font-size:14px;font-weight:900;display:block}.dbtn .t small{font-size:11.5px;color:var(--g2)}
+  .dbtn .arr{color:var(--g3)}
+  .danger{border:1.5px solid var(--time-s);border-radius:13px;padding:14px 16px;background:#fffaf6;margin-top:6px}
+  .danger b{font-size:13.5px;font-weight:900;color:#9a3a0e}
+  .danger p{font-size:11.5px;color:#9a3a0e;margin:5px 0 10px}
+  .danger button{font-size:12.5px;font-weight:900;color:var(--time);border:1.5px solid var(--time);background:#fff;border-radius:10px;padding:9px 14px;cursor:pointer}
+  /* side: invoices */
+  .side h3{font-size:13px;font-weight:900}
+  .inv{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px dashed var(--g4);font-size:12.5px}
+  .inv .d{color:var(--g2)}.inv .a{font-weight:900;font-variant-numeric:tabular-nums}
+  .inv .dl{color:var(--ink);font-weight:900;cursor:pointer}
+  .usebox{border:1.5px solid var(--g4);border-radius:13px;padding:14px;background:#fff}
+  .usebox .ut{font-size:11.5px;color:var(--g2);font-weight:700}
+  .usebox b{font-size:17px;font-weight:900}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>プラン・支払い／データ 設定（FR-14/15）</b><span>請求・解約まで Stripe セルフサーブ。データは持ち出し自由（ロックインしない）</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">← 設定</button><h1>プラン・支払い／データ</h1></div>
+    </div>
+    <div class="body">
+      <div class="main">
+        <!-- current plan -->
+        <div class="sec">
+          <h2>現在のプラン</h2>
+          <div class="plan">
+            <div class="pt"><div class="nm"><b>Standard</b><small>年払い ・ 次回更新 2027/03/31</small></div><div class="pr"><b>¥98,000</b><small>/年（¥8,166/月）</small></div></div>
+            <div class="pf"><span class="feat">数量自動算出</span><span class="feat">逆算タイムライン</span><span class="feat">廃棄/パー履歴</span><span class="feat">メディア添付</span><span class="feat">業務フロー</span></div>
+            <div class="addon"><div class="t"><b>＋ Direct アドオン</b><small>直販予約ページ・送客手数料ゼロ</small></div><span class="on2">利用中 +¥9,800/月</span></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:12px"><button class="lk" style="border:1.5px solid var(--g4);border-radius:11px;padding:11px 16px;background:#fff;text-decoration:none">プランを変更</button><button class="lk" style="border:1.5px solid var(--g4);border-radius:11px;padding:11px 16px;background:#fff;text-decoration:none">Pro にアップグレード</button></div>
+        </div>
+
+        <!-- billing -->
+        <div class="sec">
+          <h2>お支払い方法</h2>
+          <div class="rows">
+            <div class="row"><div class="t"><b>クレジットカード</b><small>Visa •••• 4242</small></div><span class="v">2028/05</span><span class="lk">変更</span></div>
+            <div class="row"><div class="t"><b>請求先・適格請求書（インボイス）</b><small>登録番号 T1234…</small></div><span class="lk">編集</span></div>
+          </div>
+          <button class="stripe" style="margin-top:12px"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Stripe で支払い・領収書を管理</button>
+          <div class="sublink">解約もここから（いつでも・違約金なし）</div>
+        </div>
+
+        <!-- data -->
+        <div class="sec">
+          <h2>データ（FR-15）</h2>
+          <button class="dbtn"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 21h14"/></svg></div><div class="t"><b>全データをエクスポート</b><small>テンプレ・実績・HACCP記録を CSV / JSON で</small></div><span class="arr">›</span></button>
+          <button class="dbtn"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></div><div class="t"><b>自動バックアップ</b><small>毎日・直近30日分を保持</small></div><span class="arr">›</span></button>
+          <div class="danger"><b>アカウントの削除</b><p>全データが消えます。エクスポート後に実行できます。</p><button>削除手続きへ</button></div>
+        </div>
+      </div>
+
+      <!-- side -->
+      <div class="side">
+        <div>
+          <h3>今月の利用</h3>
+          <div class="usebox" style="margin-top:8px"><div class="ut">登録店舗</div><b>1 店舗</b><div class="ut" style="margin-top:8px">スタッフ登録</div><b>5 名（無制限）</b></div>
+        </div>
+        <div>
+          <h3>請求書・領収書</h3>
+          <div style="margin-top:8px">
+            <div class="inv"><span class="d">2026/03/31</span><span class="a">¥98,000</span><span class="dl">PDF</span></div>
+            <div class="inv"><span class="d">2025/12 Direct</span><span class="a">¥9,800</span><span class="dl">PDF</span></div>
+            <div class="inv"><span class="d">2025/11 Direct</span><span class="a">¥9,800</span><span class="dl">PDF</span></div>
+          </div>
+        </div>
+        <div>
+          <h3>サポート</h3>
+          <div style="font-size:12px;color:var(--g2);margin-top:8px;line-height:1.7">アプリ内ガイド・FAQ／メール<br><b style="color:var(--ink)">help@prepflow.app</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>

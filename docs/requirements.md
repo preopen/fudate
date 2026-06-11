@@ -398,6 +398,8 @@ Restaurant ─┬─ Section ─── Staff
 | 設定ホーム（ハブ） | `design/p1-wireframe-settings-home.html` | FR-52/54・§4.7 |
 | セクション・スタッフ設定 | `design/p1-wireframe-staff-sections.html` | FR-07/43 |
 | 営業帯・T−規律 設定 | `design/p1-wireframe-service-periods.html` | FR-41/22 |
+| 仕込み・数量の既定 設定 | `design/p1-wireframe-prep-defaults.html` | FR-09/19/40/42 |
+| プラン・支払い／データ 設定 | `design/p1-wireframe-billing-data.html` | FR-14/15 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>仕込み・数量の既定 設定</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 14px;font-size:13px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .bL h1{font-size:19px;font-weight:900}
+  .save{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer}
+  .cont{flex:1;overflow:auto;padding:22px 30px;display:flex;flex-direction:column;gap:22px}
+  .intro{font-size:12px;color:var(--g2);background:var(--g5);border-radius:11px;padding:12px 14px}
+  .intro b{color:var(--ink)}
+  .sec h2{font-size:14.5px;font-weight:900;margin-bottom:3px}
+  .sec .d{font-size:11.5px;color:var(--g2);margin-bottom:11px}
+  .rows{border:1.5px solid var(--g4);border-radius:14px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--g4);background:#fff}
+  .row:last-child{border-bottom:none}
+  .row .t{flex:1}.row .t b{font-size:14.5px;font-weight:700;display:block}.row .t small{font-size:11.5px;color:var(--g2)}
+  .toggle{width:56px;height:32px;border-radius:999px;background:var(--ink);position:relative;flex:none}
+  .toggle:after{content:"";position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--g3)}.toggle.off:after{right:auto;left:3px}
+  .seg{display:inline-flex;border:1.5px solid var(--g4);border-radius:10px;overflow:hidden}
+  .seg button{border:none;background:#fff;font-family:var(--font);font-size:12.5px;font-weight:800;color:var(--g2);padding:9px 14px;cursor:pointer;border-right:1.5px solid var(--g4)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--ink);color:#fff}
+  .numbox{display:inline-flex;align-items:center;border:1.5px solid var(--g4);border-radius:10px;overflow:hidden;background:#fff}
+  .numbox button{width:34px;height:42px;background:var(--g5);border:none;font-size:18px;color:var(--ink);cursor:pointer}
+  .numbox .v{width:56px;text-align:center;font-weight:900;font-variant-numeric:tabular-nums}
+  .val{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;background:var(--g5);border-radius:10px;padding:9px 15px}
+  .note{font-size:11px;color:var(--g2);margin-top:11px;display:flex;gap:8px;line-height:1.6}
+  .note svg{width:15px;height:15px;stroke:var(--g2);flex:none;margin-top:1px}
+  .ovr{font-size:10.5px;font-weight:800;color:var(--g2);background:var(--g5);border-radius:999px;padding:5px 10px}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>仕込み・数量の既定 設定（FR-09/19/40/42）</b><span>店全体の既定。各仕込みアイテムで個別に上書き可（アイテム編集が優先）</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">← 設定</button><h1>仕込み・数量</h1></div>
+      <button class="save">保存</button>
+    </div>
+    <div class="cont">
+      <div class="intro">ここは<b>店全体の既定値</b>です。特定の仕込みは「<b>仕込みアイテム編集</b>」で個別に上書きできます（個別設定が優先）。</div>
+
+      <!-- 自己補正レシピ -->
+      <div class="sec">
+        <h2>自己補正レシピ（FR-09）</h2>
+        <div class="d">「作った量／余った量」の実績から1人前量を自動補正します。</div>
+        <div class="rows">
+          <div class="row"><div class="t"><b>自己補正を使う</b><small>OFFなら手動で固定</small></div><div class="toggle"></div></div>
+          <div class="row"><div class="t"><b>参照する実績</b><small>直近この回数の余り実績から計算</small></div><div class="numbox"><button>−</button><span class="v">10</span><button>＋</button></div><span style="font-size:12px;color:var(--g2)">回</span></div>
+          <div class="row"><div class="t"><b>補正サイクル</b><small>係数を見直すタイミング</small></div><div class="seg"><button>毎営業日</button><button class="on">毎週</button><button>毎月</button></div></div>
+          <div class="row"><div class="t"><b>反映のしかた</b><small>提案だけ出すか、自動で更新するか</small></div><div class="seg"><button class="on">提案のみ</button><button>自動適用</button></div></div>
+        </div>
+      </div>
+
+      <!-- 営業中・追い仕込み -->
+      <div class="sec">
+        <h2>営業中・追い仕込み（FR-19）</h2>
+        <div class="rows">
+          <div class="row"><div class="t"><b>追い仕込みの自動生成</b><small>残量が閾値を割ったら割込みタスクを作成</small></div><div class="toggle"></div></div>
+          <div class="row"><div class="t"><b>生成する閾値</b><small>残量がこの割合を下回ったら</small></div><div class="numbox"><button>−</button><span class="v">20</span><button>＋</button></div><span style="font-size:12px;color:var(--g2)">%</span></div>
+        </div>
+      </div>
+
+      <!-- 繰越 -->
+      <div class="sec">
+        <h2>繰越差引（FR-42）</h2>
+        <div class="rows">
+          <div class="row"><div class="t"><b>前日の残量を翌日に繰越</b><small>賞味期限内の半製品のみ・翌日推奨から自動差引</small></div><div class="toggle"></div></div>
+          <div class="row"><div class="t"><b>繰越を使う期限の余裕</b><small>残り賞味がこれ未満は繰越せず使い切り/廃棄へ</small></div><div class="seg"><button>当日中</button><button class="on">残1日</button><button>残2日</button></div></div>
+        </div>
+      </div>
+
+      <!-- 複数日リード -->
+      <div class="sec">
+        <h2>複数日リード（FR-40）</h2>
+        <div class="rows">
+          <div class="row"><div class="t"><b>前倒し仕込みの先読み日数</b><small>何日先の予約まで「今日から始める仕込み」に出すか</small></div><div class="numbox"><button>−</button><span class="v">3</span><button>＋</button></div><span style="font-size:12px;color:var(--g2)">日先まで</span></div>
+          <div class="row"><div class="t"><b>未来日の予約が無い時</b><small>先読み対象の予約が未確定の場合</small></div><div class="seg"><button class="on">前年同曜で予測</button><button>手入力を待つ</button></div></div>
+          <div class="row"><div class="t"><b>定休日の扱い</b><small>逆算時に休業日をスキップ</small></div><span class="val">営業日カレンダーに従う</span></div>
+        </div>
+        <div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>これらは<b>既定値</b>です。鯖の〆など個別の賞味/リードは仕込みアイテム編集で設定し、<span class="ovr">個別が優先</span>されます。</div>
+      </div>
+    </div>
+  </div>
+</body></html>
