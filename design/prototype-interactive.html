@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrepFlow — インタラクティブ・プロトタイプ</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:24px;line-height:1.4;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .hint{font-size:13px;color:#7a807d}.hint b{color:var(--ink)}
+  .tab{width:100%;max-width:1180px;flex:1;max-height:820px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL h1{font-size:19px;font-weight:900}.bL .sub{font-size:12.5px;color:var(--g2)}
+  .sw{display:inline-flex;background:var(--g5);border-radius:999px;padding:4px;gap:2px;justify-self:center}
+  .sw button{border:none;background:none;font-family:var(--font);font-size:14.5px;font-weight:700;color:var(--g2);padding:11px 24px;border-radius:999px;cursor:pointer;transition:.12s}
+  .sw button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .bR{display:flex;align-items:center;gap:16px;justify-self:end}
+  .cd{display:flex;align-items:center;gap:10px;background:var(--time-s);border-radius:14px;padding:9px 16px}
+  .cd small{display:block;font-size:10.5px;color:var(--time);font-weight:700;letter-spacing:.08em}
+  .cd b{font-size:20px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  .cov{font-size:14px;font-weight:700;color:var(--g2)}.cov b{color:var(--ink);font-size:17px}
+  #view{flex:1;min-height:0;display:flex;flex-direction:column}
+
+  /* ---- shared bits ---- */
+  .tick{width:54px;height:54px;border-radius:50%;border:2.5px solid var(--g3);flex:none;display:grid;place-items:center;background:#fff;cursor:pointer;transition:.12s}
+  .tick.on{background:var(--ink);border-color:var(--ink)}
+  .tick svg{width:26px;height:26px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+  .tick.on svg{opacity:1}
+  .qty{font-size:12.5px;font-weight:700;color:#fff;background:var(--ink);padding:4px 10px;border-radius:7px;font-variant-numeric:tabular-nums}
+  .done .qty{background:var(--g4);color:var(--g2)}
+  .tm{font-size:12.5px;color:var(--g2);font-variant-numeric:tabular-nums}
+  .tm.now{color:var(--time);font-weight:900}
+  .nowflag{font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--time);padding:4px 9px;border-radius:999px}
+
+  /* ---- TODAY (focus) ---- */
+  .focus{display:grid;grid-template-columns:1fr 340px;flex:1;min-height:0}
+  .fL{padding:26px 32px;display:flex;flex-direction:column;min-height:0}
+  .nowtag{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;color:var(--time);background:var(--time-s);font-weight:900;font-size:14px;padding:9px 16px;border-radius:999px;font-variant-numeric:tabular-nums}
+  .fL h2{font-size:38px;font-weight:900;letter-spacing:-.02em;margin-top:14px}
+  .fL .fsub{font-size:14px;color:var(--g2);margin-top:4px}
+  .subs{margin-top:20px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow:auto}
+  .srow{display:flex;align-items:center;gap:16px;padding:15px 18px;border-radius:16px;background:var(--g5)}
+  .srow.done{background:#fff;border:1.5px solid var(--g4)}
+  .srow .nm{font-size:18px;font-weight:700;flex:1}
+  .srow.done .nm{color:var(--g3);text-decoration:line-through}
+  .cta{display:flex;gap:12px;margin-top:16px}
+  .big{flex:1;height:68px;border:none;border-radius:16px;background:var(--ink);color:#fff;font-family:var(--font);font-size:19px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer}
+  .big:disabled{background:var(--g4);color:var(--g3);cursor:default}
+  .fR{border-left:1px solid var(--g4);padding:22px;display:flex;flex-direction:column;min-height:0;background:#fcfcfd}
+  .rh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .rh b{font-size:14px;font-weight:900}.rh span{font-size:12.5px;color:var(--g2)}
+  .track{height:6px;border-radius:99px;background:var(--g4);margin-bottom:14px;overflow:hidden}
+  .track i{display:block;height:100%;background:var(--ink);transition:width .25s}
+  .tl{flex:1;overflow:auto;display:flex;flex-direction:column;gap:2px}
+  .ti{display:flex;align-items:center;gap:11px;padding:10px 8px;border-radius:10px}
+  .ti .mk{width:13px;height:13px;border-radius:50%;border:2px solid var(--g3);flex:none;background:#fff}
+  .ti.done .mk{background:var(--ink);border-color:var(--ink)}
+  .ti.now{background:var(--time-s)}.ti.now .mk{background:var(--time);border-color:var(--time)}
+  .ti .tt{font-size:14px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ti.done .tt{color:var(--g3);text-decoration:line-through}
+  .ti .tx{font-size:11.5px;color:var(--g2);font-variant-numeric:tabular-nums}
+  .ti.now .tx{color:var(--time);font-weight:900}
+
+  /* ---- DISHES ---- */
+  .list{flex:1;overflow:auto;padding:18px 28px}
+  .dish{border:1.5px solid var(--g4);border-radius:18px;margin-bottom:14px;overflow:hidden;background:#fff}
+  .dh{display:flex;align-items:center;gap:14px;padding:15px 18px;background:var(--g5)}
+  .dh h3{font-size:18px;font-weight:900;flex:1}
+  .dh .frac{font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;background:#fff;border:1.5px solid var(--g4);border-radius:999px;padding:6px 14px}
+  .dish.full .dh{background:var(--ink)}.dish.full .dh h3,.dish.full .dh .frac{color:#fff}
+  .dish.full .dh .frac{background:transparent;border-color:#494c4f}
+  .dbar{height:5px;background:var(--g4)}.dbar i{display:block;height:100%;background:var(--ink);transition:width .25s}
+  .comp{padding:0 18px}
+  .clabel{font-size:11.5px;font-weight:900;letter-spacing:.04em;color:var(--g2);padding:12px 0 2px}
+  .row{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--g4)}
+  .row:first-child{border-top:none}
+  .row .nm{font-size:16.5px;font-weight:700;flex:1}
+  .row.done .nm{color:var(--g3);text-decoration:line-through}
+  .row .tick{width:46px;height:46px}.row .tick svg{width:22px;height:22px}
+
+  /* ---- STAFF ---- */
+  .board{flex:1;display:grid;min-height:0}
+  .col{border-right:1px solid var(--g4);display:flex;flex-direction:column;min-width:0}
+  .col:last-child{border-right:none}
+  .colh{display:flex;align-items:center;gap:10px;padding:16px 16px 8px}
+  .av{width:38px;height:38px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px}
+  .colh .n{font-weight:900;font-size:15.5px;flex:1}
+  .colh .c{font-size:12.5px;font-weight:900;color:var(--g2);background:var(--g5);border-radius:999px;padding:4px 11px;font-variant-numeric:tabular-nums}
+  .loadbar{height:4px;margin:0 16px 8px;border-radius:99px;background:var(--g4);overflow:hidden}
+  .loadbar i{display:block;height:100%;background:var(--ink);transition:width .25s}
+  .cards{flex:1;overflow:auto;padding:4px 14px 16px;display:flex;flex-direction:column;gap:10px}
+  .tc{border:1.5px solid var(--g4);border-radius:14px;padding:13px;background:#fff;cursor:pointer}
+  .tc.now{border-color:var(--time);background:var(--time-s)}
+  .tc.done{background:var(--g5);border-color:transparent}
+  .tc .d2{font-size:11px;font-weight:700;color:var(--g2);margin-bottom:4px}
+  .tc .nm{font-size:16px;font-weight:700}
+  .tc.done .nm{color:var(--g3);text-decoration:line-through}
+  .tc .meta{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .tc .state{margin-top:11px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:900;font-size:14px;border:2px solid var(--ink);color:var(--ink)}
+  .tc.done .state{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tc .state svg{width:17px;height:17px;stroke-width:2.6;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:14px 20px;border-radius:14px;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 16px 40px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.25s}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast .i{width:26px;height:26px;border-radius:50%;background:#fff;display:grid;place-items:center}
+  #toast .i svg{width:16px;height:16px;stroke:var(--ink);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="hint">インタラクティブ・デモ — <b>上のスイッチでビュー切替</b>／<b>丸やカードをタップでチェック</b>／皿は構成要素が全部そろうと<b>自動で「仕込み完了」</b>に反転します</div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜 ・ 14名</div></div>
+      <div class="sw">
+        <button data-view="today" class="on">今これ</button>
+        <button data-view="dishes">皿ごと</button>
+        <button data-view="staff">担当</button>
+      </div>
+      <div class="bR"><div class="cd"><div><small>SERVICE 18:00</small><b>T−2:48</b></div></div><span class="cov"><b id="frac">0</b> <span id="fracall">/ 0</span></span></div>
+    </div>
+    <div id="view"></div>
+  </div>
+  <div id="toast"><span class="i"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span id="toastmsg"></span></div>
+
+<script>
+const CK = '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>';
+const data = {
+  dishes: [
+    {name:'おまかせ握り', course:'主菜', comps:[
+      {name:'シャリ', tasks:[{id:'s1',nm:'米を炊く・赤酢',qty:'米 2.0升',time:'14:00',tx:'T−4:00',sec:'シャリ場',min:840,done:true}]},
+      {name:'煮切り・ツメ', tasks:[
+        {id:'s2',nm:'煮切り仕込み',qty:'200ml',time:'15:00',tx:'T−3:00',sec:'親方',min:900,done:false},
+        {id:'s3',nm:'ツメ還元',qty:'100ml',time:'15:30',tx:'T−2:30',sec:'親方',min:930,done:false}]},
+      {name:'ネタの仕込み', tasks:[
+        {id:'s4',nm:'白身の昆布締め',qty:'14貫',time:'13:30',tx:'T−4:30',sec:'親方',min:810,done:true},
+        {id:'s5',nm:'赤身の漬け',qty:'14貫',time:'13:40',tx:'T−4:20',sec:'親方',min:820,done:true}]},
+    ]},
+    {name:'先付け', course:'前菜', comps:[
+      {name:'出汁地', tasks:[{id:'s6',nm:'出汁を引く',qty:'14客',time:'14:30',tx:'T−3:30',sec:'ガルド',min:870,done:true}]},
+      {name:'盛り付け', tasks:[{id:'s7',nm:'器の準備',qty:'14客',time:'16:40',tx:'T−1:20',sec:'ガルド',min:1000,done:true}]},
+    ]},
+    {name:'椀物', course:'汁', comps:[
+      {name:'椀種', tasks:[{id:'s8',nm:'椀種の準備',qty:'14客',time:'16:30',tx:'T−1:30',sec:'ガルド',min:990,done:false}]},
+      {name:'吸地', tasks:[{id:'s9',nm:'吸地を引く',qty:'14杯',time:'17:00',tx:'T−1:00',sec:'親方',min:1020,done:false}]},
+    ]},
+    {name:'水菓子', course:'甘味', comps:[
+      {name:'ソース', tasks:[{id:'s10',nm:'ソースを炊く',qty:'300ml',time:'16:00',tx:'T−2:00',sec:'ガルド',min:960,done:false}]},
+      {name:'盛り', tasks:[{id:'s11',nm:'盛り付け準備',qty:'14客',time:'17:10',tx:'T−0:50',sec:'ガルド',min:1030,done:false}]},
+    ]},
+  ]
+};
+let view='today';
+
+const allTasks=()=>{const a=[];data.dishes.forEach(d=>d.comps.forEach(c=>c.tasks.forEach(t=>a.push({t,c,d}))));return a;};
+const compDone=c=>c.tasks.every(t=>t.done);
+const dishDone=d=>d.comps.every(compDone);
+const nowTask=()=>{const f=allTasks().find(x=>!x.t.done);return f?f.t:null;};
+const byId=id=>allTasks().find(x=>x.t.id===id);
+
+function counts(){const a=allTasks();return{done:a.filter(x=>x.t.done).length,all:a.length,dd:data.dishes.filter(dishDone).length,da:data.dishes.length};}
+function header(){const c=counts();document.getElementById('frac').textContent=c.done;document.getElementById('fracall').textContent='/ '+c.all+' 完了';}
+
+/* ---------- TODAY ---------- */
+function renderToday(){
+  const nt=nowTask();
+  // focus component = component containing nowTask
+  let fc=null,fd=null;
+  if(nt){allTasks().some(x=>{if(x.t===nt){fc=x.c;fd=x.d;return true;}});}
+  const c=counts();
+  const tl=allTasks().sort((a,b)=>a.t.min-b.t.min).map(x=>{
+    const cls=x.t.done?'done':(x.t===nt?'now':'');
+    return `<div class="ti ${cls}"><span class="mk"></span><span class="tt">${x.t.nm}</span><span class="tx">${x.t.time} ${x.t===nt?'・ いま':''}</span></div>`;
+  }).join('');
+  let focusHTML;
+  if(fc){
+    const rows=fc.tasks.map(t=>`<div class="srow ${t.done?'done':''}"><div class="tick ${t.done?'on':''}" data-st="${t.id}">${CK}</div><div class="nm">${t.nm}</div><span class="tm">${t.qty} ・ ${t.time}</span></div>`).join('');
+    const remain=fc.tasks.some(t=>!t.done);
+    focusHTML=`<div class="fL">
+      <span class="nowtag">● いま これ ・ ${fc.tasks[0].time} / ${fc.tasks[0].tx}</span>
+      <h2>${fc.name}</h2><div class="fsub">${fd.name} ・ 担当 ${fc.tasks[0].sec}</div>
+      <div class="subs">${rows}</div>
+      <div class="cta"><button class="big" id="bigComplete" ${remain?'':'disabled'}>すべて完了 → 次へ</button></div>
+    </div>`;
+  } else {
+    focusHTML=`<div class="fL"><span class="nowtag">● 完了</span><h2>本日の仕込み完了</h2><div class="fsub">全 ${c.all} 工程が完了しました。ライン点検へ。</div><div class="subs"></div></div>`;
+  }
+  document.getElementById('view').className='';
+  document.getElementById('view').innerHTML=`<div class="focus">${focusHTML}
+    <div class="fR"><div class="rh"><b>逆算スケジュール</b><span>T=18:00</span></div>
+      <div class="track"><i style="width:${Math.round(c.done/c.all*100)}%"></i></div>
+      <div class="tl">${tl}</div></div></div>`;
+}
+
+/* ---------- DISHES ---------- */
+function renderDishes(){
+  const nt=nowTask();
+  const html=data.dishes.map(d=>{
+    const full=dishDone(d);
+    const tot=d.comps.reduce((s,c)=>s+c.tasks.length,0);
+    const dn=d.comps.reduce((s,c)=>s+c.tasks.filter(t=>t.done).length,0);
+    const comps=d.comps.map(c=>{
+      const rows=c.tasks.map(t=>`<div class="row ${t.done?'done':''}"><div class="tick ${t.done?'on':''}" data-st="${t.id}">${CK}</div><div class="nm">${t.nm}</div>${t===nt?'<span class="nowflag">NOW</span>':''}<span class="qty">${t.qty}</span><span class="tm ${t===nt?'now':''}">${t.time}</span></div>`).join('');
+      return `<div class="comp"><div class="clabel">構成要素：${c.name}${compDone(c)?' ✓':''}</div>${rows}</div>`;
+    }).join('');
+    return `<div class="dish ${full?'full':''}"><div class="dh"><h3>${d.name}</h3><span class="frac">${full?'仕込み完了':dn+' / '+tot}</span></div><div class="dbar"><i style="width:${Math.round(dn/tot*100)}%"></i></div>${full?'':comps}</div>`;
+  }).join('');
+  document.getElementById('view').innerHTML=`<div class="list">${html}</div>`;
+}
+
+/* ---------- STAFF ---------- */
+function renderStaff(){
+  const nt=nowTask();
+  const secs=['シャリ場','親方','ガルド'];
+  const cols=secs.map(sec=>{
+    const items=allTasks().filter(x=>x.t.sec===sec).sort((a,b)=>a.t.min-b.t.min);
+    const dn=items.filter(x=>x.t.done).length;
+    const cards=items.map(x=>{const t=x.t;
+      return `<div class="tc ${t.done?'done':(t===nt?'now':'')}" data-st="${t.id}"><div class="d2">${x.d.name}</div><div class="nm">${t.nm}</div><div class="meta"><span class="qty">${t.qty}</span><span class="tm ${t===nt?'now':''}">${t.time}${t===nt?' ・ NOW':''}</span></div><div class="state">${t.done?CK+'完了':'タップで完了'}</div></div>`;
+    }).join('');
+    return `<div class="col"><div class="colh"><div class="av">${sec[0]}</div><div class="n">${sec}</div><div class="c">${dn}/${items.length}</div></div><div class="loadbar"><i style="width:${items.length?Math.round(dn/items.length*100):0}%"></i></div><div class="cards">${cards}</div></div>`;
+  }).join('');
+  const v=document.getElementById('view');
+  v.innerHTML=`<div class="board" style="grid-template-columns:repeat(${secs.length},1fr)">${cols}</div>`;
+}
+
+function render(){header();if(view==='today')renderToday();else if(view==='dishes')renderDishes();else renderStaff();}
+
+let toastT;
+function toast(msg){const e=document.getElementById('toast');document.getElementById('toastmsg').textContent=msg;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),1900);}
+
+function afterChange(prevDishes){
+  // detect newly completed dishes for toast
+  data.dishes.forEach((d,i)=>{if(dishDone(d)&&!prevDishes[i])toast(d.name+' 仕込み完了');});
+  render();
+}
+function toggle(id){const x=byId(id);if(!x)return;const prev=data.dishes.map(dishDone);x.t.done=!x.t.done;afterChange(prev);}
+function completeCurrent(){const nt=nowTask();if(!nt)return;let fc=null;allTasks().some(x=>{if(x.t===nt){fc=x.c;return true;}});const prev=data.dishes.map(dishDone);fc.tasks.forEach(t=>t.done=true);afterChange(prev);}
+
+document.addEventListener('click',e=>{
+  const sw=e.target.closest('[data-view]'); if(sw){view=sw.dataset.view;document.querySelectorAll('.sw button').forEach(b=>b.classList.toggle('on',b===sw));render();return;}
+  const big=e.target.closest('#bigComplete'); if(big){completeCurrent();return;}
+  const st=e.target.closest('[data-st]'); if(st){toggle(st.dataset.st);return;}
+});
+render();
+</script>
+</body></html>
