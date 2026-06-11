@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>P0ワイヤーフレーム — 今日のタスク（仕込みボード）＋メディア添付</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f6f2; --surface:#f9f8f5; --surface2:#fbfbf9; --offset:#f3f0ec; --offset2:#edeae5;
+    --border:#d4d1ca; --divider:#dcd9d5;
+    --text:#28251d; --muted:#6b6963; --faint:#9d9a93; --inverse:#f9f8f4;
+    --primary:#01696f; --primary-hover:#0c4e54; --primary-hi:#cedcd8;
+    --success:#437a22; --success-hi:#d4dfcc; --warning:#964219; --warning-hi:#ddcfc6;
+    --r:.5rem; --r-lg:.75rem; --r-xl:1rem; --r-full:9999px;
+    --shadow-sm:0 1px 2px rgba(40,37,29,.06); --shadow:0 8px 24px rgba(40,37,29,.08);
+    --font:'Satoshi',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;padding:clamp(.8rem,2.5vw,2rem)}
+  .wrap{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:1.2rem}
+  .doc-head{margin-bottom:.3rem}
+  .eyebrow{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  h1{font-size:clamp(1.35rem,1rem+1.4vw,2rem);line-height:1.12;margin:.25rem 0}
+  .sub{color:var(--muted);font-size:.95rem;max-width:62ch}
+  .ann{display:inline-grid;place-items:center;min-width:1.35rem;height:1.35rem;padding:0 .35rem;border-radius:var(--r-full);background:var(--primary);color:#fff;font-size:.72rem;font-weight:700;vertical-align:middle;margin-left:.35rem}
+
+  /* phone frame */
+  .device{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);overflow:hidden}
+  .appbar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.85rem 1rem;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 80%,transparent)}
+  .brand{display:flex;align-items:center;gap:.6rem}
+  .logo{width:26px;height:26px;color:var(--primary)}
+  .brand b{font-size:1rem}
+  .brand small{display:block;color:var(--muted);font-size:.74rem;margin-top:-2px}
+  .offline{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--warning);background:var(--warning-hi);padding:.3rem .55rem;border-radius:var(--r-full)}
+  .offline .dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--warning)}
+
+  .service{padding:1rem}
+  .svc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+  .svc-top h2{font-size:1.15rem;line-height:1.15}
+  .svc-top p{color:var(--muted);font-size:.82rem;margin-top:.15rem}
+  .resync{font-size:.74rem;color:var(--primary);background:var(--primary-hi);border:none;padding:.45rem .7rem;border-radius:var(--r);font-weight:700;cursor:pointer}
+  .progress{margin-top:.9rem}
+  .pbar{height:10px;background:var(--offset2);border-radius:999px;overflow:hidden}
+  .pfill{height:100%;width:35%;background:linear-gradient(90deg,var(--primary),color-mix(in srgb,var(--primary) 65%,white))}
+  .pmeta{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);margin-top:.35rem}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.8rem}
+  .kpi{background:var(--offset);border-radius:var(--r);padding:.55rem .6rem}
+  .kpi b{display:block;font-size:1.05rem;font-variant-numeric:tabular-nums}
+  .kpi span{font-size:.7rem;color:var(--muted)}
+
+  .board{padding:0 1rem 1.1rem}
+  .alert{display:flex;align-items:center;gap:.5rem;background:var(--warning-hi);color:var(--warning);border-radius:var(--r);padding:.55rem .7rem;font-size:.8rem;margin-bottom:.9rem}
+
+  .dish{border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface2);margin-bottom:.9rem;overflow:hidden}
+  .dish-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.8rem .9rem;cursor:pointer}
+  .dish-head .l{display:flex;align-items:flex-start;gap:.6rem}
+  .caret{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--offset);font-size:.8rem}
+  .dish-title{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+  .dish-title b{font-size:.98rem}
+  .badge{display:inline-flex;align-items:center;padding:.2rem .5rem;border-radius:var(--r-full);font-size:.7rem;background:var(--primary-hi);color:var(--primary)}
+  .badge.ok{background:var(--success-hi);color:var(--success)}
+  .badge.muted{background:var(--offset2);color:var(--muted)}
+  .dish-sub{font-size:.74rem;color:var(--muted);margin-top:.2rem}
+  .status{font-size:.72rem;font-weight:700;padding:.25rem .55rem;border-radius:var(--r-full);background:var(--offset2);color:var(--muted);white-space:nowrap}
+  .status.run{background:var(--warning-hi);color:var(--warning)}
+  .status.done{background:var(--success-hi);color:var(--success)}
+
+  /* component group */
+  .components{padding:0 .9rem .8rem;display:grid;gap:.7rem}
+  .comp{border:1px solid var(--divider);border-radius:var(--r);background:var(--surface)}
+  .comp-h{display:flex;align-items:center;justify-content:space-between;padding:.5rem .65rem;border-bottom:1px dashed var(--divider)}
+  .comp-h b{font-size:.82rem}
+  .comp-h .mini{font-size:.7rem;color:var(--faint)}
+
+  .task{display:grid;grid-template-columns:auto 1fr;gap:.6rem;padding:.6rem .65rem;align-items:start}
+  .task+.task{border-top:1px solid var(--divider)}
+  .chk{width:20px;height:20px;border:2px solid var(--border);border-radius:6px;margin-top:2px;display:grid;place-items:center;background:#fff}
+  .chk.on{background:var(--primary);border-color:var(--primary);color:#fff;font-size:.8rem}
+  .t-main h4{font-size:.86rem;line-height:1.3}
+  .t-main h4.done{text-decoration:line-through;color:var(--muted)}
+  .t-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.35rem}
+  .chip{display:inline-flex;align-items:center;gap:.25rem;font-size:.7rem;color:var(--muted);background:var(--offset);padding:.22rem .5rem;border-radius:var(--r-full)}
+  .chip.calc{background:var(--primary-hi);color:var(--primary);font-weight:700}
+  .chip.time{background:#e7efe9;color:#2f6b3a}
+  .media-btn{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--primary);background:#fff;border:1px solid var(--primary-hi);padding:.28rem .55rem;border-radius:var(--r-full);font-weight:700;cursor:pointer}
+  .media-thumb{width:42px;height:42px;border-radius:8px;background:linear-gradient(135deg,#dfe7ea,#cedcd8);display:grid;place-items:center;color:var(--primary);flex:none}
+
+  /* expanded media panel */
+  .media-panel{margin-top:.55rem;border:1px solid var(--primary-hi);border-radius:var(--r);overflow:hidden;background:#fff}
+  .mp-head{display:flex;align-items:center;justify-content:space-between;padding:.45rem .6rem;background:var(--primary-hi);color:var(--primary);font-size:.76rem;font-weight:700}
+  .mp-body{display:grid;grid-template-columns:120px 1fr;gap:.7rem;padding:.65rem}
+  .mp-photo{aspect-ratio:4/3;border-radius:8px;background:repeating-linear-gradient(45deg,#eceae5,#eceae5 8px,#f4f2ee 8px,#f4f2ee 16px);display:grid;place-items:center;color:var(--faint);font-size:.7rem;text-align:center;position:relative}
+  .mp-video{position:absolute;bottom:6px;right:6px;background:rgba(40,37,29,.78);color:#fff;font-size:.66rem;padding:.15rem .4rem;border-radius:999px}
+  .mp-steps{list-style:none;display:grid;gap:.35rem}
+  .mp-steps li{font-size:.78rem;color:var(--text);padding-left:1.4rem;position:relative}
+  .mp-steps li b{position:absolute;left:0;top:0;width:1.05rem;height:1.05rem;background:var(--primary);color:#fff;border-radius:50%;display:grid;place-items:center;font-size:.66rem}
+  @media(max-width:520px){.mp-body{grid-template-columns:1fr}}
+
+  /* annotation legend */
+  .legend{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);padding:1.1rem 1.2rem}
+  .legend h3{font-size:1.05rem;margin-bottom:.7rem}
+  .legend ul{list-style:none;display:grid;gap:.6rem}
+  .legend li{display:flex;gap:.6rem;align-items:flex-start;font-size:.86rem}
+  .legend .num{flex:none;display:inline-grid;place-items:center;min-width:1.5rem;height:1.5rem;border-radius:50%;background:var(--primary);color:#fff;font-size:.78rem;font-weight:700}
+  .legend .fr{display:inline-block;font-size:.68rem;color:var(--primary);background:var(--primary-hi);padding:.05rem .4rem;border-radius:999px;font-weight:700;margin-left:.3rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="doc-head">
+    <div class="eyebrow">P0 Wireframe</div>
+    <h1>今日のタスク（仕込みボード）＋ 手順メディア添付</h1>
+    <p class="sub">厨房タブレットで開く当日のメイン画面。料理→構成要素→サブ仕込みの階層、予約人数からの数量自動算出、来店時刻からの着手目安、各タスクの手順メディア（写真/動画）、チェック→自動ロールアップを1画面に集約。番号 <span class="ann">1</span>〜<span class="ann">7</span> は下の凡例（対応FR）に対応。</p>
+  </div>
+
+  <!-- ===== device mock ===== -->
+  <div class="device">
+    <!-- app bar -->
+    <div class="appbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect x="6" y="7" width="16" height="34" rx="8" stroke="currentColor" stroke-width="4"></rect>
+          <path d="M24 11h7c6.627 0 12 5.373 12 12s-5.373 12-12 12h-7" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M24 24h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
+        </svg>
+        <div><b>PrepFlow</b><small>鮨 はやし（カウンター10席）</small></div>
+      </div>
+      <span class="offline"><span class="dot"></span>オフライン対応・ローカル保存中 <span class="ann">6</span></span>
+    </div>
+
+    <!-- service header -->
+    <div class="service">
+      <div class="svc-top">
+        <div>
+          <h2>本日の仕込み</h2>
+          <p>6月11日(木) 夜営業 ・ 開店 18:00 ・ おまかせ1本 ・ 予約 <b>14名</b></p>
+        </div>
+        <button class="resync">予約を再取込</button>
+      </div>
+      <div class="progress">
+        <div class="pbar"><div class="pfill"></div></div>
+        <div class="pmeta"><span>達成率 35% <span class="ann">7</span></span><span>開店まで 3時間40分</span></div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><b>5 / 14</b><span>構成要素の完了</span></div>
+        <div class="kpi"><b>1 / 4</b><span>皿の仕込み完了</span></div>
+        <div class="kpi"><b>14名</b><span>本日の予約（→数量に反映 <span class="ann">2</span>）</span></div>
+      </div>
+    </div>
+
+    <!-- board -->
+    <div class="board">
+      <div class="alert">⚠ 未実施アラート：「煮切り仕込み」は <b>15:00</b> 着手が目安です（残り時間わずか）<span class="ann">5</span></div>
+
+      <!-- DISH 1 (expanded) -->
+      <div class="dish">
+        <div class="dish-head">
+          <div class="l">
+            <div class="caret">▾</div>
+            <div>
+              <div class="dish-title"><b>本日のおまかせ・握り</b><span class="badge">予約14名</span><span class="badge muted">コース主菜</span></div>
+              <div class="dish-sub">構成要素 2/3 完了 ・ 18:00 一斉スタート</div>
+            </div>
+          </div>
+          <span class="status run">2/3 完了</span>
+        </div>
+
+        <div class="components">
+          <!-- component A -->
+          <div class="comp">
+            <div class="comp-h"><b>構成要素：シャリ</b><span class="mini">担当 シャリ場</span></div>
+            <div class="task">
+              <div class="chk on">✓</div>
+              <div class="t-main">
+                <h4 class="done">米を炊く・赤酢で合わせる</h4>
+                <div class="t-row">
+                  <span class="chip calc">必要量 14人前 → 米 2.0升 <span class="ann">2</span></span>
+                  <span class="chip time">着手 14:00 <span class="ann">1</span></span>
+                  <span class="chip">所要 50分</span>
+                  <button class="media-btn">▦ 手順を見る <span class="ann">3</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- component B with open media -->
+          <div class="comp">
+            <div class="comp-h"><b>構成要素：煮切り・ツメ</b><span class="mini">担当 親方</span></div>
+            <div class="task">
+              <div class="chk"></div>
+              <div class="t-main">
+                <h4>煮切り仕込み</h4>
+                <div class="t-row">
+                  <span class="chip calc">必要量 14人前 → 200ml <span class="ann">2</span></span>
+                  <span class="chip time">着手目安 15:00 <span class="ann">1</span></span>
+                  <span class="chip">所要 40分</span>
+                  <button class="media-btn">▦ 手順を閉じる <span class="ann">3</span></button>
+                </div>
+
+                <!-- expanded media panel -->
+                <div class="media-panel">
+                  <div class="mp-head"><span>手順：煮切り（親方の基準）</span><span>写真3・動画1</span></div>
+                  <div class="mp-body">
+                    <div class="mp-photo">手順写真<div class="mp-video">▶ 動画 1:20</div></div>
+                    <ol class="mp-steps">
+                      <li><b>1</b>酒・みりんを合わせ中火で煮切る（アルコール飛ばし）</li>
+                      <li><b>2</b>たまり・濃口を加え、ひと煮立ちで火を止める</li>
+                      <li><b>3</b>味見基準：塩度◯%／とろみ◯。冷暗所で保管</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- component C -->
+          <div class="comp">
+            <div class="comp-h"><b>構成要素：ネタの仕込み</b><span class="mini">担当 親方</span></div>
+            <div class="task">
+              <div class="chk on">✓</div>
+              <div class="t-main">
+                <h4 class="done">白身の昆布締め・赤身の漬け</h4>
+                <div class="t-row">
+                  <span class="chip calc">14人前 → 各14貫分 <span class="ann">2</span></span>
+                  <span class="chip time">着手 13:30 <span class="ann">1</span></span>
+                  <span class="chip">所要 60分</span>
+                  <button class="media-btn">▦ 手順を見る <span class="ann">3</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DISH 2 (collapsed, done) -->
+      <div class="dish">
+        <div class="dish-head">
+          <div class="l">
+            <div class="caret">▸</div>
+            <div>
+              <div class="dish-title"><b>先付け・茶碗蒸し</b><span class="badge">予約14名</span></div>
+              <div class="dish-sub">全構成要素 完了 → 皿が自動で「仕込み完了」へ <span class="ann">4</span></div>
+            </div>
+          </div>
+          <span class="status done">仕込み完了</span>
+        </div>
+      </div>
+
+      <!-- DISH 3 (collapsed) -->
+      <div class="dish">
+        <div class="dish-head">
+          <div class="l">
+            <div class="caret">▸</div>
+            <div>
+              <div class="dish-title"><b>椀物・吸地</b><span class="badge">予約14名</span></div>
+              <div class="dish-sub">構成要素 0/2 完了 ・ 17:00 仕上げ</div>
+            </div>
+          </div>
+          <span class="status">0/2 完了</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== annotation legend ===== -->
+  <div class="legend">
+    <h3>番号の対応（要件定義 v0.2 のFR）</h3>
+    <ul>
+      <li><span class="num">1</span><div><b>時系列・着手目安時刻</b>：開店時刻と所要時間から「何時に着手すべきか」を逆算表示。<span class="fr">FR-06 逆算タイムライン</span></div></li>
+      <li><span class="num">2</span><div><b>予約人数からの数量自動算出</b>：本日14名 × 1人前量 ÷ 歩留りで必要量を自動計算（PrepFlow独自）。<span class="fr">FR-03 数量算出</span></div></li>
+      <li><span class="num">3</span><div><b>手順メディア添付</b>：各サブ仕込みに写真・動画・テキスト手順を紐付け。脱属人化・新人教育の中核（V-Manageから採用）。<span class="fr">FR-01 メディア添付</span></div></li>
+      <li><span class="num">4</span><div><b>自動ロールアップ</b>：構成要素が全完了 → 皿が自動「仕込み完了」→ 工程フェーズへ。<span class="fr">FR-05 ロールアップ</span></div></li>
+      <li><span class="num">5</span><div><b>未実施アラート</b>：着手目安時刻を過ぎた未実施タスクを開店前に通知。<span class="fr">FR-17 定期/アラート</span></div></li>
+      <li><span class="num">6</span><div><b>オフライン継続</b>：サーバ障害・電波弱でも当日ボードはローカルで動作、復帰時に同期。<span class="fr">NFR-01 縮退運転</span></div></li>
+      <li><span class="num">7</span><div><b>達成率の可視化</b>：当日の完了率・未実施・遅延をひと目で。<span class="fr">FR-11 ダッシュボード</span></div></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

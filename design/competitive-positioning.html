@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>競合ポジショニング — V-Manage / カミナシ / PrepFlow</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f6f2; --surface:#f9f8f5; --surface2:#fbfbf9; --offset:#f3f0ec; --offset2:#edeae5;
+    --border:#d4d1ca; --divider:#dcd9d5;
+    --text:#28251d; --muted:#6b6963; --faint:#9d9a93;
+    --primary:#01696f; --primary-hi:#cedcd8; --success:#437a22; --success-hi:#d4dfcc; --warning:#964219; --warning-hi:#ddcfc6;
+    --r:0.75rem; --r-lg:1rem; --shadow:0 8px 24px rgba(40,37,29,.08);
+    --font:'Satoshi',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;padding:clamp(1rem,3vw,2.5rem)}
+  .wrap{max-width:1080px;margin:0 auto}
+  header.top{margin-bottom:2rem}
+  .eyebrow{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  h1{font-size:clamp(1.5rem,1.1rem+1.6vw,2.25rem);line-height:1.1;margin:.3rem 0}
+  .sub{color:var(--muted);font-size:1rem;max-width:60ch}
+  section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:clamp(1.1rem,2.5vw,1.8rem);margin-bottom:1.5rem}
+  h2{font-size:1.25rem;margin-bottom:.4rem}
+  h2 .n{display:inline-grid;place-items:center;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--primary);color:#fff;font-size:.9rem;margin-right:.5rem;vertical-align:middle}
+  .lead{color:var(--muted);font-size:.95rem;margin-bottom:1.2rem}
+  /* map */
+  .map-wrap{width:100%;overflow-x:auto}
+  svg{display:block;width:100%;height:auto;min-width:560px}
+  /* matrix */
+  table{border-collapse:collapse;width:100%;font-size:.86rem}
+  th,td{padding:.6rem .7rem;text-align:left;border-bottom:1px solid var(--divider);vertical-align:middle}
+  thead th{position:sticky;top:0;background:var(--offset);font-size:.8rem}
+  th.feat{width:36%}
+  td.prod,th.prod{text-align:center;width:16%}
+  tbody tr:hover{background:var(--surface2)}
+  .col-pf{background:color-mix(in srgb,var(--primary-hi) 35%, transparent)}
+  .mark{display:inline-grid;place-items:center;width:1.55rem;height:1.55rem;border-radius:50%;font-size:.85rem;font-weight:700}
+  .yes{background:var(--success-hi);color:var(--success)}
+  .part{background:var(--warning-hi);color:var(--warning)}
+  .no{background:var(--offset2);color:var(--faint)}
+  .cell-note{display:block;font-size:.7rem;color:var(--faint);margin-top:.15rem}
+  .price{font-weight:700;font-variant-numeric:tabular-nums}
+  .matrix-scroll{overflow-x:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem;font-size:.8rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:.4rem}
+  .seg{display:inline-block;padding:.15rem .5rem;border-radius:999px;font-size:.72rem;font-weight:700}
+  .seg.k{background:#e7e3dd;color:#5c574e}
+  .seg.v{background:#dfe7ea;color:#2a5c63}
+  .seg.p{background:var(--primary-hi);color:var(--primary)}
+  ul.points{list-style:none;display:grid;gap:.7rem}
+  ul.points li{padding-left:1.4rem;position:relative;font-size:.92rem}
+  ul.points li:before{content:"";position:absolute;left:0;top:.55rem;width:.5rem;height:.5rem;border-radius:50%;background:var(--primary)}
+  .tag{display:inline-block;background:var(--primary-hi);color:var(--primary);font-size:.72rem;font-weight:700;padding:.1rem .45rem;border-radius:999px}
+  .foot{color:var(--faint);font-size:.75rem;margin-top:1rem}
+  @media(max-width:640px){th.feat{width:40%}.cell-note{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Competitive Positioning</div>
+    <h1>競合ポジショニング図 — V-Manage / カミナシ / PrepFlow</h1>
+    <p class="sub">「店舗オペレーション全般の記録・可視化」と「厨房の仕込み（数量・段取り）の自動化」という2軸で、PrepFlowの白地を示す。参考として欧米のBOH最大手Apicbaseも淡色で表示。</p>
+  </header>
+
+  <section>
+    <h2><span class="n">1</span>ポジショニングマップ</h2>
+    <p class="lead">横軸＝業務の焦点（左：店舗オペ全般・汎用チェック ↔ 右：仕込み/mise-en-place特化）。縦軸＝知能の深さ（下：やること記録・可視化 ↔ 上：予約連動の予測・自動算出）。</p>
+    <div class="map-wrap">
+      <svg viewBox="0 0 820 600" role="img" aria-label="ポジショニングマップ">
+        <!-- whitespace highlight (top-right) -->
+        <rect x="470" y="70" width="300" height="220" rx="14" fill="#cedcd8" opacity="0.35"/>
+        <text x="620" y="105" text-anchor="middle" font-family="Satoshi" font-size="13" fill="#01696f" font-weight="700">WHITE SPACE</text>
+        <text x="620" y="124" text-anchor="middle" font-family="Satoshi" font-size="11" fill="#0c4e54">予約連動 × 仕込み特化</text>
+
+        <!-- axes -->
+        <line x1="90" y1="70" x2="90" y2="520" stroke="#c9c5bd" stroke-width="2"/>
+        <line x1="90" y1="520" x2="770" y2="520" stroke="#c9c5bd" stroke-width="2"/>
+        <!-- axis arrows -->
+        <polygon points="90,62 85,74 95,74" fill="#9d9a93"/>
+        <polygon points="778,520 766,515 766,525" fill="#9d9a93"/>
+
+        <!-- axis labels -->
+        <text x="100" y="60" font-family="Satoshi" font-size="13" fill="#6b6963" font-weight="700">↑ 予約連動の予測・自動算出</text>
+        <text x="100" y="540" font-family="Satoshi" font-size="13" fill="#6b6963">やること記録・可視化</text>
+        <text x="430" y="572" text-anchor="middle" font-family="Satoshi" font-size="13" fill="#6b6963" font-weight="700">業務の焦点 →</text>
+        <text x="150" y="500" text-anchor="middle" font-family="Satoshi" font-size="11" fill="#9d9a93">店舗オペ全般・汎用</text>
+        <text x="690" y="500" text-anchor="middle" font-family="Satoshi" font-size="11" fill="#9d9a93">仕込み特化・成果物階層</text>
+
+        <!-- gridline mid -->
+        <line x1="430" y1="70" x2="430" y2="520" stroke="#e3dfd9" stroke-width="1" stroke-dasharray="4 5"/>
+        <line x1="90" y1="295" x2="770" y2="295" stroke="#e3dfd9" stroke-width="1" stroke-dasharray="4 5"/>
+
+        <!-- カミナシ : 汎用現場記録 (左下) -->
+        <circle cx="195" cy="430" r="13" fill="#8d877c"/>
+        <text x="215" y="428" font-family="Satoshi" font-size="14" fill="#28251d" font-weight="700">カミナシ</text>
+        <text x="215" y="446" font-family="Satoshi" font-size="11" fill="#6b6963">多業種の現場点検・HACCP記録</text>
+
+        <!-- V-Manage : 店舗オペ全般+本部 (左中) -->
+        <circle cx="320" cy="360" r="13" fill="#3f7d86"/>
+        <text x="340" y="358" font-family="Satoshi" font-size="14" fill="#28251d" font-weight="700">V-Manage</text>
+        <text x="340" y="376" font-family="Satoshi" font-size="11" fill="#6b6963">飲食チェーンの時系列タスク＋本部配信</text>
+
+        <!-- Apicbase 参考 (右中・淡色) -->
+        <circle cx="560" cy="330" r="11" fill="#b9b3a8" opacity="0.8"/>
+        <text x="578" y="328" font-family="Satoshi" font-size="12" fill="#9d9a93" font-weight="700">Apicbase（参考）</text>
+        <text x="578" y="344" font-family="Satoshi" font-size="10.5" fill="#b0aca3">レシピ/生産計画＝需要予測ベース・enterprise</text>
+
+        <!-- PrepFlow : 右上 white space -->
+        <circle cx="630" cy="175" r="16" fill="#01696f"/>
+        <circle cx="630" cy="175" r="24" fill="none" stroke="#01696f" stroke-width="2" opacity="0.4"/>
+        <text x="612" y="150" text-anchor="end" font-family="Satoshi" font-size="15" fill="#01696f" font-weight="700">PrepFlow</text>
+        <text x="612" y="168" text-anchor="end" font-family="Satoshi" font-size="11" fill="#0c4e54">予約人数→数量算出</text>
+        <text x="612" y="184" text-anchor="end" font-family="Satoshi" font-size="11" fill="#0c4e54">来店時刻→逆算タイムライン</text>
+        <text x="612" y="200" text-anchor="end" font-family="Satoshi" font-size="11" fill="#0c4e54">階層×自動ロールアップ</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><span class="seg k">カミナシ</span> 多業種の現場記録DX（17,000サイト規模）</span>
+      <span><span class="seg v">V-Manage</span> 飲食チェーンのオペ標準化（¥5,000/店舗）</span>
+      <span><span class="seg p">PrepFlow</span> 単店・コース店の仕込み知能</span>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>機能マップ（比較表）</h2>
+    <p class="lead">下段5項目（階層・ロールアップ・数量算出・逆算・学習）はいずれもPrepFlowのみ＝白地。上段はテーブルステークス。</p>
+    <div class="matrix-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th class="feat">機能 / 観点</th>
+          <th class="prod">カミナシ</th>
+          <th class="prod">V-Manage</th>
+          <th class="prod col-pf">PrepFlow</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="feat">対象セグメント</td>
+          <td class="prod" colspan="1"><span class="seg k">多業種現場</span></td>
+          <td class="prod"><span class="seg v">飲食チェーン</span></td>
+          <td class="prod col-pf"><span class="seg p">高級コース単店</span></td></tr>
+
+        <tr><td class="feat">時系列タスク（今日のタスク）</td>
+          <td class="prod"><span class="mark part">△</span><span class="cell-note">点検中心</span></td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod col-pf"><span class="mark yes">✓</span></td></tr>
+
+        <tr><td class="feat">手順マニュアル / 写真 / 動画 添付</td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod col-pf"><span class="mark yes">✓</span><span class="cell-note">P1</span></td></tr>
+
+        <tr><td class="feat">電子チェックシート（HACCP）</td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod col-pf"><span class="mark part">△</span><span class="cell-note">P2/任意</span></td></tr>
+
+        <tr><td class="feat">本部→店舗 一斉配信</td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod col-pf"><span class="mark no">✕</span><span class="cell-note">対象外</span></td></tr>
+
+        <tr><td class="feat">チャット / 掲示板</td>
+          <td class="prod"><span class="mark part">△</span></td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod col-pf"><span class="mark no">✕</span></td></tr>
+
+        <tr><td class="feat">多言語</td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod"><span class="mark yes">✓</span></td>
+          <td class="prod col-pf"><span class="mark part">△</span><span class="cell-note">P3</span></td></tr>
+
+        <tr><td class="feat"><strong>料理→構成要素→サブ仕込み の階層</strong></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod col-pf"><span class="mark yes">✓</span></td></tr>
+
+        <tr><td class="feat"><strong>全完了で皿が自動ロールアップ</strong></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod col-pf"><span class="mark yes">✓</span></td></tr>
+
+        <tr><td class="feat"><strong>予約人数 → 仕込み量の自動算出</strong></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod col-pf"><span class="mark yes">✓</span></td></tr>
+
+        <tr><td class="feat"><strong>来店時刻からの逆算タイムライン</strong></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod col-pf"><span class="mark yes">✓</span></td></tr>
+
+        <tr><td class="feat"><strong>過剰仕込み / 廃棄の学習</strong></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod col-pf"><span class="mark part">△</span><span class="cell-note">P2</span></td></tr>
+
+        <tr><td class="feat">予約システム連携</td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod col-pf"><span class="mark part">△</span><span class="cell-note">P2メール/P3 API</span></td></tr>
+
+        <tr><td class="feat">在庫 / 発注 / 原価</td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod"><span class="mark no">✕</span></td>
+          <td class="prod col-pf"><span class="mark no">✕</span><span class="cell-note">連携前提</span></td></tr>
+
+        <tr><td class="feat">月額（税別）</td>
+          <td class="prod"><span class="price">要見積</span><span class="cell-note">中〜高</span></td>
+          <td class="prod"><span class="price">¥5,000</span><span class="cell-note">/店舗</span></td>
+          <td class="prod col-pf"><span class="price">¥5,800〜19,800</span></td></tr>
+
+        <tr><td class="feat">主戦場</td>
+          <td class="prod">多店舗・多業種の点検DX</td>
+          <td class="prod">飲食チェーンのオペ標準化</td>
+          <td class="prod col-pf">単店・コース店の仕込み知能</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="legend">
+      <span><span class="mark yes" style="width:1.2rem;height:1.2rem">✓</span> 対応</span>
+      <span><span class="mark part" style="width:1.2rem;height:1.2rem">△</span> 部分/限定/将来</span>
+      <span><span class="mark no" style="width:1.2rem;height:1.2rem">✕</span> 非対応/対象外</span>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>要点</h2>
+    <ul class="points">
+      <li><span class="tag">白地</span> 「<strong>予約連動の数量・逆算・階層ロールアップ</strong>」は3社中PrepFlowのみ。カミナシ／V-Manageは“やることの記録・可視化”に留まり、仕込みの<strong>量と段取りを計算しない</strong>。</li>
+      <li><span class="tag">採用</span> 「時系列タスク＋手順メディア＋チェック＋ダッシュボード」はV-Manageで実証済みのUI。PrepFlowも踏襲（FR-01メディア添付・FR-11ダッシュボード）。</li>
+      <li><span class="tag">価格</span> V-Manage ¥5,000/店舗のアンカーに対し、PrepFlowは<strong>Lite ¥5,800で並べ、Standard ¥9,800で“数量・逆算”の独自価値</strong>へ誘導。</li>
+      <li><span class="tag">注意</span> 一斉配信・チャット・多言語はチェーン向けの強みでありPrepFlowの主戦場ではない。<strong>単店・コース店の仕込み</strong>に集中することで差別化が成立。</li>
+      <li><span class="tag">脅威</span> 隣接データを持つ予約勢（TableCheck/トレタ）や予測勢（Apicbase/HANZO）が逆算プレップを後付けする可能性。先回りの提携が有効。</li>
+    </ul>
+    <p class="foot">出典：V-Manage公式・インフォマート／カミナシ公式・各種導入事例／Apicbase公式。価格・機能は2026年6月時点の公開情報に基づく整理（一部は要見積・推定）。</p>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# rendering tooling (regenerate with `npm i && node design/render.mjs`)
+design/node_modules/
+design/.cache/
+design/package-lock.json
+node_modules/
