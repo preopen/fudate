@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>コース手動割当モーダル</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column;position:relative}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL h1{font-size:19px;font-weight:900}.bL .sub{font-size:12.5px;color:var(--g2)}
+  .cd{display:flex;align-items:center;gap:8px;background:var(--time-s);border-radius:12px;padding:8px 14px}
+  .cd small{display:block;font-size:10px;color:var(--time);font-weight:700;letter-spacing:.08em}
+  .cd b{font-size:18px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  /* dimmed background list */
+  .listwrap{padding:16px 28px;overflow:hidden;filter:saturate(.9)}
+  .lh{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+  .lh b{font-size:14px;font-weight:900}.lh span{font-size:12px;color:var(--g2)}
+  .res{display:grid;grid-template-columns:62px 96px 1fr auto auto;gap:12px;align-items:center;padding:13px 12px;border:1.5px solid var(--g4);border-radius:13px;margin-bottom:9px;background:#fff}
+  .res.active{border-color:var(--ink);border-width:2.5px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+  .res .time{font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+  .src-badge{font-size:10.5px;font-weight:900;padding:4px 9px;border-radius:999px;text-align:center}
+  .sb-mail{background:var(--g5);color:var(--g2)}.sb-direct{background:var(--ink);color:#fff}
+  .who b{font-size:15px;font-weight:700}.who small{display:block;font-size:11.5px;color:var(--g2)}
+  .course{font-size:12px;font-weight:700;color:var(--ink);background:var(--g5);padding:5px 10px;border-radius:8px;white-space:nowrap}
+  .course.none{color:var(--time);background:var(--time-s)}
+  .pax{font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;text-align:right}
+  /* scrim + modal */
+  .scrim{position:absolute;inset:0;background:rgba(21,23,26,.45)}
+  .modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:560px;background:#fff;border-radius:22px;box-shadow:0 30px 70px rgba(0,0,0,.3);overflow:hidden}
+  .mh{padding:20px 24px 16px;border-bottom:1px solid var(--g4)}
+  .mh .k{font-size:11px;font-weight:900;letter-spacing:.12em;color:var(--time)}
+  .mh h2{font-size:21px;font-weight:900;margin-top:6px}
+  .mh .guest{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13px;color:var(--g2)}
+  .mh .guest .b2{font-size:10.5px;font-weight:900;padding:4px 9px;border-radius:999px;background:var(--g5);color:var(--g2)}
+  .mh .guest b{color:var(--ink);font-weight:900}
+  .mb{padding:18px 24px;display:flex;flex-direction:column;gap:10px;max-height:380px;overflow:auto}
+  .lbl{font-size:11.5px;font-weight:900;letter-spacing:.04em;color:var(--g2)}
+  .copt{display:flex;align-items:center;gap:14px;border:1.5px solid var(--g4);border-radius:14px;padding:15px 16px;cursor:pointer;background:#fff}
+  .copt.sel{border-color:var(--ink);border-width:2.5px}
+  .copt .radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--g3);flex:none}
+  .copt.sel .radio{border-color:var(--ink);border-width:6.5px}
+  .copt .c b{font-size:16px;font-weight:900;display:block}
+  .copt .c small{font-size:12px;color:var(--g2)}
+  .copt .pr{margin-left:auto;font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--g2)}
+  .copt.split{border-style:dashed}
+  .splitrow{display:flex;align-items:center;gap:10px;padding:2px 4px 4px 52px}
+  .splitrow .s{display:flex;align-items:center;gap:8px;font-size:13px}
+  .splitrow .seatbox{display:inline-flex;align-items:center;border:1.5px solid var(--g4);border-radius:9px;overflow:hidden}
+  .splitrow .seatbox button{width:30px;height:34px;background:var(--g5);border:none;font-size:16px;cursor:pointer}
+  .splitrow .seatbox .v{width:38px;text-align:center;font-weight:900;font-variant-numeric:tabular-nums}
+  .applyto{display:flex;align-items:center;gap:10px;background:var(--g5);border-radius:11px;padding:12px 14px;font-size:13px;color:var(--g2);margin-top:2px}
+  .applyto .chk{width:22px;height:22px;border-radius:6px;background:var(--ink);display:grid;place-items:center;flex:none}
+  .applyto .chk svg{width:14px;height:14px;stroke:#fff}
+  .mf{display:flex;gap:12px;padding:16px 24px 20px;border-top:1px solid var(--g4)}
+  .mf .cancel{flex:none;width:120px;height:54px;border:1.5px solid var(--g4);border-radius:13px;background:#fff;font-family:var(--font);font-size:15px;font-weight:800;color:var(--g2);cursor:pointer}
+  .mf .ok{flex:1;height:54px;border:none;border-radius:13px;background:var(--ink);color:#fff;font-family:var(--font);font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>コース未確定 → 手動割当（FR-34）</b><span>メール予約はコース情報が無いため、人数にコースを紐付ける小モーダル。確定すると仕込み数量へ即反映</span></div>
+  <div class="tab">
+    <div class="bar"><div class="bL"><h1>予約ハブ</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜</div></div><div class="cd"><div><small>SERVICE 18:00</small><b>T−2:48</b></div></div></div>
+
+    <div class="listwrap">
+      <div class="lh"><b>本日の予約（合算 14名 / 5件）</b><span>時刻順</span></div>
+      <div class="res"><span class="time">18:00</span><span class="src-badge sb-direct">Direct</span><div class="who"><b>高橋 様</b><small>甲殻類（席2）・記念日</small></div><span class="course">おまかせ握り</span><span class="pax">6名</span></div>
+      <div class="res active"><span class="time">18:00</span><span class="src-badge sb-mail">食べlog</span><div class="who"><b>鈴木 様</b><small>メモ：—</small></div><span class="course none">コース未確定</span><span class="pax">4名</span></div>
+      <div class="res"><span class="time">20:30</span><span class="src-badge sb-mail">Table</span><div class="who"><b>田中 様</b><small>接待</small></div><span class="course none">コース未確定</span><span class="pax">2名</span></div>
+      <div class="res"><span class="time">20:30</span><span class="src-badge sb-direct">Direct</span><div class="who"><b>佐藤 様</b><small>わさび抜き（席1）</small></div><span class="course">おまかせ握り</span><span class="pax">2名</span></div>
+    </div>
+
+    <!-- modal -->
+    <div class="scrim"></div>
+    <div class="modal">
+      <div class="mh">
+        <div class="k">コースを割り当てる</div>
+        <h2>鈴木 様 ・ 4名</h2>
+        <div class="guest"><span class="b2">食べログ（メール取込）</span><span>18:00 来店</span><span>・ コース未確定</span></div>
+      </div>
+      <div class="mb">
+        <span class="lbl">コースを選択（4名分）</span>
+        <div class="copt sel"><span class="radio"></span><div class="c"><b>おまかせ握り</b><small>標準コース</small></div><span class="pr">¥16,500</span></div>
+        <div class="copt"><span class="radio"></span><div class="c"><b>特別おまかせ</b><small>特上ネタ</small></div><span class="pr">¥22,000</span></div>
+        <div class="copt split"><span class="radio"></span><div class="c"><b>内訳を分ける</b><small>卓内で複数コースが混在する場合</small></div></div>
+        <div class="splitrow">
+          <div class="s">おまかせ <div class="seatbox"><button>−</button><span class="v">3</span><button>＋</button></div>名</div>
+          <div class="s">特別 <div class="seatbox"><button>−</button><span class="v">1</span><button>＋</button></div>名</div>
+        </div>
+        <div class="applyto"><div class="chk"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>同じ「食べログ・コース未確定」の他予約にも、今後このコースを既定にする</div>
+      </div>
+      <div class="mf"><button class="cancel">あとで</button><button class="ok"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff"><path d="M5 13l4 4L19 7"/></svg>割り当てて仕込みに反映</button></div>
+    </div>
+  </div>
+</body></html>

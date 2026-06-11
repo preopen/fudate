@@ -53,6 +53,8 @@
 | Direct予約ページ（ゲスト直販動線） | `p3-wireframe-direct-booking.html/.png` | FR-35（コース事前選択・アレルギー・事前決済） |
 | 予約ハブ（複数ソース合算・重複警告） | `p2-wireframe-reservation-hub.html/.png` | FR-34 |
 | Direct設定・店舗側（アロットメント/デポジット/コース公開） | `p3-wireframe-direct-settings.html/.png` | FR-35/36 |
+| コース手動割当モーダル（予約ハブ） | `p2-wireframe-course-assign.html/.png` | FR-34 |
+| Direct確定メール＋ゲストマイページ | `p3-wireframe-direct-mypage.html/.png` | FR-35（リマインド・キャンセル動線） |
 
 ---
 

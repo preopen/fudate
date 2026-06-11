@@ -266,6 +266,8 @@ Restaurant ─┬─ Section ─── Staff
 | Direct予約ページ（ゲスト直販） | `design/p3-wireframe-direct-booking.html` | FR-35 |
 | 予約ハブ（複数ソース合算） | `design/p2-wireframe-reservation-hub.html` | FR-34 |
 | Direct設定・店舗側 | `design/p3-wireframe-direct-settings.html` | FR-35/36 |
+| コース手動割当モーダル | `design/p2-wireframe-course-assign.html` | FR-34 |
+| Direct確定メール＋ゲストマイページ | `design/p3-wireframe-direct-mypage.html` | FR-35 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 

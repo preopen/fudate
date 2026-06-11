@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Direct 確定メール＋マイページ</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1b1a17;--g2:#6d6a62;--g3:#b5b1a7;--line:#e7e2d8;--cream:#faf8f3;--card:#fff;
+        --time:#bb4d1b;--time-s:#f6e7dc;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#d9d6cf;color:var(--ink);-webkit-font-smoothing:antialiased;padding:24px;line-height:1.5}
+  .cap{max-width:1080px;margin:0 auto 14px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#86837c;font-size:13px}
+  .stage{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:368px 1fr;gap:24px;align-items:start}
+  .powered{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;font-size:11px;color:var(--g3);font-weight:700;letter-spacing:.04em}
+  .powered svg{width:13px;height:13px;color:var(--g3)}
+  /* ===== email ===== */
+  .mail{background:var(--card);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.16);overflow:hidden}
+  .mtop{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--cream)}
+  .mtop .av{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px}
+  .mtop b{font-size:14px;font-weight:900}.mtop small{display:block;font-size:11px;color:var(--g2)}
+  .mtop .time{margin-left:auto;font-size:11px;color:var(--g3)}
+  .mbody{padding:22px 22px 24px;text-align:center}
+  .seal{width:54px;height:54px;border-radius:50%;background:var(--ink);display:grid;place-items:center;margin:0 auto 14px}
+  .seal svg{width:28px;height:28px;stroke:#fff}
+  .mbody h2{font-size:20px;font-weight:900}
+  .mbody .lead{font-size:12.5px;color:var(--g2);margin-top:6px}
+  .ticket{border:1.5px dashed var(--line);border-radius:14px;margin-top:18px;text-align:left;overflow:hidden}
+  .tr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);font-size:13.5px}
+  .tr:last-child{border-bottom:none}
+  .tr .l{color:var(--g2)}.tr .v{font-weight:900;text-align:right}
+  .tr .v small{display:block;font-size:11px;color:var(--g2);font-weight:700}
+  .tr.no{background:var(--cream)}
+  .resno{font-size:12px;color:var(--g2);margin-top:14px;font-variant-numeric:tabular-nums}
+  .resno b{color:var(--ink);font-weight:900;letter-spacing:.04em}
+  .cta{display:block;width:100%;height:52px;border:none;border-radius:13px;background:var(--time);color:#fff;font-family:var(--font);font-size:15px;font-weight:900;margin-top:16px;cursor:pointer}
+  .subbtns{display:flex;gap:8px;margin-top:9px}
+  .subbtns button{flex:1;height:42px;border:1.5px solid var(--line);border-radius:11px;background:var(--card);font-family:var(--font);font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer}
+  .mfoot{font-size:11px;color:var(--g2);margin-top:16px;line-height:1.6}
+  /* ===== mypage ===== */
+  .page{background:var(--cream);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.16);overflow:hidden}
+  .pnav{display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid var(--line)}
+  .pnav .b{font-size:16px;font-weight:900}
+  .pnav .st{font-size:11.5px;font-weight:900;background:var(--ink);color:#fff;padding:6px 13px;border-radius:999px}
+  .pbody{padding:24px 28px}
+  .count{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .count .ic{width:42px;height:42px;border-radius:11px;background:var(--ink);display:grid;place-items:center;flex:none}
+  .count .ic svg{width:22px;height:22px;stroke:#fff}
+  .count b{font-size:18px;font-weight:900}.count small{display:block;font-size:12px;color:var(--g2)}
+  .count .cd{margin-left:auto;text-align:right}
+  .count .cd b{font-size:20px;color:var(--time)}.count .cd small{color:var(--time)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .blk{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:16px 18px}
+  .blk h4{font-size:11.5px;font-weight:900;letter-spacing:.06em;color:var(--g2);margin-bottom:11px}
+  .kv{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;font-size:14px}
+  .kv .k{color:var(--g2)}.kv .v{font-weight:900}
+  .alg{display:inline-flex;align-items:center;gap:7px;background:var(--time-s);color:var(--time);font-size:12.5px;font-weight:900;padding:6px 11px;border-radius:999px;margin-top:2px}
+  .editlink{font-size:12px;font-weight:900;color:var(--ink);text-decoration:underline;cursor:pointer;margin-top:10px;display:inline-block}
+  .pay-paid{font-size:12px;font-weight:900;color:#3a6a2a;display:inline-flex;align-items:center;gap:6px}
+  .actions{display:flex;gap:12px;margin-top:16px}
+  .change{flex:1;height:54px;border:1.5px solid var(--line);border-radius:13px;background:var(--card);font-family:var(--font);font-size:15px;font-weight:900;color:var(--ink);cursor:pointer}
+  .cancel{flex:none;width:200px;height:54px;border:1.5px solid var(--time);border-radius:13px;background:var(--card);font-family:var(--font);font-size:15px;font-weight:900;color:var(--time);cursor:pointer}
+  /* cancel policy */
+  .policy{margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden}
+  .policy h4{font-size:11.5px;font-weight:900;letter-spacing:.06em;color:var(--g2);padding:14px 18px 6px}
+  .pp{display:flex;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid var(--line);font-size:13px}
+  .pp .dot{width:10px;height:10px;border-radius:50%;flex:none}
+  .pp.free .dot{background:var(--ink)}.pp.fee .dot{background:var(--time)}
+  .pp .t2{flex:1}.pp .t2 b{font-weight:900}.pp .t2 small{display:block;color:var(--g2);font-size:11.5px}
+  .pp .amt{font-weight:900;font-variant-numeric:tabular-nums}
+  .pp.now{background:var(--cream)}
+  .pp.now .amt{color:var(--time)}
+  .remind{display:flex;align-items:center;gap:12px;margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px 18px}
+  .remind .t3{flex:1;font-size:13px}.remind .t3 b{font-weight:900;display:block}.remind .t3 small{color:var(--g2);font-size:11.5px}
+  .toggle{width:52px;height:30px;border-radius:999px;background:var(--ink);position:relative;flex:none}
+  .toggle:after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff}
+  svg{stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>Direct 確定メール ＋ ゲスト側マイページ（FR-35）</b><span>左＝予約確定メール ／ 右＝ゲストが自分で確認・変更・キャンセルできるマイページ。リマインド自動送信</span></div>
+  <div class="stage">
+    <!-- ===== email ===== -->
+    <div>
+      <div class="mail">
+        <div class="mtop"><div class="av">鮨</div><div><b>鮨 はやし</b><small>reservation@prepflow.app</small></div><span class="time">今</span></div>
+        <div class="mbody">
+          <div class="seal"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <h2>ご予約が確定しました</h2>
+          <div class="lead">高橋 様 ／ ご来店を心よりお待ちしております。</div>
+          <div class="ticket">
+            <div class="tr"><span class="l">日時</span><span class="v">6月11日(木) 18:00<small>2名</small></span></div>
+            <div class="tr"><span class="l">コース</span><span class="v">おまかせ握り<small>¥16,500 / 名</small></span></div>
+            <div class="tr no"><span class="l">お支払い（受領）</span><span class="v">デポジット ¥10,000<small>残り ¥23,000 来店時</small></span></div>
+          </div>
+          <div class="resno">予約番号 <b>HF-0611-1800</b></div>
+          <button class="cta">予約を確認・変更する</button>
+          <div class="subbtns"><button>カレンダーに追加</button><button>アクセス・地図</button></div>
+          <div class="mfoot">前日6/10 18:00以降のキャンセルはデポジットの返金ができません。<br>ご予約のリマインドを前日と当日にお送りします。</div>
+        </div>
+      </div>
+      <div class="powered"><svg viewBox="0 0 48 48" fill="none"><rect x="6" y="7" width="16" height="34" rx="8" stroke="currentColor" stroke-width="5"/><path d="M24 11h7c6.6 0 12 5.4 12 12s-5.4 12-12 12h-7" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>Powered by PrepFlow</div>
+    </div>
+
+    <!-- ===== mypage ===== -->
+    <div class="page">
+      <div class="pnav"><div class="b">鮨 はやし ・ ご予約</div><span class="st">確定</span></div>
+      <div class="pbody">
+        <div class="count">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 10h18M7 3v4M17 3v4M5 6h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1z"/></svg></div>
+          <div><b>6月11日(木) 18:00</b><small>2名 ・ おまかせ握り</small></div>
+          <div class="cd"><b>あと 2日 21時間</b><small>来店まで</small></div>
+        </div>
+
+        <div class="grid2">
+          <div class="blk">
+            <h4>ご予約内容</h4>
+            <div class="kv"><span class="k">人数</span><span class="v">2名</span></div>
+            <div class="kv"><span class="k">コース</span><span class="v">おまかせ握り</span></div>
+            <div class="kv"><span class="k">アレルギー</span><span class="v"></span></div>
+            <span class="alg">甲殻類（席2）</span>
+            <span class="editlink">アレルギー・苦手を編集</span>
+          </div>
+          <div class="blk">
+            <h4>お支払い</h4>
+            <div class="kv"><span class="k">デポジット</span><span class="v"><span class="pay-paid"><svg viewBox="0 0 24 24" width="14" height="14" stroke="#3a6a2a"><path d="M5 13l4 4L19 7"/></svg>支払済 ¥10,000</span></span></div>
+            <div class="kv"><span class="k">コース計</span><span class="v">¥33,000</span></div>
+            <div class="kv"><span class="k">残り（来店時）</span><span class="v">¥23,000</span></div>
+            <span class="editlink">領収書を表示</span>
+          </div>
+        </div>
+
+        <div class="actions"><button class="change">人数・コースを変更</button><button class="cancel">キャンセルする</button></div>
+
+        <div class="policy">
+          <h4>キャンセル規定</h4>
+          <div class="pp free now"><span class="dot"></span><div class="t2"><b>いま 〜 6/10(水) 18:00</b><small>無料キャンセル・デポジット全額返金</small></div><span class="amt">¥0</span></div>
+          <div class="pp fee"><span class="dot"></span><div class="t2"><b>6/10 18:00 以降</b><small>デポジットは返金されません</small></div><span class="amt">¥10,000</span></div>
+        </div>
+
+        <div class="remind">
+          <div class="t3"><b>リマインド通知</b><small>前日・当日の朝にメール／LINEでお知らせ</small></div>
+          <div class="toggle"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>
