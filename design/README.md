@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **29画面 / 6カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **34画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -65,7 +65,9 @@
 | シミュレーション並走（実績 vs 推奨） | `p0-wireframe-simulation.html/.png` | FR-39 |
 | 複数日デイレール（今日提供＋前倒し） | `p1-wireframe-dayrail-multiday.html/.png` | FR-40/41 |
 | 営業日カレンダー設定 | `p1-wireframe-calendar.html/.png` | FR-17/40の基礎（設定追加） |
-| ラベル運用フロー（完了→印刷→QR残量→繰越） | `p2-wireframe-label-flow.html/.png` | FR-20/42 ＋ **FR-45/46（探索・v0.7候補）** |
+| ラベル運用フロー（完了→印刷→QR残量→繰越） | `p2-wireframe-label-flow.html/.png` | FR-20/42/45/46 |
+| 「今ある半製品」ビュー（作り置き・残量・期限） | `p2-wireframe-prep-larder.html/.png` | FR-45（ラベルモード） |
+| ラベルモード設定（プリンタ接続） | `p2-wireframe-label-settings.html/.png` | FR-48 |
 
 ---
 

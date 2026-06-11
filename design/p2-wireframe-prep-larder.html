@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>今ある半製品ビュー — 作り置き・残量・期限</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL h1{font-size:19px;font-weight:900}.bL .sub{font-size:12.5px;color:var(--g2)}
+  .bR{display:flex;align-items:center;gap:12px}
+  .scan{font-size:13px;font-weight:900;color:#fff;background:var(--ink);border:none;border-radius:11px;padding:11px 16px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+  .scan svg{width:17px;height:17px;stroke:#fff}
+  .modepill{font-size:11px;font-weight:900;color:var(--time);background:var(--time-s);padding:7px 12px;border-radius:999px}
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 28px 4px}
+  .kpi{border:1.5px solid var(--g4);border-radius:13px;padding:13px 15px}
+  .kpi small{font-size:11.5px;color:var(--g2);font-weight:700}
+  .kpi b{display:block;font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;margin-top:3px}
+  .kpi.warn{border-color:var(--time);background:var(--time-s)}.kpi.warn b{color:var(--time)}
+  /* filters */
+  .filters{display:flex;gap:8px;padding:12px 28px 4px;align-items:center}
+  .fc{font-size:12.5px;font-weight:700;border:1.5px solid var(--g4);border-radius:999px;padding:8px 14px;color:var(--g2);background:#fff;cursor:pointer}
+  .fc.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .sort{margin-left:auto;font-size:11.5px;color:var(--g2)}
+  .sort b{color:var(--ink)}
+  /* list */
+  .list{flex:1;overflow:auto;padding:8px 28px 22px}
+  .grp{font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--g2);margin:14px 0 8px;display:flex;align-items:center;gap:10px}
+  .grp .ln{flex:1;height:1px;background:var(--g4)}
+  .grp.exp{color:var(--time)}
+  .item{display:grid;grid-template-columns:auto 1fr 150px 120px auto;gap:14px;align-items:center;padding:13px 14px;border:1.5px solid var(--g4);border-radius:13px;margin-bottom:9px;background:#fff}
+  .item.exp{border-color:var(--time);background:var(--time-s)}
+  .swatch{width:8px;height:42px;border-radius:5px;background:var(--ink)}
+  .item.exp .swatch{background:var(--time)}
+  .nm b{font-size:15.5px;font-weight:700}
+  .nm small{display:block;font-size:11.5px;color:var(--g2);margin-top:2px}
+  /* remaining bar */
+  .rem{display:flex;flex-direction:column;gap:5px}
+  .rem .rt{display:flex;justify-content:space-between;font-size:11.5px;color:var(--g2)}
+  .rem .rt b{color:var(--ink);font-weight:900;font-variant-numeric:tabular-nums}
+  .rem .track{height:9px;background:var(--g4);border-radius:5px;overflow:hidden}
+  .rem .fill{height:100%;background:var(--ink);border-radius:5px}
+  .item.exp .rem .fill{background:var(--time)}
+  /* expiry */
+  .exp-col{text-align:right}
+  .exp-col .big{font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
+  .exp-col small{display:block;font-size:11px;color:var(--g2)}
+  .exp-col.danger .big{color:var(--time)}.exp-col.danger small{color:var(--time);font-weight:700}
+  .use{font-size:12px;font-weight:900;border:1.5px solid var(--g4);border-radius:10px;padding:9px 13px;background:#fff;cursor:pointer;white-space:nowrap}
+  .use.t{border-color:var(--time);color:var(--time)}
+  .empty-note{font-size:11px;color:var(--g2);margin-top:14px;display:flex;align-items:center;gap:8px}
+  .empty-note svg{width:15px;height:15px;stroke:var(--g2);flex:none}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>「今ある半製品」ビュー（FR-45・ラベルモード）</b><span>発行済みラベル＋残量記録から、冷蔵庫の作り置き・残量・期限を一覧。古い順＝FIFO。食材在庫ではなく“仕込みの現在地”</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><h1>今ある仕込み（作り置き）</h1><div class="sub">鮨 はやし ・ 6/11(木) 15:50 時点</div></div>
+      <div class="bR"><span class="modepill">ラベルモード ON</span><button class="scan"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-7"/></svg>QRで記録</button></div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><small>作り置き 点数</small><b>12</b></div>
+      <div class="kpi warn"><small>本日中に使い切り推奨</small><b>3</b></div>
+      <div class="kpi warn"><small>期限切れ（要廃棄）</small><b>1</b></div>
+    </div>
+
+    <div class="filters">
+      <span class="fc on">すべて</span>
+      <span class="fc">期限が近い</span>
+      <span class="fc">本日仕込み</span>
+      <span class="fc">繰越あり</span>
+      <span class="sort">並び：<b>期限が近い順（FIFO）</b></span>
+    </div>
+
+    <div class="list">
+      <!-- 期限間近・切れ -->
+      <div class="grp exp">本日中に使い切り・期限切れ <span class="ln"></span></div>
+
+      <div class="item exp">
+        <div class="swatch"></div>
+        <div class="nm"><b>出汁ジュ</b><small>6/10 仕込み ・ 月曜色 ・ 親方</small></div>
+        <div class="rem"><div class="rt"><span>残量</span><b>40%</b></div><div class="track"><div class="fill" style="width:40%"></div></div></div>
+        <div class="exp-col danger"><div class="big">本日まで</div><small>賞味1日・残り約6h</small></div>
+        <button class="use t">使い切りに</button>
+      </div>
+
+      <div class="item exp">
+        <div class="swatch"></div>
+        <div class="nm"><b>百合根ピュレ</b><small>6/09 仕込み ・ 日曜色 ・ 美奈</small></div>
+        <div class="rem"><div class="rt"><span>残量</span><b>15%</b></div><div class="track"><div class="fill" style="width:15%"></div></div></div>
+        <div class="exp-col danger"><div class="big">期限切れ</div><small>−1日</small></div>
+        <button class="use t">廃棄を記録</button>
+      </div>
+
+      <div class="item exp">
+        <div class="swatch"></div>
+        <div class="nm"><b>焦がしバターパン粉</b><small>6/10 仕込み ・ 月曜色</small></div>
+        <div class="rem"><div class="rt"><span>残量</span><b>60%</b></div><div class="track"><div class="fill" style="width:60%"></div></div></div>
+        <div class="exp-col danger"><div class="big">本日まで</div><small>賞味2日</small></div>
+        <button class="use t">使い切りに</button>
+      </div>
+
+      <!-- 期限内 -->
+      <div class="grp">期限内（古い順） <span class="ln"></span></div>
+
+      <div class="item">
+        <div class="swatch"></div>
+        <div class="nm"><b>煮切り</b><small>6/11 15:40 仕込み ・ 木曜色 ・ 親方</small></div>
+        <div class="rem"><div class="rt"><span>残量</span><b>100%</b></div><div class="track"><div class="fill" style="width:100%"></div></div></div>
+        <div class="exp-col"><div class="big">6/14 まで</div><small>あと3日</small></div>
+        <button class="use">残量を記録</button>
+      </div>
+
+      <div class="item">
+        <div class="swatch"></div>
+        <div class="nm"><b>鯖の〆（2日漬け）</b><small>6/11 仕込み ・ 6/14提供予定 ・ 親方</small></div>
+        <div class="rem"><div class="rt"><span>残量</span><b>100%</b></div><div class="track"><div class="fill" style="width:100%"></div></div></div>
+        <div class="exp-col"><div class="big">6/14 まで</div><small>熟成中</small></div>
+        <button class="use">残量を記録</button>
+      </div>
+
+      <div class="item">
+        <div class="swatch"></div>
+        <div class="nm"><b>ツメ</b><small>6/10 仕込み ・ 月曜色 ・ 煮切り由来</small></div>
+        <div class="rem"><div class="rt"><span>残量</span><b>70%</b></div><div class="track"><div class="fill" style="width:70%"></div></div></div>
+        <div class="exp-col"><div class="big">6/13 まで</div><small>あと2日</small></div>
+        <button class="use">残量を記録</button>
+      </div>
+
+      <div class="empty-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>これは「作り置き（半製品）の現在地」です。食材在庫・発注の管理はしません。残量はラベルのQR記録から更新されます。</div>
+    </div>
+  </div>
+</body></html>
