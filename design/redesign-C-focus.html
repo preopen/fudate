@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>案C フォーカス</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16181a;--ink2:#5b6166;--line:#e6e8e6;--surf:#f4f6f4;--white:#fff;
+    --teal:#0f766e;--teal-s:#e2f1ef;--amber:#dd7a2e;--amber-s:#fbeede;
+    --font:'Satoshi',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e9ebe9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#7a807d;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:var(--white);border-radius:26px;box-shadow:0 30px 60px rgba(20,24,26,.18);overflow:hidden;position:relative;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:18px 26px;border-bottom:1px solid var(--line)}
+  .bL h1{font-size:20px;font-weight:900}.bL .sub{font-size:13px;color:var(--ink2)}
+  .covers{display:inline-flex;align-items:center;gap:8px;background:var(--surf);border-radius:999px;padding:8px 14px;font-weight:700}.covers b{font-size:18px}
+  .main{flex:1;display:grid;grid-template-columns:1fr 360px;overflow:hidden}
+  /* focus pane */
+  .focus{padding:30px 34px;display:flex;flex-direction:column;overflow:hidden}
+  .nowtag{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;background:var(--amber-s);color:#a8531a;font-weight:900;font-size:14px;padding:8px 14px;border-radius:999px}
+  .focus h2{font-size:40px;font-weight:900;letter-spacing:-.02em;margin-top:16px;line-height:1.05}
+  .fmeta{display:flex;gap:12px;margin-top:14px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;padding:9px 14px;border-radius:12px;background:var(--surf)}
+  .chip.q{background:var(--teal-s);color:var(--teal)}
+  .chip.t{background:var(--amber-s);color:#a8531a}
+  .fbody{display:grid;grid-template-columns:260px 1fr;gap:22px;margin-top:22px;flex:1;min-height:0}
+  .photo{border-radius:18px;background:repeating-linear-gradient(45deg,#eceeec,#eceeec 10px,#f6f7f6 10px,#f6f7f6 20px);display:grid;place-items:center;color:#9aa09b;font-size:14px;position:relative}
+  .photo .play{position:absolute;width:56px;height:56px;border-radius:50%;background:rgba(20,24,26,.7);display:grid;place-items:center}
+  .steps{display:flex;flex-direction:column;gap:16px;padding-top:4px}
+  .steps .s{display:flex;gap:14px;align-items:flex-start}
+  .steps .s b{width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:15px;flex:none;font-weight:900}
+  .steps .s p{font-size:19px;font-weight:500}
+  .cta{display:flex;gap:14px;margin-top:20px}
+  .cta .big{flex:1;height:78px;border:none;border-radius:18px;background:var(--teal);color:#fff;font-size:22px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:12px}
+  .cta .alt{width:150px;border:1px solid var(--line);background:#fff;border-radius:18px;font-size:16px;font-weight:700;color:var(--ink2)}
+  /* timeline rail */
+  .rail{border-left:1px solid var(--line);padding:22px 22px;display:flex;flex-direction:column;overflow:hidden}
+  .rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .rh .n{font-weight:900;font-size:15px}
+  .rh .p{font-size:13px;font-weight:700;color:var(--teal)}
+  .rtrack{height:8px;border-radius:99px;background:var(--surf);overflow:hidden;margin-bottom:16px}
+  .rtrack i{display:block;height:100%;width:35%;background:var(--teal)}
+  .tl{flex:1;overflow:auto;display:flex;flex-direction:column;gap:4px}
+  .ti{display:flex;gap:12px;align-items:center;padding:12px 8px;border-radius:12px}
+  .ti.now{background:var(--amber-s)}
+  .ti .mk{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;border:2px solid #d4d8d4;background:#fff}
+  .ti.done .mk{background:var(--teal);border-color:var(--teal)}
+  .ti.now .mk{border-color:var(--amber);background:var(--amber)}
+  .ti .mk svg{width:16px;height:16px;stroke:#fff}
+  .ti .tx{flex:1;min-width:0}
+  .ti .tx .tt{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ti.done .tx .tt{color:var(--ink2);text-decoration:line-through}
+  .ti .tx .tm{font-size:12px;color:var(--ink2)}
+  .ti.now .tx .tm{color:#a8531a;font-weight:700}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>案C — フォーカス（今これ）</b><span>“次にやる1つ”だけを大きく提示／巨大な完了ボタン／右に時系列レール。読む量を最小化</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜 ・ 開店 18:00</div></div>
+      <span class="covers"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#16181a"><path d="M16 11a4 4 0 10-8 0M3 21a7 7 0 0118 0"/></svg><b>14</b>名</span>
+    </div>
+    <div class="main">
+      <!-- focus -->
+      <div class="focus">
+        <span class="nowtag"><svg viewBox="0 0 24 24" width="16" height="16" stroke="#a8531a"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>いま これ ・ 15:00 着手</span>
+        <h2>煮切り仕込み</h2>
+        <div class="fmeta"><span class="chip q">200ml（14名分）</span><span class="chip t">所要 40分</span><span class="chip">担当 親方</span></div>
+        <div class="fbody">
+          <div class="photo">手順写真<div class="play"><svg viewBox="0 0 24 24" width="22" height="22" stroke="#fff" fill="#fff"><path d="M8 5v14l11-7z"/></svg></div></div>
+          <div class="steps">
+            <div class="s"><b>1</b><p>酒・みりんを煮切る</p></div>
+            <div class="s"><b>2</b><p>たまり・濃口を加えひと煮立ち</p></div>
+            <div class="s"><b>3</b><p>塩度◯%・とろみ◯で止め、冷暗所へ</p></div>
+          </div>
+        </div>
+        <div class="cta"><button class="alt">手順動画</button><button class="big"><svg viewBox="0 0 24 24" width="28" height="28" stroke="#fff"><path d="M5 13l4 4L19 7"/></svg>完了する</button></div>
+      </div>
+      <!-- rail -->
+      <div class="rail">
+        <div class="rh"><span class="n">本日の流れ</span><span class="p">5 / 14</span></div>
+        <div class="rtrack"><i></i></div>
+        <div class="tl">
+          <div class="ti done"><div class="mk"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="tx"><div class="tt">ネタの仕込み</div><div class="tm">13:30 ・ 完了</div></div></div>
+          <div class="ti done"><div class="mk"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="tx"><div class="tt">シャリを炊く</div><div class="tm">14:00 ・ 完了</div></div></div>
+          <div class="ti now"><div class="mk"></div><div class="tx"><div class="tt">煮切り仕込み</div><div class="tm">15:00 着手 ・ いま</div></div></div>
+          <div class="ti"><div class="mk"></div><div class="tx"><div class="tt">ソースを炊く</div><div class="tm">16:00</div></div></div>
+          <div class="ti"><div class="mk"></div><div class="tx"><div class="tt">盛り付けの準備</div><div class="tm">16:30</div></div></div>
+          <div class="ti"><div class="mk"></div><div class="tx"><div class="tt">吸地を引く</div><div class="tm">17:00</div></div></div>
+          <div class="ti"><div class="mk"></div><div class="tx"><div class="tt">提供順の最終確認</div><div class="tm">17:30</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>案B 担当カンバン</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16181a;--ink2:#5b6166;--line:#e6e8e6;--surf:#f4f6f4;--white:#fff;
+    --teal:#0f766e;--teal-s:#e2f1ef;--amber:#dd7a2e;--amber-s:#fbeede;
+    --font:'Satoshi',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e9ebe9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#7a807d;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:var(--white);border-radius:26px;box-shadow:0 30px 60px rgba(20,24,26,.18);overflow:hidden;position:relative;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:18px 26px;border-bottom:1px solid var(--line)}
+  .bL h1{font-size:22px;font-weight:900}.bL .sub{font-size:13px;color:var(--ink2)}
+  .bR{display:flex;align-items:center;gap:14px}
+  .covers{display:inline-flex;align-items:center;gap:8px;background:var(--surf);border-radius:999px;padding:8px 14px;font-weight:700}
+  .covers b{font-size:18px}
+  .pbar{width:200px}
+  .pbar .t{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-bottom:5px}
+  .pbar .track{height:10px;border-radius:99px;background:var(--surf);overflow:hidden}
+  .pbar .fill{height:100%;width:35%;background:var(--teal)}
+  .bell{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);display:grid;place-items:center;position:relative}
+  .bell .dot{position:absolute;top:10px;right:11px;width:9px;height:9px;border-radius:50%;background:var(--amber)}
+  /* columns */
+  .board{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:0;overflow:hidden}
+  .col{border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+  .col:last-child{border-right:none}
+  .colh{display:flex;align-items:center;gap:10px;padding:16px 16px 12px}
+  .av{width:38px;height:38px;border-radius:50%;background:var(--teal-s);color:var(--teal);display:grid;place-items:center;font-weight:900;font-size:14px}
+  .colh .n{font-weight:900;font-size:16px;flex:1}
+  .colh .c{font-size:13px;font-weight:700;color:var(--ink2);background:var(--surf);border-radius:999px;padding:3px 10px}
+  .cards{flex:1;overflow:auto;padding:4px 14px 16px;display:flex;flex-direction:column;gap:12px}
+  .tc{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+  .tc.now{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-s)}
+  .tc.done{background:var(--surf);opacity:.7}
+  .dish{font-size:12px;font-weight:700;color:var(--ink2);text-transform:none;margin-bottom:6px}
+  .tc h3{font-size:17px;font-weight:700;line-height:1.25}
+  .tc .meta{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .qty{font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-s);padding:4px 9px;border-radius:7px}
+  .time{font-size:12px;color:var(--ink2);display:inline-flex;align-items:center;gap:5px}
+  .time.amber{color:var(--amber);font-weight:700}
+  .tap{margin-top:12px;width:100%;height:52px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:13px;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
+  .tap.done{background:var(--teal);color:#fff;border-color:var(--teal)}
+  /* toast notification flowing in */
+  .toast{position:absolute;top:84px;right:26px;background:#16181a;color:#fff;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 16px 36px rgba(0,0,0,.25)}
+  .toast .ic{width:30px;height:30px;border-radius:50%;background:var(--teal);display:grid;place-items:center;flex:none}
+  .toast b{font-weight:900}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>案B — 担当カンバン</b><span>セクション（担当）ごとの列で厨房を俯瞰／カードのタップで完了／右上に通知がスッと流れる</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜 ・ 開店 18:00</div></div>
+      <div class="bR">
+        <span class="covers"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#16181a"><path d="M16 11a4 4 0 10-8 0M3 21a7 7 0 0118 0"/></svg><b>14</b>名</span>
+        <div class="pbar"><div class="t"><span>進捗</span><span>35%</span></div><div class="track"><div class="fill"></div></div></div>
+        <div class="bell"><svg viewBox="0 0 24 24" width="22" height="22" stroke="#16181a"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg><span class="dot"></span></div>
+      </div>
+    </div>
+    <div class="board">
+      <!-- col シャリ場 -->
+      <div class="col">
+        <div class="colh"><div class="av">シ</div><div class="n">シャリ場</div><div class="c">1/1</div></div>
+        <div class="cards">
+          <div class="tc done"><div class="dish">おまかせ握り</div><h3>米を炊く・赤酢</h3><div class="meta"><span class="qty">米 2.0升</span><span class="time">14:00</span></div><button class="tap done"><svg viewBox="0 0 24 24" width="18" height="18" stroke="#fff"><path d="M5 13l4 4L19 7"/></svg>完了</button></div>
+        </div>
+      </div>
+      <!-- col 親方 (now) -->
+      <div class="col">
+        <div class="colh"><div class="av">親</div><div class="n">親方</div><div class="c">1/3</div></div>
+        <div class="cards">
+          <div class="tc now"><div class="dish">おまかせ握り</div><h3>煮切り仕込み</h3><div class="meta"><span class="qty">200ml</span><span class="time amber"><svg viewBox="0 0 24 24" width="14" height="14" stroke="#dd7a2e"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>15:00 着手</span></div><button class="tap">タップで完了</button></div>
+          <div class="tc done"><div class="dish">おまかせ握り</div><h3>ネタの仕込み</h3><div class="meta"><span class="qty">各14貫</span><span class="time">13:30</span></div><button class="tap done"><svg viewBox="0 0 24 24" width="18" height="18" stroke="#fff"><path d="M5 13l4 4L19 7"/></svg>完了</button></div>
+          <div class="tc"><div class="dish">椀物</div><h3>吸地を引く</h3><div class="meta"><span class="qty">14杯</span><span class="time">17:00</span></div><button class="tap">タップで完了</button></div>
+        </div>
+      </div>
+      <!-- col ガルド -->
+      <div class="col">
+        <div class="colh"><div class="av">ガ</div><div class="n">ガルド</div><div class="c">0/2</div></div>
+        <div class="cards">
+          <div class="tc"><div class="dish">先付け</div><h3>盛り付けの準備</h3><div class="meta"><span class="qty">14客</span><span class="time">16:30</span></div><button class="tap">タップで完了</button></div>
+          <div class="tc"><div class="dish">水菓子</div><h3>ソースを炊く</h3><div class="meta"><span class="qty">300ml</span><span class="time">16:00</span></div><button class="tap">タップで完了</button></div>
+        </div>
+      </div>
+      <!-- col シェフ -->
+      <div class="col">
+        <div class="colh"><div class="av">シ</div><div class="n">シェフ</div><div class="c">0/1</div></div>
+        <div class="cards">
+          <div class="tc"><div class="dish">全体</div><h3>提供順の最終確認</h3><div class="meta"><span class="time">17:30</span></div><button class="tap">タップで完了</button></div>
+        </div>
+      </div>
+    </div>
+    <!-- toast notification -->
+    <div class="toast"><div class="ic"><svg viewBox="0 0 24 24" width="18" height="18" stroke="#fff"><path d="M5 13l4 4L19 7"/></svg></div><div><b>ネタの仕込み</b> 完了 ・ 握り 2/3</div></div>
+  </div>
+</body></html>

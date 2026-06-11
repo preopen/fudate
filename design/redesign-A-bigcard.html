@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>案A ビッグカード</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16181a;--ink2:#5b6166;--line:#e6e8e6;--surf:#f4f6f4;--white:#fff;
+    --teal:#0f766e;--teal-s:#e2f1ef;--amber:#dd7a2e;--amber-s:#fbeede;
+    --font:'Satoshi',sans-serif;--rad:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e9ebe9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px} .cap span{color:#7a807d;font-size:13px}
+  /* tablet device */
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:var(--white);border-radius:26px;box-shadow:0 30px 60px rgba(20,24,26,.18);overflow:hidden;position:relative;display:flex;flex-direction:column}
+  /* top bar */
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:18px 26px;border-bottom:1px solid var(--line)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .bL h1{font-size:22px;font-weight:900;letter-spacing:-.01em}
+  .bL .sub{font-size:13px;color:var(--ink2)}
+  .covers{display:inline-flex;align-items:center;gap:8px;background:var(--surf);border-radius:999px;padding:8px 14px;font-weight:700;font-size:15px}
+  .covers b{font-size:18px}
+  .bR{display:flex;align-items:center;gap:12px}
+  .prog{display:flex;align-items:center;gap:10px}
+  .ring{--p:35;width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--teal) calc(var(--p)*1%),var(--surf) 0);display:grid;place-items:center}
+  .ring i{width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:12px;font-weight:900;font-style:normal}
+  .bell{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);display:grid;place-items:center;position:relative}
+  .bell .dot{position:absolute;top:10px;right:11px;width:9px;height:9px;border-radius:50%;background:var(--amber)}
+  /* urgent strip */
+  .urg{display:flex;align-items:center;gap:12px;margin:16px 26px 4px;background:var(--amber-s);border-radius:16px;padding:14px 18px}
+  .urg .clk{width:40px;height:40px;border-radius:12px;background:var(--amber);display:grid;place-items:center}
+  .urg .t{font-weight:700}.urg .t b{color:#a8531a}
+  .urg .go{margin-left:auto;background:var(--amber);color:#fff;border:none;border-radius:12px;padding:12px 18px;font-weight:700;font-size:15px}
+  /* scroll list */
+  .list{flex:1;overflow:auto;padding:14px 26px 26px}
+  .card{border:1px solid var(--line);border-radius:var(--rad);margin-bottom:16px;overflow:hidden}
+  .card.done{opacity:.72}
+  .ch{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surf)}
+  .ch h2{font-size:19px;font-weight:900;flex:1}
+  .pill{font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink2)}
+  .pill.tl{background:var(--teal-s);color:var(--teal);border-color:transparent}
+  /* task row */
+  .row{display:flex;align-items:center;gap:16px;padding:16px 18px;border-top:1px solid var(--line)}
+  .tick{width:56px;height:56px;border-radius:50%;border:3px solid #d4d8d4;flex:none;display:grid;place-items:center;background:#fff}
+  .tick svg{width:30px;height:30px;stroke:#cfd3cf}
+  .tick.on{background:var(--teal);border-color:var(--teal)}.tick.on svg{stroke:#fff}
+  .rt{flex:1}.rt h3{font-size:18px;font-weight:700}
+  .rt.done h3{text-decoration:line-through;color:var(--ink2)}
+  .meta{display:flex;gap:10px;margin-top:6px}
+  .m{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2)}
+  .m.amber{color:var(--amber);font-weight:700}
+  .qty{font-size:13px;font-weight:700;color:var(--teal);background:var(--teal-s);padding:5px 10px;border-radius:8px}
+  .mediaT{width:64px;height:64px;border-radius:14px;flex:none;background:#eceeec center/cover no-repeat;display:grid;place-items:center;border:1px solid var(--line)}
+  .mediaT svg{width:26px;height:26px;stroke:var(--ink2)}
+  /* bottom sheet modal */
+  .scrim{position:absolute;inset:0;background:rgba(20,24,26,.38)}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:26px 26px 0 0;box-shadow:0 -20px 50px rgba(0,0,0,.18);padding:10px 26px 26px;max-height:62%;display:flex;flex-direction:column}
+  .grip{width:46px;height:5px;border-radius:99px;background:#d9ddd9;margin:8px auto 14px}
+  .sheet h2{font-size:22px;font-weight:900}
+  .sheet .sb{display:grid;grid-template-columns:200px 1fr;gap:18px;margin-top:14px}
+  .photo{aspect-ratio:4/3;border-radius:16px;background:repeating-linear-gradient(45deg,#eceeec,#eceeec 9px,#f6f7f6 9px,#f6f7f6 18px);display:grid;place-items:center;color:#9aa09b;font-size:13px;position:relative}
+  .photo .play{position:absolute;width:48px;height:48px;border-radius:50%;background:rgba(20,24,26,.7);display:grid;place-items:center}
+  .steps{display:grid;gap:10px}
+  .steps div{display:flex;gap:10px;font-size:16px}
+  .steps b{width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:13px;flex:none}
+  .done-btn{margin-top:auto;display:flex;gap:12px}
+  .done-btn button{flex:1;height:64px;border:none;border-radius:16px;font-size:18px;font-weight:900;cursor:pointer}
+  .b-done{background:var(--teal);color:#fff}.b-sec{flex:none;width:160px;background:var(--surf);color:var(--ink)}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>案A — ビッグカード</b><span>コース縦スクロール／左の大きな丸タップで完了／詳細は下からスッと出るボトムシート</span></div>
+  <div class="tab">
+    <!-- bar -->
+    <div class="bar">
+      <div class="bL">
+        <div><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜 ・ 開店 18:00</div></div>
+      </div>
+      <div class="bR">
+        <span class="covers"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#16181a"><path d="M16 11a4 4 0 10-8 0M3 21a7 7 0 0118 0"/></svg><b>14</b>名</span>
+        <div class="prog"><div class="ring"><i>35%</i></div></div>
+        <div class="bell"><svg viewBox="0 0 24 24" width="22" height="22" stroke="#16181a"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg><span class="dot"></span></div>
+      </div>
+    </div>
+    <!-- urgent -->
+    <div class="urg">
+      <div class="clk"><svg viewBox="0 0 24 24" width="22" height="22" stroke="#fff"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <div class="t"><b>15:00 着手</b> ・ 煮切り仕込み</div>
+      <button class="go">開く</button>
+    </div>
+    <!-- list -->
+    <div class="list">
+      <div class="card">
+        <div class="ch"><h2>おまかせ握り</h2><span class="pill tl">2 / 3</span></div>
+        <div class="row">
+          <div class="tick on"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="rt done"><h3>シャリ — 米を炊く・赤酢</h3><div class="meta"><span class="qty">米 2.0升</span><span class="m">14:00</span></div></div>
+        </div>
+        <div class="row">
+          <div class="tick"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="rt"><h3>煮切り仕込み</h3><div class="meta"><span class="qty">200ml</span><span class="m amber"><svg viewBox="0 0 24 24" width="15" height="15" stroke="#dd7a2e"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>15:00 着手</span></div></div>
+          <div class="mediaT"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></div>
+        </div>
+        <div class="row">
+          <div class="tick on"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="rt done"><h3>ネタの仕込み</h3><div class="meta"><span class="qty">各14貫</span><span class="m">13:30</span></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><h2>椀物</h2><span class="pill">0 / 2</span></div>
+        <div class="row">
+          <div class="tick"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="rt"><h3>吸地を引く</h3><div class="meta"><span class="qty">14杯</span><span class="m">17:00</span></div></div>
+          <div class="mediaT"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></div>
+        </div>
+      </div>
+    </div>
+    <!-- bottom sheet modal (task detail flowing up) -->
+    <div class="scrim"></div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <h2>煮切り仕込み</h2>
+      <div class="meta" style="margin-top:8px"><span class="qty">200ml（14名）</span><span class="m amber">15:00 着手 ・ 40分</span><span class="m">担当 親方</span></div>
+      <div class="sb">
+        <div class="photo">手順写真<div class="play"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff" fill="#fff"><path d="M8 5v14l11-7z"/></svg></div></div>
+        <div class="steps">
+          <div><b>1</b><span>酒・みりんを煮切る</span></div>
+          <div><b>2</b><span>たまり・濃口を加えひと煮立ち</span></div>
+          <div><b>3</b><span>塩度◯%・とろみ◯で止め冷暗所へ</span></div>
+        </div>
+      </div>
+      <div class="done-btn">
+        <button class="b-sec">あとで</button>
+        <button class="b-done">✓ 完了にする</button>
+      </div>
+    </div>
+  </div>
+</body></html>
