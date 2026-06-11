@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>画面遷移図 — 軽量版PrepFlow</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f6f2;--surface:#f9f8f5;--offset:#f3f0ec;--border:#d4d1ca;--divider:#dcd9d5;
+    --text:#28251d;--muted:#6b6963;--faint:#9d9a93;
+    --primary:#01696f;--primary-hi:#cedcd8;--success:#437a22;--warning:#964219;
+    --r-xl:1rem;--r-full:9999px;--shadow:0 8px 24px rgba(40,37,29,.08);--font:'Satoshi',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;padding:clamp(.8rem,2.5vw,2rem)}
+  .wrap{max-width:1180px;margin:0 auto;display:grid;gap:1.2rem}
+  .eyebrow{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  h1{font-size:clamp(1.35rem,1rem+1.4vw,2rem);line-height:1.12;margin:.25rem 0}
+  .sub{color:var(--muted);font-size:.95rem;max-width:70ch}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);padding:1rem}
+  .map-wrap{width:100%;overflow-x:auto}
+  svg{display:block;width:100%;height:auto;min-width:900px}
+  .legend{display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;font-size:.82rem;color:var(--muted);margin-top:.4rem;padding:0 .4rem}
+  .legend b{color:var(--text)}
+  .swatch{display:inline-flex;align-items:center;gap:.4rem}
+  .line{width:34px;height:0;border-top:3px solid var(--primary)}
+  .line.muted{border-top-color:#8d877c}
+  .line.dash{border-top:3px dashed var(--primary)}
+  .chip{display:inline-block;font-size:.7rem;font-weight:700;padding:.08rem .45rem;border-radius:999px}
+  .p0{background:var(--primary-hi);color:var(--primary)} .p1{background:#e3ece6;color:#2f6b3a} .p2{background:#efe2d8;color:var(--warning)}
+  .notecard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);padding:1.1rem 1.2rem}
+  .notecard h3{font-size:1.05rem;margin-bottom:.6rem}
+  .notecard ol{margin:0 0 .2rem 1.1rem;display:grid;gap:.35rem;font-size:.88rem}
+  .notecard .fb{margin-top:.7rem;font-size:.85rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="eyebrow">Screen Flow Map</div>
+    <h1>画面遷移図（フロー）— 軽量版PrepFlow</h1>
+    <p class="sub">3レーン構成：① 初回セットアップ（一度きり）／② 日次運用ループ（毎営業日の中心）／③ 振り返り・管理。実線＝画面遷移、破線＝データ・フィードバック。色チップ＝リリースフェーズ。</p>
+  </div>
+
+  <div class="panel">
+    <div class="map-wrap">
+    <svg viewBox="0 0 1160 770" role="img" aria-label="画面遷移図">
+      <defs>
+        <marker id="arr" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5c574e"/></marker>
+        <marker id="arrp" markerWidth="11" markerHeight="11" refX="7.5" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="#01696f"/></marker>
+        <marker id="arrt" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#01696f"/></marker>
+      </defs>
+
+      <!-- band backgrounds -->
+      <rect x="24" y="70" width="1112" height="118" rx="14" fill="#f0ede8"/>
+      <rect x="24" y="320" width="1112" height="232" rx="14" fill="#eaf1ee"/>
+      <rect x="24" y="600" width="1112" height="112" rx="14" fill="#f0ede8"/>
+      <text x="40" y="92" font-family="Satoshi" font-size="12.5" fill="#9d9a93" font-weight="700">① 初回セットアップ（一度きり）</text>
+      <text x="40" y="342" font-family="Satoshi" font-size="12.5" fill="#3f7d86" font-weight="700">② 日次運用ループ（毎営業日 — 中心）</text>
+      <text x="40" y="622" font-family="Satoshi" font-size="12.5" fill="#9d9a93" font-weight="700">③ 振り返り・管理</text>
+
+      <!-- ===== EDGES (draw before nodes) ===== -->
+      <!-- onboarding chain -->
+      <line x1="240" y1="135" x2="296" y2="135" stroke="#5c574e" stroke-width="2.5" marker-end="url(#arr)"/>
+      <line x1="510" y1="135" x2="576" y2="135" stroke="#5c574e" stroke-width="2.5" marker-end="url(#arr)"/>
+      <!-- onboarding -> daily entry -->
+      <polyline points="600,168 600,232 150,232 150,352" fill="none" stroke="#8d877c" stroke-width="2" stroke-dasharray="1 0" marker-end="url(#arr)"/>
+      <text x="360" y="224" font-family="Satoshi" font-size="11" fill="#8d877c">初回完了 → 日次運用へ</text>
+
+      <!-- daily main path (primary) -->
+      <line x1="222" y1="388" x2="266" y2="388" stroke="#01696f" stroke-width="3" marker-end="url(#arrp)"/>
+      <line x1="514" y1="388" x2="576" y2="388" stroke="#01696f" stroke-width="3" marker-end="url(#arrp)"/>
+      <text x="545" y="378" text-anchor="middle" font-family="Satoshi" font-size="10.5" fill="#6b6963">人数・開店時刻</text>
+      <line x1="734" y1="388" x2="796" y2="392" stroke="#01696f" stroke-width="3" marker-end="url(#arrp)"/>
+      <!-- board -> media (sub) -->
+      <line x1="858" y1="442" x2="858" y2="478" stroke="#5c574e" stroke-width="2" marker-end="url(#arr)"/>
+      <!-- board -> 営業 -->
+      <line x1="980" y1="442" x2="998" y2="478" stroke="#01696f" stroke-width="3" marker-end="url(#arrp)"/>
+
+      <!-- template -> board (data, dashed teal) -->
+      <line x1="678" y1="170" x2="656" y2="352" stroke="#01696f" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrt)"/>
+      <text x="690" y="262" font-family="Satoshi" font-size="10.5" fill="#01696f">テンプレ構造・数量・所要</text>
+
+      <!-- board -> dashboard (review) -->
+      <line x1="935" y1="442" x2="935" y2="616" stroke="#5c574e" stroke-width="2" marker-end="url(#arr)"/>
+      <text x="945" y="540" font-family="Satoshi" font-size="10.5" fill="#6b6963">営業後に振り返り</text>
+      <!-- board -> HACCP -->
+      <polyline points="820,442 820,566 415,566 415,616" fill="none" stroke="#5c574e" stroke-width="2" marker-end="url(#arr)"/>
+      <text x="430" y="556" font-family="Satoshi" font-size="10.5" fill="#6b6963">営業前後に衛生記録</text>
+
+      <!-- dashboard -> template (feedback, dashed) -->
+      <polyline points="935,684 935,712 765,712 765,180 690,166" fill="none" stroke="#bb653b" stroke-width="2.2" stroke-dasharray="7 5" marker-end="url(#arr)"/>
+      <text x="775" y="430" font-family="Satoshi" font-size="10.5" fill="#964219" transform="rotate(-90 775,430)">1人前量の見直し（学習提案 FR-09）</text>
+
+      <!-- ===== NODES ===== -->
+      <!-- A1 -->
+      <g><rect x="70" y="103" width="170" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <text x="155" y="132" text-anchor="middle" font-family="Satoshi" font-size="13" fill="#28251d" font-weight="700">サインアップ / ログイン</text>
+        <text x="155" y="150" text-anchor="middle" font-family="Satoshi" font-size="10" fill="#9d9a93">FR-14</text></g>
+      <!-- A2 -->
+      <g><rect x="300" y="103" width="210" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <text x="405" y="129" text-anchor="middle" font-family="Satoshi" font-size="13" fill="#28251d" font-weight="700">業態テンプレ選択</text>
+        <text x="405" y="146" text-anchor="middle" font-family="Satoshi" font-size="10.5" fill="#6b6963">サンプル投入（セルフサーブ）</text>
+        <text x="405" y="161" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#01696f" font-weight="700">NFR-07 · P0</text></g>
+      <!-- A3 -->
+      <g><rect x="580" y="103" width="200" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <text x="680" y="132" text-anchor="middle" font-family="Satoshi" font-size="13" fill="#28251d" font-weight="700">コーステンプレ編集</text>
+        <text x="680" y="150" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#01696f" font-weight="700">FR-01/03/06 · P0</text></g>
+
+      <!-- B1 home -->
+      <g><rect x="72" y="356" width="150" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <circle cx="92" cy="376" r="11" fill="#01696f"/><text x="92" y="380" text-anchor="middle" font-family="Satoshi" font-size="11" fill="#fff" font-weight="700">1</text>
+        <text x="150" y="396" text-anchor="middle" font-family="Satoshi" font-size="13" fill="#28251d" font-weight="700">ホーム / 今日へ</text></g>
+      <!-- B2 service setup -->
+      <g><rect x="266" y="356" width="248" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <circle cx="286" cy="376" r="11" fill="#01696f"/><text x="286" y="380" text-anchor="middle" font-family="Satoshi" font-size="11" fill="#fff" font-weight="700">2</text>
+        <text x="394" y="385" text-anchor="middle" font-family="Satoshi" font-size="12.5" fill="#28251d" font-weight="700">本日のサービス設定 / 予約メール取込</text>
+        <text x="394" y="403" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#01696f" font-weight="700">FR-02 / FR-10 · P0</text></g>
+      <!-- B3 board generate -->
+      <g><rect x="580" y="356" width="154" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <circle cx="600" cy="376" r="11" fill="#01696f"/><text x="600" y="380" text-anchor="middle" font-family="Satoshi" font-size="11" fill="#fff" font-weight="700">3</text>
+        <text x="657" y="385" text-anchor="middle" font-family="Satoshi" font-size="12.5" fill="#28251d" font-weight="700">当日ボード生成</text>
+        <text x="657" y="403" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#6b6963">数量算出・逆算</text></g>
+      <!-- B4 today board (primary) -->
+      <g><rect x="800" y="344" width="252" height="98" rx="12" fill="#cedcd8" stroke="#01696f" stroke-width="1.5"/>
+        <circle cx="822" cy="366" r="11" fill="#01696f"/><text x="822" y="370" text-anchor="middle" font-family="Satoshi" font-size="11" fill="#fff" font-weight="700">4</text>
+        <text x="926" y="378" text-anchor="middle" font-family="Satoshi" font-size="14" fill="#0c4e54" font-weight="700">今日のタスク（仕込みボード）</text>
+        <text x="926" y="398" text-anchor="middle" font-family="Satoshi" font-size="10.5" fill="#0c4e54">チェック→皿の自動ロールアップ→工程フェーズ</text>
+        <text x="926" y="424" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#01696f" font-weight="700">FR-04/05/11/17 · P0（中心画面）</text></g>
+      <!-- M1 media -->
+      <g><rect x="800" y="480" width="116" height="48" rx="9" fill="#fbfbf9" stroke="#cedcd8"/>
+        <text x="858" y="500" text-anchor="middle" font-family="Satoshi" font-size="11.5" fill="#01696f" font-weight="700">手順メディア</text>
+        <text x="858" y="515" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#6b6963">FR-01</text></g>
+      <!-- B5 営業 -->
+      <g><rect x="940" y="480" width="112" height="48" rx="9" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <circle cx="958" cy="498" r="10" fill="#01696f"/><text x="958" y="502" text-anchor="middle" font-family="Satoshi" font-size="10" fill="#fff" font-weight="700">5</text>
+        <text x="1003" y="503" text-anchor="middle" font-family="Satoshi" font-size="12" fill="#28251d" font-weight="700">営業・提供</text></g>
+
+      <!-- C3 settings -->
+      <g><rect x="72" y="620" width="170" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <text x="157" y="648" text-anchor="middle" font-family="Satoshi" font-size="12.5" fill="#28251d" font-weight="700">設定 / 課金（Stripe）</text>
+        <text x="157" y="666" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#6b6963">FR-14 · セルフサーブ</text></g>
+      <!-- C1 HACCP -->
+      <g><rect x="300" y="620" width="230" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <text x="415" y="648" text-anchor="middle" font-family="Satoshi" font-size="12.5" fill="#28251d" font-weight="700">HACCP 電子チェックシート</text>
+        <text x="415" y="666" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#964219" font-weight="700">FR-16 · P2（任意/Pro）</text></g>
+      <!-- C2 dashboard -->
+      <g><rect x="820" y="620" width="232" height="64" rx="10" fill="#fbfbf9" stroke="#d4d1ca"/>
+        <text x="936" y="648" text-anchor="middle" font-family="Satoshi" font-size="12.5" fill="#28251d" font-weight="700">ダッシュボード</text>
+        <text x="936" y="666" text-anchor="middle" font-family="Satoshi" font-size="9.5" fill="#2f6b3a" font-weight="700">FR-11 · P1</text></g>
+
+      <text x="80" y="704" font-family="Satoshi" font-size="10" fill="#9d9a93">※ ②③の各画面はサイドナビから随時移動可</text>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="swatch"><span class="line"></span><b>主要遷移（日次の中心）</b></span>
+      <span class="swatch"><span class="line muted"></span>画面遷移</span>
+      <span class="swatch"><span class="line dash"></span>データ供給</span>
+      <span class="swatch"><span class="line" style="border-top-color:#bb653b;border-top-style:dashed"></span>フィードバック</span>
+      <span class="swatch"><span class="chip p0">P0</span>最初に作る</span>
+      <span class="swatch"><span class="chip p1">P1</span>有料化</span>
+      <span class="swatch"><span class="chip p2">P2</span>Pro</span>
+    </div>
+  </div>
+
+  <div class="notecard">
+    <h3>コアループ（毎営業日の中心）</h3>
+    <ol>
+      <li><b>ホーム / 今日へ</b> — 当日を開く</li>
+      <li><b>本日のサービス設定 / 予約メール取込</b> — 人数（手入力/メール/CSV）と開店時刻を確定</li>
+      <li><b>当日ボード生成</b> — テンプレ＋人数＋開店時刻から数量算出・逆算タイムラインを反映</li>
+      <li><b>今日のタスク（仕込みボード）</b> — チェック→皿の自動ロールアップ→工程フェーズ（手順メディアを参照）</li>
+      <li><b>営業・提供</b></li>
+    </ol>
+    <div class="fb">↩ <b>フィードバック</b>：営業後に<b>ダッシュボード</b>で振り返り → 過剰仕込みの実績から<b>コーステンプレ編集</b>の1人前量・歩留りを見直し（FR-09）。<b>HACCP</b>は営業前後に記録。<b>初回セットアップ</b>は業態テンプレ選択→テンプレ編集の一度きり。</div>
+  </div>
+</div>
+</body>
+</html>
