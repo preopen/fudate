@@ -1,7 +1,7 @@
 # PrepFlow 事業サマリー（経営判断用）
 
 > コース料理を出す高級店・専門店のための「仕込み（mise-en-place）管理SaaS」。一人開発・運営前提。
-> 版：2026-06-11（要件 v0.5 時点に更新） ／ 詳細：[`requirements.md`](./requirements.md)（v0.5）・[`../design/README.md`](../design/README.md)
+> 版：2026-06-11（要件 v0.6 時点に更新） ／ 詳細：[`requirements.md`](./requirements.md)（v0.6）・[`../design/README.md`](../design/README.md)
 
 ---
 
@@ -72,7 +72,7 @@
 ## 7. これまでの成果物（リポジトリ格納）
 
 - **市場調査レポート**（需要・TAM/SAM/SOM・競合・価格・solo feasibility）＋ Smart Rabbitベンチマーク（`note-smartrabbit.md`）
-- **要件定義 v0.5**：`docs/requirements.md`（FR-01〜39・NFR-01〜10・3テーマ・Ops Flow/予約ハブ/Direct・軽量レシピ層・イベント駆動方針・ベンチマーク）
+- **要件定義 v0.6**：`docs/requirements.md`（FR-01〜44・NFR-01〜10・3テーマ・Ops Flow/予約ハブ/Direct・軽量レシピ層・複数日リード/二部制・イベント駆動方針・ベンチマーク）
 - **全画面設計 29画面**：`design/`（一覧＝`overview-gallery`。3テーマ、3ビュー、デイレール、営業中、パス、ホールUI、予約ハブ、Direct一式、仕込みアイテム編集、シミュレーション 等）
 - **動くインタラクティブ・プロトタイプ**：`design/prototype-interactive.html`（3ビュー切替＋自動ロールアップ）
 - **パイロット店向け資料**：2ページ（概要＋導入の流れ/FAQ）
