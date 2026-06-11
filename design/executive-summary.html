@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrepFlow 事業サマリー（経営判断用）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#6f747a;--g3:#bcc0c4;--g4:#e6e8ea;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdedf;color:var(--ink);-webkit-font-smoothing:antialiased;padding:24px;line-height:1.45}
+  .sheet{width:920px;margin:0 auto;background:#fff;border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.16);overflow:hidden}
+  .hero{background:var(--ink);color:#fff;padding:26px 38px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:30px;height:30px;color:#fff}
+  .brand b{font-size:21px;font-weight:900}
+  .brand .meta{margin-left:auto;text-align:right;font-size:11px;color:#9aa0a6;font-weight:700;letter-spacing:.04em}
+  .hero h1{font-size:26px;font-weight:900;margin-top:16px;letter-spacing:-.01em}
+  .hero h1 em{font-style:normal;color:#f0a070}
+  /* verdict */
+  .verdict{margin:0 38px;transform:translateY(-18px);background:#fff;border:2px solid var(--ink);border-radius:16px;padding:18px 22px;box-shadow:0 12px 30px rgba(0,0,0,.1)}
+  .verdict .lab{font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--time)}
+  .verdict p{font-size:16.5px;font-weight:800;margin-top:7px;line-height:1.5}
+  .verdict p b{border-bottom:3px solid var(--time)}
+  .pad{padding:6px 38px 30px}
+  .kick{font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--time);margin:22px 0 12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{border:1.5px solid var(--g4);border-radius:14px;padding:16px 18px}
+  .card h3{font-size:14px;font-weight:900;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .card h3 .pin{width:7px;height:7px;border-radius:50%;background:var(--ink)}
+  .card h3 .pin.t{background:var(--time)}
+  /* tam rows */
+  .tam{display:flex;flex-direction:column;gap:9px}
+  .tr{display:flex;align-items:baseline;gap:10px}
+  .tr .k{font-size:12.5px;font-weight:900;width:54px;flex:none}
+  .tr .v{font-size:13px;color:var(--g2);flex:1}
+  .tr .n{font-size:14.5px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tr .n.t{color:var(--time)}
+  /* bullets */
+  ul.b{list-style:none;display:flex;flex-direction:column;gap:8px}
+  ul.b li{font-size:13px;color:var(--g2);display:flex;gap:9px}
+  ul.b li:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink);margin-top:6px;flex:none}
+  ul.b li.t:before{background:var(--time)}
+  ul.b li b{color:var(--ink)}
+  /* compare mini */
+  .cmp{display:flex;flex-direction:column;gap:7px}
+  .cm{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .cm .nm{width:88px;font-weight:900;flex:none}
+  .cm .dx{color:var(--g2);flex:1}
+  .cm .mk{font-size:11px;font-weight:900;padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .mk.no{background:var(--g5);color:var(--g2)}
+  .mk.yes{background:var(--ink);color:#fff}
+  /* price */
+  .price{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+  .pc{border:1.5px solid var(--g4);border-radius:11px;padding:11px 8px;text-align:center;position:relative}
+  .pc.best{border-color:var(--ink);border-width:2.5px}
+  .pc .nm{font-size:11px;font-weight:900;color:var(--g2)}
+  .pc .pr{font-size:16px;font-weight:900;margin-top:3px;font-variant-numeric:tabular-nums}
+  .pc .tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:900;color:#fff;background:var(--ink);padding:3px 8px;border-radius:999px}
+  .scn{margin-top:11px;font-size:12.5px;color:var(--g2)}
+  .scn b{color:var(--ink);font-variant-numeric:tabular-nums}
+  /* roadmap */
+  .road{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .rs{border:1.5px solid var(--g4);border-radius:11px;padding:12px 10px;position:relative}
+  .rs .ph{font-size:11px;font-weight:900}.rs .ph .t{color:var(--time)}
+  .rs p{font-size:11px;color:var(--g2);margin-top:5px;line-height:1.35}
+  .rs .ar{position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--g3);width:16px;height:16px;z-index:2;background:#fff}
+  .road .rs:last-child .ar{display:none}
+  /* deliverables */
+  .deliv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .dv{background:var(--g5);border-radius:11px;padding:13px 14px}
+  .dv b{font-size:13px;font-weight:900;display:block}
+  .dv span{font-size:11.5px;color:var(--g2)}
+  /* gate */
+  .gate{margin-top:22px;background:var(--ink);color:#fff;border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:22px}
+  .gate .l b{font-size:11px;font-weight:900;letter-spacing:.12em;color:#f0a070;display:block;margin-bottom:6px}
+  .gate .l p{font-size:15px;font-weight:800;line-height:1.45}
+  .gate .r{margin-left:auto;flex:none;text-align:right}
+  .gate .r .big{font-size:13px;font-weight:900;background:var(--time);padding:9px 14px;border-radius:999px;white-space:nowrap}
+  .foot{padding:14px 38px 26px;font-size:11.5px;color:var(--g2)}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+<div class="sheet">
+  <div class="hero">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 48 48" fill="none"><rect x="6" y="7" width="16" height="34" rx="8" stroke="currentColor" stroke-width="4"/><path d="M24 11h7c6.6 0 12 5.4 12 12s-5.4 12-12 12h-7" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M24 24h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+      <b>PrepFlow 事業サマリー</b>
+      <span class="meta">経営判断用 ・ 2026-06-11<br>コース店向け 仕込み管理SaaS</span>
+    </div>
+    <h1>予約から逆算する、<em>仕込みの司令塔。</em></h1>
+  </div>
+
+  <div class="verdict">
+    <div class="lab">結論</div>
+    <p>需要は<b>業界トップクラスに強い</b>。差別化（予約連動の数量・逆算・自動ロールアップ）は<b>本物で白地</b>。市場はニッチだが、<b>一人事業として成立可能</b>。最大の関門は中核連携の実現性と、P0パイロットでの「毎日使う」検証。<b>→ P0（無料10店）へ進むことを推奨。</b></p>
+  </div>
+
+  <div class="pad">
+    <div class="grid2">
+      <!-- 市場 -->
+      <div class="card">
+        <h3><span class="pin"></span>市場規模（日本・コース/予約主体）</h3>
+        <div class="tam">
+          <div class="tr"><span class="k">TAM</span><span class="v">中〜高級コース店 6〜9万店</span><span class="n">¥108–162億/年</span></div>
+          <div class="tr"><span class="k">SAM</span><span class="v">客単価¥5,000–10,000帯 3〜5.5万店</span><span class="n">¥54–132億/年</span></div>
+          <div class="tr"><span class="k">SOM</span><span class="v">3–5年・600〜5,500店</span><span class="n t">¥1–10億 ARR</span></div>
+        </div>
+        <ul class="b" style="margin-top:11px"><li>参考：世界のレストラン管理ソフト市場 <b>$5.8–6.9B</b>・年成長 15–18%</li></ul>
+      </div>
+      <!-- 差別化 -->
+      <div class="card">
+        <h3><span class="pin t"></span>差別化（3点セット＝白地）</h3>
+        <ul class="b">
+          <li class="t"><b>予約人数 → 仕込み量を自動算出</b></li>
+          <li class="t"><b>来店時刻 → 逆算した仕込みタイムライン</b></li>
+          <li class="t"><b>構成要素が全完了 → 皿が自動で完了</b></li>
+          <li>＋ 3つ星の運営思想（T−カウントダウン・ライン点検ゲート）</li>
+        </ul>
+      </div>
+      <!-- 競合 -->
+      <div class="card">
+        <h3><span class="pin"></span>競合 — “予約×仕込み”は不在</h3>
+        <div class="cmp">
+          <div class="cm"><span class="nm">V-Manage</span><span class="dx">飲食チェーンのオペ標準化 ¥5,000/店</span><span class="mk no">仕込み数量×</span></div>
+          <div class="cm"><span class="nm">カミナシ</span><span class="dx">多業種の現場点検・HACCP</span><span class="mk no">予約連動×</span></div>
+          <div class="cm"><span class="nm">Apicbase</span><span class="dx">BOH管理・需要予測ベース</span><span class="mk no">来店逆算×</span></div>
+          <div class="cm"><span class="nm">PrepFlow</span><span class="dx">単店・コース店の仕込み知能</span><span class="mk yes">独自</span></div>
+        </div>
+      </div>
+      <!-- 価格・収益 -->
+      <div class="card">
+        <h3><span class="pin"></span>価格・収益（一人事業）</h3>
+        <div class="price">
+          <div class="pc"><div class="nm">Free</div><div class="pr">¥0</div></div>
+          <div class="pc"><div class="nm">Lite</div><div class="pr">¥5,800</div></div>
+          <div class="pc best"><div class="tag">主力</div><div class="nm">Standard</div><div class="pr">¥9,800</div></div>
+          <div class="pc"><div class="nm">Pro</div><div class="pr">¥19,800</div></div>
+        </div>
+        <div class="scn">想定：<b>100〜300店 × ¥6,000〜20,000/月</b> → 月商 <b>¥100万〜数百万</b>（粗利70〜90%）</div>
+      </div>
+    </div>
+
+    <div class="kick">重大リスク（着手前に潰す順）</div>
+    <ul class="b">
+      <li class="t"><b>① 連携の実現性</b>：予約APIが構造化コース非対応（TableCheck確認済）。“自動逆算”は店舗ごとの手動コーステンプレ運用に化ける恐れ → スタンドアロン先行で回避。</li>
+      <li class="t"><b>② TAMの小ささ</b>：高級店オンリーは小 → ¥7,000帯まで拡大しSAMを約3〜4倍に。</li>
+      <li class="t"><b>③ 飲食SaaSの難しさ</b>：低WTP・高解約・営業中ダウンは即事故 → オフライン縮退・セルフサーブ・年払いで対処。</li>
+    </ul>
+
+    <div class="kick">ロードマップ</div>
+    <div class="road">
+      <div class="rs"><div class="ph">P0 <span class="t">無料</span></div><p>コア検証・10店パイロット</p><svg class="ar" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg></div>
+      <div class="rs"><div class="ph">P1 有料化</div><p>逆算・担当・廃棄／Lite・Standard</p><svg class="ar" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg></div>
+      <div class="rs"><div class="ph">P2 Pro</div><p>営業中モード・HACCP・分析</p><svg class="ar" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg></div>
+      <div class="rs"><div class="ph">P3</div><p>公式API・多言語・リプレイ</p><svg class="ar" viewBox="0 0 24 24" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg></div>
+      <div class="rs"><div class="ph">P4 <span class="t">POS連携</span></div><p>Service Sync（ハンディ→厨房）</p></div>
+    </div>
+
+    <div class="kick">これまでの成果物（リポジトリに格納）</div>
+    <div class="deliv">
+      <div class="dv"><b>市場調査レポート</b><span>需要・TAM/SAM/SOM・競合・価格</span></div>
+      <div class="dv"><b>要件定義 v0.3</b><span>docs/requirements.md（FR-01〜30）</span></div>
+      <div class="dv"><b>全画面設計</b><span>3テーマ＋営業中/パス/ホール/設定</span></div>
+      <div class="dv"><b>競合図・遷移図</b><span>ポジショニング／画面フロー</span></div>
+      <div class="dv"><b>動くプロトタイプ</b><span>3ビュー切替＋自動ロールアップ</span></div>
+      <div class="dv"><b>パイロット資料</b><span>2ページ（概要＋導入/FAQ）</span></div>
+    </div>
+
+    <div class="gate">
+      <div class="l"><b>次の意思決定（GO / NO-GO）</b><p>P0で ①オフライン縮退が作れるか ②10店パイロットで週5日継続 ≥70%・¥9,800の支払い意思 を確認 → クリアで P1 有料化へ。</p></div>
+      <div class="r"><span class="big">→ P0 着手を推奨</span></div>
+    </div>
+  </div>
+  <div class="foot">PrepFlow — コース料理を出す高級店・専門店のための仕込み管理SaaS ／ 一人開発・運営前提 ／ 詳細：docs/requirements.md・design/README.md</div>
+</div>
+</body></html>
