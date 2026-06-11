@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ラベル運用フロー — 完了→印刷→残量→繰越</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:24px;line-height:1.42}
+  .wrap{max-width:1280px;margin:0 auto}
+  .head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .head b{font-size:19px;font-weight:900}.head span{font-size:13px;color:#8a8a8a}
+  .sub{font-size:12.5px;color:#8a8a8a;margin-bottom:16px}
+  /* flow strip */
+  .flow{display:grid;grid-template-columns:1fr 38px 1fr 38px 1fr 38px 1fr;gap:0;align-items:stretch}
+  .arrow{display:grid;place-items:center}
+  .arrow svg{width:24px;height:24px;stroke:var(--g3);stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .card{background:#fff;border-radius:20px;box-shadow:0 16px 40px rgba(0,0,0,.1);overflow:hidden;display:flex;flex-direction:column;min-height:560px}
+  .ch{padding:14px 16px;border-bottom:1px solid var(--g4)}
+  .step{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:900;letter-spacing:.06em;color:var(--time)}
+  .step .n{width:20px;height:20px;border-radius:50%;background:var(--time);color:#fff;display:grid;place-items:center;font-size:11px}
+  .ch h3{font-size:16px;font-weight:900;margin-top:7px}
+  .ch p{font-size:11.5px;color:var(--g2);margin-top:3px}
+  .cb{padding:14px 16px;flex:1;display:flex;flex-direction:column;gap:12px}
+  /* device chrome mini */
+  .scr{border:1.5px solid var(--g4);border-radius:13px;overflow:hidden;background:#fff;flex:1;display:flex;flex-direction:column}
+  .scrbar{display:flex;align-items:center;gap:6px;padding:8px 11px;border-bottom:1px solid var(--g4);background:var(--g5)}
+  .scrbar .d{width:7px;height:7px;border-radius:50%;background:var(--g3)}
+  .scrbar small{font-size:10px;color:var(--g2);margin-left:4px;font-weight:700}
+  .scrbody{padding:13px;flex:1}
+
+  /* STEP1: complete */
+  .task{display:flex;align-items:center;gap:11px;border:1.5px solid var(--g4);border-radius:12px;padding:12px;margin-bottom:9px}
+  .task.done{background:var(--g5)}
+  .tick{width:42px;height:42px;border-radius:50%;border:2.5px solid var(--g3);display:grid;place-items:center;flex:none;background:#fff}
+  .tick.on{background:var(--ink);border-color:var(--ink)}
+  .tick svg{width:21px;height:21px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .task .nm{font-size:14px;font-weight:700}.task.done .nm{color:var(--g3);text-decoration:line-through}
+  .task .q{font-size:11px;font-weight:700;color:#fff;background:var(--ink);padding:3px 8px;border-radius:6px;display:inline-block;margin-top:4px;font-variant-numeric:tabular-nums}
+  .who{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .chip{font-size:11.5px;font-weight:700;color:var(--g2);background:var(--g5);border:1.5px solid var(--g4);border-radius:999px;padding:6px 11px}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .toast{margin-top:auto;display:flex;align-items:center;gap:9px;background:var(--ink);color:#fff;border-radius:11px;padding:11px 13px;font-size:12.5px;font-weight:700}
+  .toast .i{width:22px;height:22px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
+  .toast .i svg{width:13px;height:13px;stroke:var(--ink);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+  /* STEP2: label preview */
+  .label{border:2px dashed var(--g3);border-radius:10px;padding:13px;background:#fff;position:relative}
+  .label .lt{display:flex;justify-content:space-between;align-items:flex-start}
+  .label .lt b{font-size:18px;font-weight:900}
+  .qr{width:54px;height:54px;border-radius:6px;background:
+     conic-gradient(#15171a 25%,#fff 0 50%,#15171a 0 75%,#fff 0),
+     conic-gradient(#15171a 25%,#fff 0 50%,#15171a 0 75%,#fff 0);
+     background-size:18px 18px,18px 18px;background-position:0 0,9px 9px;border:3px solid #15171a;flex:none}
+  .lrow{display:flex;justify-content:space-between;font-size:12px;margin-top:8px;border-top:1px dotted var(--g3);padding-top:7px}
+  .lrow .k{color:var(--g2)}.lrow .v{font-weight:900;font-variant-numeric:tabular-nums}
+  .lrow .v.t{color:var(--time)}
+  .lbadge{position:absolute;top:-9px;left:13px;font-size:9.5px;font-weight:900;background:var(--time);color:#fff;padding:3px 8px;border-radius:999px}
+  .opts{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+  .opt{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--g2)}
+  .opt .box{width:18px;height:18px;border-radius:5px;background:var(--ink);display:grid;place-items:center;flex:none}
+  .opt .box.off{background:#fff;border:1.5px solid var(--g3)}
+  .opt .box svg{width:11px;height:11px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .printbtn{margin-top:auto;height:48px;border:none;border-radius:12px;background:var(--ink);color:#fff;font-family:var(--font);font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer}
+  .printbtn svg{width:18px;height:18px;stroke:#fff;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+  /* STEP3: scan remaining */
+  .scanhero{border:1.5px solid var(--g4);border-radius:12px;padding:14px;text-align:center;background:var(--g5)}
+  .scanhero .qrbig{width:64px;height:64px;margin:0 auto 8px;border-radius:8px;background:
+     conic-gradient(#15171a 25%,#fff 0 50%,#15171a 0 75%,#fff 0),
+     conic-gradient(#15171a 25%,#fff 0 50%,#15171a 0 75%,#fff 0);
+     background-size:20px 20px,20px 20px;background-position:0 0,10px 10px;border:3px solid #15171a}
+  .scanhero b{font-size:14px;font-weight:900}.scanhero small{display:block;font-size:11px;color:var(--g2);margin-top:2px}
+  .seg{display:flex;gap:7px;margin-top:6px}
+  .sopt{flex:1;border:1.5px solid var(--g4);border-radius:11px;padding:11px 8px;text-align:center;cursor:pointer;background:#fff}
+  .sopt.sel{border-color:var(--ink);border-width:2.5px}
+  .sopt b{font-size:13px;font-weight:900;display:block}.sopt small{font-size:10px;color:var(--g2)}
+  .sopt.waste.sel{border-color:var(--time)}
+  .amt{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+  .amtbox{display:inline-flex;align-items:center;border:1.5px solid var(--g4);border-radius:10px;overflow:hidden}
+  .amtbox button{width:32px;height:38px;background:var(--g5);border:none;font-size:17px;cursor:pointer}
+  .amtbox .v{width:54px;text-align:center;font-weight:900;font-variant-numeric:tabular-nums}
+  .flowto{font-size:11px;color:var(--g2);background:var(--g5);border-radius:10px;padding:9px 11px;line-height:1.6}
+  .flowto b{color:var(--ink)}
+  .savebtn{margin-top:auto;height:48px;border:none;border-radius:12px;background:var(--ink);color:#fff;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer}
+
+  /* STEP4: carryover next day */
+  .nextday{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:900;color:var(--time);background:var(--time-s);border-radius:9px;padding:8px 11px}
+  .calc{border:1.5px solid var(--time);border-radius:12px;overflow:hidden}
+  .calc .cr{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;font-size:12.5px;border-bottom:1px solid var(--g4);background:#fff}
+  .calc .cr:last-child{border-bottom:none}
+  .calc .cr .k{color:var(--g2)}.calc .cr .v{font-weight:900;font-variant-numeric:tabular-nums}
+  .calc .cr.minus .v{color:#3a6a2a}
+  .calc .cr.total{background:var(--time-s)}
+  .calc .cr.total .k{font-weight:900}.calc .cr.total .v{font-size:18px;color:var(--time)}
+  .expnote{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--g2);margin-top:2px}
+  .expnote svg{width:14px;height:14px;stroke:var(--g2);stroke-width:2.2;fill:none;flex:none}
+  .boardcard{border:1.5px solid var(--g4);border-radius:12px;padding:12px;background:#fff;margin-top:auto}
+  .boardcard .bt{font-size:10.5px;font-weight:900;color:var(--g2);letter-spacing:.05em}
+  .boardcard .bn{font-size:15px;font-weight:900;margin-top:4px}
+  .boardcard .bn small{font-size:11px;color:var(--g2);font-weight:700}
+  .boardcard .q2{font-size:11px;font-weight:700;color:#fff;background:var(--ink);padding:3px 9px;border-radius:6px;display:inline-block;margin-top:7px;font-variant-numeric:tabular-nums}
+
+  .legend{display:flex;gap:18px;margin-top:16px;flex-wrap:wrap;font-size:12px;color:var(--g2)}
+  .legend b{color:var(--ink)}
+  @media(max-width:1100px){.flow{grid-template-columns:1fr;gap:14px}.arrow{transform:rotate(90deg)}}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="head"><b>ラベル運用フロー（FR-20/45/46/42）</b><span>完了 → ラベル印刷 → QRで残量記録 → 翌日繰越 を1枚で</span></div>
+  <div class="sub">ラベルは「印刷」だけでなく、物理↔デジタルの橋渡し。手書き・棚卸し・余り入力をゼロにし、データを自己補正レシピ（FR-09）と繰越（FR-42）へ環流する。</div>
+
+  <div class="flow">
+    <!-- STEP 1 -->
+    <div class="card">
+      <div class="ch"><div class="step"><span class="n">1</span>完了チェック</div><h3>仕込みを終える</h3><p>ボードでタップ→担当を選ぶ</p></div>
+      <div class="cb">
+        <div class="scr">
+          <div class="scrbar"><span class="d"></span><span class="d"></span><span class="d"></span><small>今日のタスク</small></div>
+          <div class="scrbody">
+            <div class="task done"><div class="tick on"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div><div class="nm">煮切り仕込み</div><span class="q">290ml</span></div></div>
+            <div style="font-size:11px;font-weight:900;color:var(--g2);margin:10px 0 6px">締めた担当は？</div>
+            <div class="who"><span class="chip on">親方</span><span class="chip">阿部</span><span class="chip">美奈</span></div>
+          </div>
+        </div>
+        <div class="toast"><div class="i"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>完了 → ラベルを作成します</div>
+      </div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+
+    <!-- STEP 2 -->
+    <div class="card">
+      <div class="ch"><div class="step"><span class="n">2</span>ラベル印刷</div><h3>自動で正しく印字</h3><p>手書きゼロ・期限は自動計算</p></div>
+      <div class="cb">
+        <div class="label">
+          <span class="lbadge">PREVIEW</span>
+          <div class="lt"><b>煮切り</b><div class="qr"></div></div>
+          <div class="lrow"><span class="k">仕込み</span><span class="v">6/11 15:40</span></div>
+          <div class="lrow"><span class="k">使用期限</span><span class="v t">6/14 まで（3日）</span></div>
+          <div class="lrow"><span class="k">量 / 担当</span><span class="v">290ml ・ 親方</span></div>
+        </div>
+        <div class="opts">
+          <div class="opt"><span class="box"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>使用期限を印字（レシピの賞味から自動）</div>
+          <div class="opt"><span class="box"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>残量記録用のQRを付ける</div>
+          <div class="opt"><span class="box off"></span>曜日色（FIFO）を付ける</div>
+        </div>
+        <button class="printbtn"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-3a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2M6 14h12v7H6z"/></svg>印刷（Brother QL）</button>
+      </div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+
+    <!-- STEP 3 -->
+    <div class="card">
+      <div class="ch"><div class="step"><span class="n">3</span>QRで残量記録</div><h3>営業後、かざすだけ</h3><p>手入力ゼロでデータ化</p></div>
+      <div class="cb">
+        <div class="scanhero"><div class="qrbig"></div><b>煮切り（6/11仕込み）</b><small>ラベルのQRを読み取りました</small></div>
+        <div class="seg">
+          <div class="sopt sel"><b>残った</b><small>翌日へ繰越</small></div>
+          <div class="sopt"><b>使い切り</b><small>残0</small></div>
+          <div class="sopt waste"><b>廃棄</b><small>ロス計上</small></div>
+        </div>
+        <div class="amt"><span style="font-size:12px;color:var(--g2)">残り</span><div class="amtbox"><button>−</button><span class="v">100</span><button>＋</button></div><span style="font-size:12px;color:var(--g2)">ml</span></div>
+        <div class="flowto">この記録は <b>繰越(FR-42)</b>・<b>廃棄(FR-08)</b>・<b>自己補正レシピ(FR-09)</b> に自動で流れます。</div>
+        <button class="savebtn">記録する</button>
+      </div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+
+    <!-- STEP 4 -->
+    <div class="card">
+      <div class="ch"><div class="step"><span class="n">4</span>翌日に繰越</div><h3>作り過ぎを防ぐ</h3><p>残量を今日の推奨から差引</p></div>
+      <div class="cb">
+        <div class="nextday"><svg viewBox="0 0 24 24" width="14" height="14" stroke="#bb4d1b" stroke-width="2.4" fill="none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>翌営業日 6/13 の仕込みボード</div>
+        <div class="calc">
+          <div class="cr"><span class="k">本日必要（16名・推奨）</span><span class="v">230ml</span></div>
+          <div class="cr minus"><span class="k">昨日の繰越（期限内）</span><span class="v">−100ml</span></div>
+          <div class="cr total"><span class="k">今日の追い仕込み</span><span class="v">130ml</span></div>
+        </div>
+        <div class="expnote"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>繰越分は 6/14 期限。先に使い切るよう古い順で提示。</div>
+        <div class="boardcard">
+          <div class="bt">ボード表示</div>
+          <div class="bn">煮切り（追い仕込み）<small>／ 昨日分100ml＋130ml</small></div>
+          <span class="q2">130ml</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><b>狙い</b>：手書き・棚卸し・余り入力をゼロに</span>
+    <span><b>効果</b>：HACCP（期限管理）＋食材ロス削減＋脱属人化</span>
+    <span><b>線</b>：食材在庫・発注はしない／アレルゲンは参考のみ</span>
+  </div>
+</div>
+</body></html>

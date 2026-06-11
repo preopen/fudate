@@ -65,6 +65,7 @@
 | シミュレーション並走（実績 vs 推奨） | `p0-wireframe-simulation.html/.png` | FR-39 |
 | 複数日デイレール（今日提供＋前倒し） | `p1-wireframe-dayrail-multiday.html/.png` | FR-40/41 |
 | 営業日カレンダー設定 | `p1-wireframe-calendar.html/.png` | FR-17/40の基礎（設定追加） |
+| ラベル運用フロー（完了→印刷→QR残量→繰越） | `p2-wireframe-label-flow.html/.png` | FR-20/42 ＋ **FR-45/46（探索・v0.7候補）** |
 
 ---
 
