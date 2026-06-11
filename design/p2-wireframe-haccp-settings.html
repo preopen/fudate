@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HACCPモード設定 — チェック項目・基準温度</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 14px;font-size:13px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .bL h1{font-size:19px;font-weight:900}
+  .bL .badge{font-size:11px;font-weight:900;color:var(--time);background:var(--time-s);padding:6px 11px;border-radius:999px}
+  .save{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer}
+  .body{display:grid;grid-template-columns:224px 1fr;min-height:0;flex:1}
+  .nav{border-right:1px solid var(--g4);padding:16px 14px;display:flex;flex-direction:column;gap:3px;background:#fcfcfd}
+  .ni{padding:13px 14px;border-radius:12px;font-size:14px;font-weight:700;color:var(--g2);cursor:pointer;display:flex;align-items:center;gap:8px}
+  .ni.on{background:var(--ink);color:#fff}
+  .ni .c{margin-left:auto;font-size:11px;color:var(--g3)}.ni.on .c{color:#9aa0a6}
+  .cont{padding:20px 28px;overflow:auto;display:flex;flex-direction:column;gap:22px}
+  .intro{font-size:12px;color:var(--g2);background:var(--g5);border-radius:11px;padding:12px 14px}
+  .intro b{color:var(--ink)}
+  .sec h2{font-size:14px;font-weight:900;margin-bottom:3px;display:flex;align-items:center;gap:9px}
+  .sec h2 .ph{font-size:10.5px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--ink);padding:3px 9px;border-radius:999px}
+  .sec .d{font-size:11.5px;color:var(--g2);margin-bottom:10px}
+  /* check item rows */
+  .rows{border:1.5px solid var(--g4);border-radius:14px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--g4);background:#fff}
+  .row:last-child{border-bottom:none}
+  .grip{color:var(--g3);font-size:15px;cursor:grab}
+  .row .t{flex:1}.row .t b{font-size:14px;font-weight:700;display:block}.row .t small{font-size:11.5px;color:var(--g2)}
+  /* input type chip */
+  .itype{font-size:11px;font-weight:900;padding:5px 10px;border-radius:999px;white-space:nowrap}
+  .it-check{background:var(--ok-s);color:var(--ok)}
+  .it-temp{background:#e4ecf2;color:#2a5a86}
+  .it-yn{background:var(--g5);color:var(--g2)}
+  .it-photo{background:#efe2d8;color:#7a6327}
+  /* threshold pill */
+  .thr{font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;background:var(--g5);border-radius:9px;padding:7px 11px;color:var(--ink)}
+  .thr.edit{background:#fff;border:1.5px solid var(--ink)}
+  .toggle{width:48px;height:28px;border-radius:999px;background:var(--ink);position:relative;flex:none}
+  .toggle:after{content:"";position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--g3)}.toggle.off:after{right:auto;left:3px}
+  .addrow{font-size:12.5px;color:var(--time);border:1px dashed var(--time-s);border-radius:10px;padding:11px;text-align:center;cursor:pointer;margin-top:9px}
+  /* temp standards table */
+  .tt{display:grid;grid-template-columns:1fr 120px 120px 70px;gap:8px;align-items:center}
+  .tt .h{font-size:10.5px;font-weight:900;letter-spacing:.04em;color:var(--g2);padding-bottom:2px}
+  .tt .nm{font-size:14px;font-weight:700}.tt .nm small{display:block;font-size:11px;color:var(--g2)}
+  .numbox{display:inline-flex;align-items:center;border:1.5px solid var(--g4);border-radius:9px;overflow:hidden;background:#fff;width:fit-content}
+  .numbox .v{width:54px;text-align:right;padding:8px 8px;font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
+  .numbox .u{padding:0 8px;color:var(--g2);font-weight:700;background:var(--g5);align-self:stretch;display:flex;align-items:center;font-size:12px}
+  .freq{font-size:11.5px;font-weight:800;color:var(--g2);background:var(--g5);border-radius:8px;padding:7px 0;text-align:center}
+  /* preview card */
+  .prev{border:1.5px solid var(--g4);border-radius:13px;padding:14px 16px;background:var(--g5)}
+  .prev .pt{font-size:11px;font-weight:900;color:var(--g2);margin-bottom:9px}
+  .pchip{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;background:#fff;border:1.5px solid var(--g4);border-radius:10px;padding:8px 11px;margin:0 6px 6px 0}
+  .pchip .warn{color:var(--time);font-weight:900}
+  .scopebar{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--g2)}
+  .scopebar svg{width:15px;height:15px;stroke:var(--g2);flex:none}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>HACCPモード設定（FR-16/51）</b><span>チェック項目のカスタム（始業前/営業中CCP/終業後）＋ 冷蔵庫・加熱の基準温度。MHLWの“小規模飲食店向け”ひな形から開始</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">← モード</button><h1>HACCP設定</h1><span class="badge">HACCPモード ON</span></div>
+      <button class="save">保存</button>
+    </div>
+    <div class="body">
+      <div class="nav">
+        <div class="ni on">チェック項目<span class="c">7</span></div>
+        <div class="ni">基準温度<span class="c">5</span></div>
+        <div class="ni">記録・PDF</div>
+        <div class="ni">ひな形から追加</div>
+      </div>
+      <div class="cont">
+        <div class="intro">厚労省の<b>「HACCPの考え方を取り入れた衛生管理（小規模一般飲食店向け）」</b>のひな形を初期搭載。お店に合わせて項目の<b>追加・並べ替え・入力方法</b>を変えられます。</div>
+
+        <!-- 始業前 -->
+        <div class="sec">
+          <h2><span class="ph">始業前</span>一般的衛生管理</h2>
+          <div class="rows">
+            <div class="row"><span class="grip">⋮⋮</span><div class="t"><b>従業員の健康・手洗い</b><small>下痢・発熱・手指の傷</small></div><span class="itype it-check">チェック</span><div class="toggle"></div></div>
+            <div class="row"><span class="grip">⋮⋮</span><div class="t"><b>冷蔵庫の温度</b><small>基準とアラートは「基準温度」で設定</small></div><span class="itype it-temp">数値℃</span><span class="thr">≤4℃</span><div class="toggle"></div></div>
+            <div class="row"><span class="grip">⋮⋮</span><div class="t"><b>器具の洗浄・消毒</b><small>まな板・包丁</small></div><span class="itype it-check">チェック</span><div class="toggle"></div></div>
+          </div>
+          <div class="addrow">＋ 始業前の項目を追加</div>
+        </div>
+
+        <!-- 営業中 CCP -->
+        <div class="sec">
+          <h2><span class="ph">営業中</span>重要管理点（CCP）</h2>
+          <div class="rows">
+            <div class="row"><span class="grip">⋮⋮</span><div class="t"><b>加熱の中心温度</b><small>椀物・加熱品</small></div><span class="itype it-temp">数値℃</span><span class="thr">≥75℃ / 1分</span><div class="toggle"></div></div>
+            <div class="row"><span class="grip">⋮⋮</span><div class="t"><b>生鮮ネタの状態</b><small>色・におい・鮮度＋写真</small></div><span class="itype it-yn">良/否</span><span class="itype it-photo">写真</span><div class="toggle"></div></div>
+          </div>
+          <div class="addrow">＋ 営業中の項目を追加</div>
+        </div>
+
+        <!-- 終業後 -->
+        <div class="sec">
+          <h2><span class="ph">終業後</span>一般的衛生管理</h2>
+          <div class="rows">
+            <div class="row"><span class="grip">⋮⋮</span><div class="t"><b>床・排水・ゴミ処理</b><small>清掃完了</small></div><span class="itype it-check">チェック</span><div class="toggle"></div></div>
+            <div class="row"><span class="grip">⋮⋮</span><div class="t"><b>残置食材の保管</b><small>ラップ・期限ラベル（ラベルモード連携）</small></div><span class="itype it-check">チェック</span><div class="toggle"></div></div>
+          </div>
+          <div class="addrow">＋ 終業後の項目を追加</div>
+        </div>
+
+        <!-- 基準温度 -->
+        <div class="sec">
+          <h2>基準温度（冷蔵庫・加熱）</h2>
+          <div class="d">超過すると時間色アラート。冷蔵庫QR（FR-49）からその場で記録できます。</div>
+          <div class="tt">
+            <div class="h">対象</div><div class="h">基準</div><div class="h">記録頻度</div><div class="h">警告</div>
+            <div class="nm">冷蔵1・冷蔵2 <small>refrigerated</small></div>
+            <div><div class="numbox"><span class="v">4</span><span class="u">℃以下</span></div></div>
+            <div class="freq">始業・終業</div>
+            <div class="toggle"></div>
+            <div class="nm">冷凍庫 <small>frozen</small></div>
+            <div><div class="numbox"><span class="v">−15</span><span class="u">℃以下</span></div></div>
+            <div class="freq">始業・終業</div>
+            <div class="toggle"></div>
+            <div class="nm">加熱（中心温度・CCP）</div>
+            <div><div class="numbox edit" style="border:1.5px solid var(--ink)"><span class="v">75</span><span class="u">℃/1分</span></div></div>
+            <div class="freq">提供ごと</div>
+            <div class="toggle"></div>
+          </div>
+        </div>
+
+        <!-- preview -->
+        <div class="sec">
+          <h2>当日の記録イメージ</h2>
+          <div class="prev">
+            <div class="pt">この設定だと、始業前にこう表示されます</div>
+            <span class="pchip">✓ 健康・手洗い</span>
+            <span class="pchip">冷蔵2：<span class="warn">−8℃ ⚠</span></span>
+            <span class="pchip">器具の洗浄 ✓</span>
+            <span class="pchip">加熱：78℃</span>
+          </div>
+          <div class="scopebar" style="margin-top:10px"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>記録は記録者・時刻つきで保存し、PDF出力できます。アレルゲンの“正”管理は行いません（参考のみ）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>

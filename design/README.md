@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **36画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **37画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -70,6 +70,7 @@
 | ラベルモード設定（プリンタ接続） | `p2-wireframe-label-settings.html/.png` | FR-48 |
 | 冷蔵庫QRレンズ／点検モード | `p2-wireframe-fridge-lens.html/.png` | FR-49/50 |
 | モード設定（ラベル/HACCP・冷蔵庫登録） | `p2-wireframe-modes-settings.html/.png` | FR-48/49/51・モード制 |
+| HACCPモード設定（チェック項目・基準温度） | `p2-wireframe-haccp-settings.html/.png` | FR-16/51 |
 
 ---
 

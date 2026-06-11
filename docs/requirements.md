@@ -370,6 +370,7 @@ Restaurant ─┬─ Section ─── Staff
 | ラベルモード設定（プリンタ接続） | `design/p2-wireframe-label-settings.html` | FR-48 |
 | 冷蔵庫QRレンズ／点検モード | `design/p2-wireframe-fridge-lens.html` | FR-49/50 |
 | モード設定（ラベル/HACCP・冷蔵庫登録） | `design/p2-wireframe-modes-settings.html` | FR-48/49/51 |
+| HACCPモード設定（チェック項目・基準温度） | `design/p2-wireframe-haccp-settings.html` | FR-16/51 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 
