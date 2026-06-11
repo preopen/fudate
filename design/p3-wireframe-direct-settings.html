@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Direct設定（店舗側）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 15px;font-size:13.5px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .bL h1{font-size:19px;font-weight:900}
+  .preview{font-size:13px;font-weight:900;color:var(--ink);border:1.5px solid var(--g4);background:#fff;border-radius:11px;padding:10px 16px;cursor:pointer}
+  .save{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer;margin-left:10px}
+  .main{flex:1;display:grid;grid-template-columns:230px 1fr;min-height:0}
+  .nav{border-right:1px solid var(--g4);padding:16px 14px;display:flex;flex-direction:column;gap:3px;background:#fcfcfd}
+  .ni{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:12px;font-size:14px;font-weight:700;color:var(--g2);cursor:pointer}
+  .ni.on{background:var(--ink);color:#fff}
+  .cont{padding:22px 30px;overflow:auto;display:flex;flex-direction:column;gap:22px}
+  .sec h2{font-size:15px;font-weight:900;margin-bottom:4px}
+  .sec .d{font-size:12px;color:var(--g2);margin-bottom:12px}
+  .rows{border:1.5px solid var(--g4);border-radius:14px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--g4);background:#fff}
+  .row:last-child{border-bottom:none}
+  .row .t{flex:1}.row .t b{font-size:14.5px;font-weight:700;display:block}.row .t small{font-size:12px;color:var(--g2)}
+  .val{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;background:var(--g5);border-radius:10px;padding:9px 16px}
+  .val.t-{color:var(--time);background:var(--time-s)}
+  .toggle{width:56px;height:32px;border-radius:999px;background:var(--ink);position:relative;flex:none}
+  .toggle:after{content:"";position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--g3)}.toggle.off:after{right:auto;left:3px}
+  /* allotment grid */
+  .allot{display:grid;grid-template-columns:130px 1fr 1fr;gap:8px;align-items:center}
+  .allot .h{font-size:11px;font-weight:900;letter-spacing:.06em;color:var(--g2)}
+  .allot .slot{font-size:14px;font-weight:700}
+  .allot .slot small{display:block;font-size:11px;color:var(--g2)}
+  .seatbox{display:inline-flex;align-items:center;border:1.5px solid var(--g4);border-radius:10px;overflow:hidden;background:#fff;width:fit-content}
+  .seatbox button{width:36px;height:40px;background:var(--g5);border:none;font-size:17px;color:var(--ink);cursor:pointer}
+  .seatbox .v{width:46px;text-align:center;font-weight:900;font-variant-numeric:tabular-nums}
+  .closed{font-size:12px;font-weight:900;color:var(--g2);background:var(--g5);border-radius:10px;padding:10px 14px;text-align:center}
+  /* deposit segmented */
+  .seg{display:inline-flex;border:1.5px solid var(--g4);border-radius:12px;overflow:hidden}
+  .seg button{border:none;background:#fff;font-family:var(--font);font-size:14px;font-weight:800;color:var(--g2);padding:12px 20px;cursor:pointer;border-right:1.5px solid var(--g4)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--ink);color:#fff}
+  .inline{display:flex;align-items:center;gap:10px;margin-top:10px}
+  .inline .lab{font-size:13px;color:var(--g2)}
+  .moneybox{display:inline-flex;align-items:center;border:1.5px solid var(--g4);border-radius:10px;overflow:hidden;background:#fff}
+  .moneybox .y{padding:0 10px;color:var(--g2);font-weight:700;background:var(--g5);align-self:stretch;display:flex;align-items:center}
+  .moneybox input,.moneybox .v{width:90px;text-align:right;padding:11px 12px;font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;border:none}
+  /* course publish */
+  .course{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid var(--g4);border-radius:13px;margin-bottom:9px;background:#fff}
+  .course .nm{flex:1}.course .nm b{font-size:15px;font-weight:900}.course .nm small{display:block;font-size:12px;color:var(--g2)}
+  .course .pr{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
+  .pubtag{font-size:11px;font-weight:900;padding:5px 11px;border-radius:999px}
+  .pub{background:var(--ink);color:#fff}.unpub{background:var(--g5);color:var(--g2)}
+  .fee{display:flex;align-items:center;gap:12px;background:var(--time-s);border-radius:13px;padding:14px 18px}
+  .fee svg{width:20px;height:20px;stroke:var(--time);flex:none}
+  .fee b{font-size:14px;font-weight:900;color:#9a3a0e}
+  .fee small{display:block;font-size:12px;color:#9a3a0e}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>Direct設定（店舗側 / FR-35・FR-36）</b><span>直販枠アロットメント・デポジット（必須/任意/なし）・コース公開。台帳とは非衝突</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">← 設定</button><h1>PrepFlow Direct 設定</h1></div>
+      <div><button class="preview">予約ページを確認</button><button class="save">保存</button></div>
+    </div>
+    <div class="main">
+      <div class="nav">
+        <div class="ni on">直販枠（在庫）</div>
+        <div class="ni">お支払い</div>
+        <div class="ni">公開するコース</div>
+        <div class="ni">キャンセル規定</div>
+        <div class="ni">ページ・写真</div>
+        <div class="ni">受取口座（Stripe）</div>
+      </div>
+      <div class="cont">
+        <!-- allotment -->
+        <div class="sec">
+          <h2>直販枠（アロットメント）</h2>
+          <div class="d">台帳とは同期せず、直販に出す席数だけを設定。満枠で自動クローズ。残りは台帳側で従来どおり運用できます。</div>
+          <div class="rows"><div class="row"><div class="t"><b>直販を受け付ける</b><small>OFFにすると予約ページは「予約停止中」になります</small></div><div class="toggle"></div></div></div>
+          <div class="allot" style="margin-top:14px">
+            <div class="h">時間スロット</div><div class="h">直販に出す席数</div><div class="h">状態</div>
+            <div class="slot">18:00 <small>第一部</small></div>
+            <div><div class="seatbox"><button>−</button><span class="v">6</span><button>＋</button></div></div>
+            <div><span class="val">残 1 / 6</span></div>
+            <div class="slot">20:30 <small>第二部</small></div>
+            <div><div class="seatbox"><button>−</button><span class="v">4</span><button>＋</button></div></div>
+            <div><span class="closed">満席・自動クローズ</span></div>
+          </div>
+        </div>
+
+        <!-- deposit -->
+        <div class="sec">
+          <h2>お支払い（事前決済）</h2>
+          <div class="d">店舗ごとに選べます。高級店は「必須」、カジュアルは「デポジットのみ」や「なし」も可。</div>
+          <div class="seg"><button>必須（全額前払い）</button><button class="on">デポジット</button><button>なし（来店時）</button></div>
+          <div class="inline"><span class="lab">デポジット額</span><div class="moneybox"><span class="y">¥</span><span class="v">5,000</span></div><span class="lab">× 人数 ／ 残りは来店時</span></div>
+        </div>
+
+        <!-- course publish -->
+        <div class="sec">
+          <h2>公開するコース</h2>
+          <div class="d">予約ページに表示するコースと価格。事前選択は必須です。</div>
+          <div class="course"><div class="nm"><b>おまかせ握り</b><small>つまみ＋握り15貫＋椀＋水菓子</small></div><span class="pr">¥16,500</span><span class="pubtag pub">公開中</span></div>
+          <div class="course"><div class="nm"><b>特別おまかせ</b><small>季節の特上ネタ・ペアリング相談可</small></div><span class="pr">¥22,000</span><span class="pubtag pub">公開中</span></div>
+          <div class="course"><div class="nm"><b>ランチおまかせ</b><small>平日昼のみ</small></div><span class="pr">¥8,800</span><span class="pubtag unpub">非公開</span></div>
+        </div>
+
+        <!-- fee callout -->
+        <div class="fee">
+          <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          <div><b>送客手数料ゼロ</b><small>食べログ純予約の目安：夜 ¥200/人（月200人で約¥44,000）→ Directは月額 +¥9,800 のみ。決済はStripe実費。</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>

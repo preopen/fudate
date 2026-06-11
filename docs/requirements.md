@@ -264,6 +264,8 @@ Restaurant ─┬─ Section ─── Staff
 | 設定画面 | `design/p1-wireframe-settings.html` | FR-14/15/10・§13・T−規律 |
 | デイレール（業務×仕込み 1日ビュー） | `design/p1-wireframe-dayrail.html` | FR-31/32 |
 | Direct予約ページ（ゲスト直販） | `design/p3-wireframe-direct-booking.html` | FR-35 |
+| 予約ハブ（複数ソース合算） | `design/p2-wireframe-reservation-hub.html` | FR-34 |
+| Direct設定・店舗側 | `design/p3-wireframe-direct-settings.html` | FR-35/36 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 
