@@ -396,6 +396,8 @@ Restaurant ─┬─ Section ─── Staff
 | モード設定（ラベル/HACCP・冷蔵庫登録） | `design/p2-wireframe-modes-settings.html` | FR-48/49/51 |
 | HACCPモード設定（チェック項目・基準温度） | `design/p2-wireframe-haccp-settings.html` | FR-16/51 |
 | 設定ホーム（ハブ） | `design/p1-wireframe-settings-home.html` | FR-52/54・§4.7 |
+| セクション・スタッフ設定 | `design/p1-wireframe-staff-sections.html` | FR-07/43 |
+| 営業帯・T−規律 設定 | `design/p1-wireframe-service-periods.html` | FR-41/22 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 

@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **38画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **40画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -72,6 +72,8 @@
 | モード設定（ラベル/HACCP・冷蔵庫登録） | `p2-wireframe-modes-settings.html/.png` | FR-48/49/51・モード制 |
 | HACCPモード設定（チェック項目・基準温度） | `p2-wireframe-haccp-settings.html/.png` | FR-16/51 |
 | 設定ホーム（ハブ・1機能1場所） | `p1-wireframe-settings-home.html/.png` | FR-52/54・§4.7 |
+| ├ セクション・スタッフ | `p1-wireframe-staff-sections.html/.png` | FR-07/43 |
+| ├ 営業帯・T−規律 | `p1-wireframe-service-periods.html/.png` | FR-41/22 |
 
 ---
 
