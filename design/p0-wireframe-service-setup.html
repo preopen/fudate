@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ワイヤーフレーム — 本日のサービス設定／予約メール取込</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f6f2;--surface:#f9f8f5;--surface2:#fbfbf9;--offset:#f3f0ec;--offset2:#edeae5;
+    --border:#d4d1ca;--divider:#dcd9d5;--text:#28251d;--muted:#6b6963;--faint:#9d9a93;
+    --primary:#01696f;--primary-hover:#0c4e54;--primary-hi:#cedcd8;--success:#437a22;--success-hi:#d4dfcc;--warning:#964219;--warning-hi:#ddcfc6;
+    --r:.5rem;--r-lg:.75rem;--r-xl:1rem;--r-full:9999px;--shadow:0 8px 24px rgba(40,37,29,.08);--font:'Satoshi',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;padding:clamp(.8rem,2.5vw,2rem)}
+  .wrap{max-width:1040px;margin:0 auto;display:grid;gap:1.2rem}
+  .eyebrow{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  h1{font-size:clamp(1.35rem,1rem+1.4vw,2rem);line-height:1.12;margin:.25rem 0}
+  .sub{color:var(--muted);font-size:.95rem;max-width:66ch}
+  .ann{display:inline-grid;place-items:center;min-width:1.35rem;height:1.35rem;padding:0 .35rem;border-radius:var(--r-full);background:var(--primary);color:#fff;font-size:.72rem;font-weight:700;vertical-align:middle;margin-left:.3rem}
+  .device{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);overflow:hidden}
+  .appbar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.85rem 1rem;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--bg) 80%,transparent)}
+  .brand{display:flex;align-items:center;gap:.6rem}
+  .logo{width:24px;height:24px;color:var(--primary)}
+  .brand b{font-size:.98rem}
+  .step{font-size:.76rem;color:var(--muted)}
+  .step b{color:var(--primary)}
+
+  /* service header */
+  .svc{padding:1rem 1.1rem;border-bottom:1px solid var(--divider);display:grid;grid-template-columns:repeat(3,auto);gap:1rem;align-items:end}
+  .f{display:grid;gap:.3rem}
+  .f label{font-size:.74rem;color:var(--muted);font-weight:700}
+  .ctl{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--border);border-radius:var(--r);background:#fff;padding:.5rem .65rem;font-size:.86rem}
+  .toggle{display:inline-flex;border:1px solid var(--border);border-radius:var(--r-full);overflow:hidden}
+  .toggle span{font-size:.8rem;padding:.45rem .8rem;color:var(--muted)}
+  .toggle span.on{background:var(--primary);color:#fff;font-weight:700}
+
+  /* method tabs */
+  .methods{display:flex;gap:.5rem;padding:1rem 1.1rem 0;flex-wrap:wrap}
+  .m{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;padding:.5rem .8rem;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);color:var(--muted);cursor:pointer}
+  .m.on{background:var(--primary-hi);border-color:var(--primary-hi);color:var(--primary);font-weight:700}
+
+  .cols{display:grid;grid-template-columns:1.45fr 1fr;gap:1rem;padding:1rem 1.1rem 1.1rem}
+  .card{border:1px solid var(--border);border-radius:var(--r-lg);background:var(--surface2)}
+  .card h3{font-size:.9rem;padding:.7rem .8rem;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between}
+  .card .c{padding:.8rem}
+  .muted{color:var(--muted);font-size:.78rem;font-weight:400}
+
+  /* forward address */
+  .fwd{display:flex;align-items:center;gap:.5rem;background:#fff;border:1px dashed var(--primary-hi);border-radius:var(--r);padding:.55rem .65rem;margin-bottom:.4rem}
+  .fwd code{font-size:.8rem;color:var(--primary);font-weight:700;word-break:break-all}
+  .copy{margin-left:auto;font-size:.72rem;color:var(--primary);border:1px solid var(--primary-hi);background:#fff;border-radius:var(--r-full);padding:.3rem .6rem;font-weight:700;cursor:pointer;white-space:nowrap}
+  .conn{font-size:.72rem;color:var(--success);display:inline-flex;align-items:center;gap:.35rem;margin-bottom:.7rem}
+  .conn .dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--success)}
+
+  /* parsed reservation rows */
+  .res{display:grid;grid-template-columns:auto auto 1fr auto;gap:.5rem .6rem;align-items:center;padding:.55rem .6rem;border:1px solid var(--divider);border-radius:var(--r);background:#fff;margin-bottom:.5rem;font-size:.82rem}
+  .res.review{border-color:var(--warning-hi);background:#fffaf6}
+  .site{font-size:.68rem;font-weight:700;padding:.2rem .45rem;border-radius:999px;white-space:nowrap}
+  .s-tc{background:#dfe7ea;color:#2a5c63}.s-tl{background:#e9e2d6;color:#7a6327}.s-ik{background:#e7dfe9;color:#5d3f63}.s-tel{background:var(--offset2);color:var(--muted)}
+  .time{font-variant-numeric:tabular-nums;font-weight:700}
+  .who{color:var(--text)}
+  .who small{display:block;color:var(--faint);font-size:.7rem;margin-top:.1rem}
+  .pax{font-weight:700;font-variant-numeric:tabular-nums}
+  .assign{display:inline-flex;align-items:center;gap:.3rem;font-size:.74rem;border:1px solid var(--border);border-radius:var(--r);padding:.28rem .5rem;background:var(--offset);color:var(--muted)}
+  .assign.set{background:var(--primary-hi);color:var(--primary);border-color:var(--primary-hi);font-weight:700}
+  .st{font-size:.66rem;font-weight:700;padding:.16rem .42rem;border-radius:999px}
+  .st-auto{background:var(--success-hi);color:var(--success)}.st-rev{background:var(--warning-hi);color:var(--warning)}
+  .note{font-size:.74rem;color:var(--warning);background:var(--warning-hi);border-radius:var(--r);padding:.5rem .6rem;margin-top:.2rem;display:flex;gap:.4rem}
+
+  /* confirm panel */
+  .sum{display:flex;align-items:center;justify-content:space-between;padding:.5rem .2rem;border-bottom:1px dashed var(--divider);font-size:.86rem}
+  .sum:last-of-type{border-bottom:none}
+  .stepper{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+  .stepper button{width:28px;height:28px;background:var(--offset);color:var(--muted);font-size:1rem;border:none;cursor:pointer}
+  .stepper .v{width:42px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+  .total{display:flex;align-items:center;justify-content:space-between;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--divider);font-size:.92rem}
+  .total b{font-size:1.2rem;font-variant-numeric:tabular-nums}
+  .timeband{font-size:.74rem;color:var(--muted);margin-top:.3rem}
+  .cta{display:block;width:100%;text-align:center;background:var(--primary);color:#fff;border:none;border-radius:var(--r);padding:.75rem;font-weight:700;font-size:.92rem;cursor:pointer;margin-top:.8rem}
+  .cta.sub{background:var(--surface);color:var(--text);border:1px solid var(--border);margin-top:.5rem;font-size:.82rem;padding:.6rem}
+
+  .legend{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow);padding:1.1rem 1.2rem}
+  .legend h3{font-size:1.05rem;margin-bottom:.7rem}
+  .legend ul{list-style:none;display:grid;gap:.55rem}
+  .legend li{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem}
+  .legend .n{flex:none;display:inline-grid;place-items:center;min-width:1.5rem;height:1.5rem;border-radius:50%;background:var(--primary);color:#fff;font-size:.76rem;font-weight:700}
+  .fr{display:inline-block;font-size:.68rem;color:var(--primary);background:var(--primary-hi);padding:.05rem .4rem;border-radius:999px;font-weight:700;margin-left:.3rem}
+  @media(max-width:820px){.cols{grid-template-columns:1fr}.svc{grid-template-columns:1fr 1fr}.res{grid-template-columns:auto 1fr auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="eyebrow">Wireframe · 残る主要画面</div>
+    <h1>本日のサービス設定 ／ 予約メール取込</h1>
+    <p class="sub">日付・営業・開店時刻と「コース別の予約人数」を確定して当日ボードを生成。人数は 手入力／メール取込／CSV・貼り付け の3通り。メール取込は予約通知メールを転送して<strong>人数・時刻のみ自動抽出</strong>（コース・アレルギーは自由文メモのため手動確認＝API非対応の制約に対応）。</p>
+  </div>
+
+  <div class="device">
+    <div class="appbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="6" y="7" width="16" height="34" rx="8" stroke="currentColor" stroke-width="4"/><path d="M24 11h7c6.6 0 12 5.4 12 12s-5.4 12-12 12h-7" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M24 24h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+        <b>サービス設定</b>
+      </div>
+      <span class="step">STEP 1/2 ・ 設定 → <b>当日ボード生成</b></span>
+    </div>
+
+    <!-- service header -->
+    <div class="svc">
+      <div class="f"><label>日付 <span class="ann">1</span></label><span class="ctl">📅 2026/06/11(木) ▾</span></div>
+      <div class="f"><label>営業</label><span class="toggle"><span>昼</span><span class="on">夜</span></span></div>
+      <div class="f"><label>開店時刻</label><span class="ctl">🕔 18:00 ▾</span></div>
+    </div>
+
+    <!-- method tabs -->
+    <div class="methods">
+      <span class="m">⌨ 手入力</span>
+      <span class="m on">✉ メール取込 <span class="ann">2</span></span>
+      <span class="m">⇪ CSV・貼り付け</span>
+    </div>
+
+    <div class="cols">
+      <!-- LEFT: parsed reservations -->
+      <div class="card">
+        <h3>取込済み予約 <span class="muted">本日 ・ 直近の予約通知メールから</span></h3>
+        <div class="c">
+          <div class="fwd">
+            <span style="font-size:.74rem;color:var(--muted)">転送先 <span class="ann">3</span></span>
+            <code>hayashi-yoyaku@in.prepflow.app</code>
+            <button class="copy">コピー</button>
+          </div>
+          <div class="conn"><span class="dot"></span>接続済み ・ 直近取込 5分前 ・ 本日 4件を抽出</div>
+
+          <div class="res">
+            <span class="site s-tc">TableCheck</span>
+            <span class="time">18:00</span>
+            <span class="who">佐藤 様 <small>メモ: 記念日・乾杯シャンパン</small></span>
+            <span class="pax">2名</span>
+          </div>
+          <div class="res">
+            <span class="site s-tl">食べログ</span>
+            <span class="time">18:00</span>
+            <span class="who">鈴木 様 <small>メモ: —</small></span>
+            <span class="pax">4名</span>
+          </div>
+          <div class="res">
+            <span class="site s-ik">一休</span>
+            <span class="time">18:30</span>
+            <span class="who">高橋 様 <small>メモ: アレルギー「甲殻類」<span class="ann">4</span></small></span>
+            <span class="pax">6名</span>
+          </div>
+          <div class="res review">
+            <span class="site s-tel">電話/手入力</span>
+            <span class="time">20:00</span>
+            <span class="who">田中 様 <small>抽出: 人数が曖昧（“2〜3名”）</small></span>
+            <span class="pax">2名 ⚠</span>
+          </div>
+
+          <div class="note">⚠ メールからは<strong>人数・時刻のみ</strong>自動抽出します。コース内容・アレルギーは自由文メモのため、<strong>反映前に手動で確認・割当</strong>てください（予約APIの構造化データ非対応に対応）。<span class="ann">4</span></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: confirm covers -->
+      <div class="card">
+        <h3>コース別の予約人数（確定） <span class="muted"><span class="ann">5</span></span></h3>
+        <div class="c">
+          <div class="sum">
+            <span>おまかせコース</span>
+            <span class="stepper"><button>−</button><span class="v">14</span><button>＋</button></span>
+          </div>
+          <div class="sum">
+            <span>アラカルト/その他</span>
+            <span class="stepper"><button>−</button><span class="v">0</span><button>＋</button></span>
+          </div>
+
+          <div class="total"><span>合計</span><b>14名</b></div>
+          <div class="timeband">来店時間帯 18:00–20:00 ・ ピーク 18:00（10名）</div>
+
+          <button class="cta">この内容で当日ボードを生成 <span class="ann">6</span></button>
+          <button class="cta sub">＋ 手入力で予約を追加</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <h3>番号の対応（要件定義 v0.2 のFR）</h3>
+    <ul>
+      <li><span class="n">1</span><div><b>日付・営業・開店時刻</b>：当日設定の基本。開店時刻は逆算タイムラインの基準。<span class="fr">FR-02</span></div></li>
+      <li><span class="n">2</span><div><b>取込方法の選択</b>：手入力／メール取込／CSV・貼り付け。MVPは手入力、v1.5でメール取込。<span class="fr">FR-02 / FR-10</span></div></li>
+      <li><span class="n">3</span><div><b>専用転送先アドレス</b>：各予約サイトの通知メールを転送するとパースして取込（API審査不要の現実解）。<span class="fr">FR-10</span></div></li>
+      <li><span class="n">4</span><div><b>人数・時刻のみ自動抽出</b>：コース・アレルギーは自由文メモのため手動確認・割当（構造化API非対応の制約）。<span class="fr">FR-10 / 連携の制約</span></div></li>
+      <li><span class="n">5</span><div><b>コース別人数の確定</b>：抽出結果を集計し、手で微調整。これが数量算出の入力に。<span class="fr">FR-02 → FR-03</span></div></li>
+      <li><span class="n">6</span><div><b>当日ボードを生成</b>：確定人数＋開店時刻から、数量算出・逆算タイムラインを反映したボードを作成。<span class="fr">FR-03 / FR-06</span></div></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
