@@ -33,7 +33,7 @@
 | FR-07 | 担当アサイン | S/P1 | ✓ | view-staff, staff-sections |
 | FR-08 | パー/廃棄の記録 | **S/P1** | ✓ | close-flow（③本日のパー・廃棄記録：予約→作った→余った→繰越/廃棄）。simulation・prepitem-editorも参照 |
 | FR-09 | 自己補正レシピ | S/P2 | ✓ | prepitem-editor, prep-defaults, simulation, dashboard |
-| FR-10 | 予約メール取込 | S/P2 | ✓ | service-setup, settings |
+| FR-10 | 予約メール取込 | C/保留（v1.4降格） | ✓ | service-setup, settings ※実装はパイロット需要の確認後 |
 | FR-11 | ダッシュボード/分析 | S/P1-2 | ✓ | dashboard, todaytask |
 | FR-12 | 複数フロア/複数厨房 | C/P2 | △ | devices設定に内包。**分割ボードの専用画面は未作成** |
 | FR-13 | TableCheck深掘り連携 | **S戦略上位**/申請P0・構築P3 | ✓ | tablecheck-settings |
