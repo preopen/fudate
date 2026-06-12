@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **48画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **49画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -30,7 +30,7 @@
 | 画面 | ファイル | 対応FR |
 |---|---|---|
 | オンボーディング（業態テンプレ選択） | `p0-wireframe-onboarding.html/.png` | NFR-07 |
-| 本日のサービス設定／予約メール取込 | `p0-wireframe-service-setup.html/.png` | FR-02/10 |
+| 本日のサービス設定／予約メール取込 〔初期版・予約ハブ(FR-34)へ統合〕 | `p0-wireframe-service-setup.html/.png` | FR-02/10 |
 | 今日のタスク（仕込みボード） | `p0-wireframe-todaytask.html/.png` | FR-01/03/05/06/11/17 |
 | コーステンプレ編集 | `p1-wireframe-template-editor.html/.png` | FR-01/03/06 |
 | ダッシュボード | `p1-wireframe-dashboard.html/.png` | FR-11/09/17 |
@@ -54,7 +54,7 @@
 | 状態バリエーション（遅延／点検NG／全画面） | `p2-wireframe-state-alerts.html/.png` | FR-22（アラート3段階） |
 | パスビュー（卓×コース） | `p4-wireframe-passview.html/.png` | FR-24/25/27（P4 Service Sync） |
 | ホール側UI（ハンディ＋タッチパネル） | `p4-wireframe-hall-handy.html/.png` | FR-25/26/27/28（P4 Service Sync） |
-| 設定画面 | `p1-wireframe-settings.html/.png` | FR-14/15/10・§13テーマ切替・T−規律既定値 |
+| 設定画面 〔初期版・設定ホーム(FR-52)＋5サブ画面へ分割置換〕 | `p1-wireframe-settings.html/.png` | FR-14/15/10・§13テーマ切替・T−規律既定値 |
 | デイレール（業務×仕込み 1日ビュー） | `p1-wireframe-dayrail.html/.png` | FR-31/32（業務フローを同じT−軸に混在） |
 | Direct予約ページ（ゲスト直販動線） | `p3-wireframe-direct-booking.html/.png` | FR-35（コース事前選択・アレルギー・事前決済） |
 | 予約ハブ（複数ソース合算・重複警告） | `p2-wireframe-reservation-hub.html/.png` | FR-34 |
@@ -82,6 +82,7 @@
 | TableCheck連携設定 | `p3-wireframe-tablecheck-settings.html/.png` | FR-13 |
 | 特別仕込み（おもてなし→自動生成） | `p2-wireframe-special-prep.html/.png` | FR-57 |
 | アレルギー事前確認メッセージ（店側設定＋ゲストLINE） | `p3-wireframe-allergy-message.html/.png` | FR-58（Messaging API・参考確認） |
+| 閉店・締めフロー（締めゲート＋パー/廃棄＋申し送り） | `p2-wireframe-close-flow.html/.png` | FR-33/23/08（1日の締めゲート・FR-09/42へ環流） |
 
 ---
 

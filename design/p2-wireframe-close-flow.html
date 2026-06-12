@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>閉店・締めフロー（FR-33/23/08）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL h1{font-size:19px;font-weight:900}.bL .sub{font-size:12.5px;color:var(--g2)}
+  .bR{display:flex;align-items:center;gap:12px}
+  .gate{font-size:10.5px;font-weight:900;color:#fff;background:var(--ink);padding:5px 11px;border-radius:999px}
+  .cd{display:flex;align-items:center;gap:8px;background:var(--time-s);border-radius:12px;padding:8px 14px}
+  .cd small{display:block;font-size:10px;color:var(--time);font-weight:700;letter-spacing:.08em}
+  .cd b{font-size:18px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  /* stepper (FR-33 = 1本の流れ) */
+  .steps{display:flex;align-items:center;padding:15px 28px;border-bottom:1px solid var(--g4);gap:0}
+  .stp{display:flex;align-items:center;gap:10px}
+  .stp .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:900;flex:none;border:2px solid var(--g3);color:var(--g2);background:#fff}
+  .stp.done .n{background:var(--ink);border-color:var(--ink);color:#fff}
+  .stp.now .n{border-color:var(--ink);color:var(--ink);border-width:2.6px}
+  .stp .tx b{font-size:12.5px;font-weight:900;display:block;line-height:1.15}
+  .stp.pend .tx b{color:var(--g3)}
+  .stp .tx small{font-size:9.5px;color:var(--g2)}
+  .stp .n svg{width:15px;height:15px;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .seg-ln{flex:1;height:2px;background:var(--g4);margin:0 12px}
+  .seg-ln.done{background:var(--ink)}
+  /* main two columns */
+  .main{flex:1;display:grid;grid-template-columns:1fr 372px;gap:0;overflow:hidden}
+  .col{overflow:auto;padding:18px 24px 22px}
+  .colL{border-right:1px solid var(--g4)}
+  .h2{font-size:13.5px;font-weight:900;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .h2 .fr{font-size:9.5px;font-weight:900;color:var(--g2);background:var(--g5);border-radius:999px;padding:3px 8px}
+  .h2 .auto{font-size:9.5px;font-weight:900;color:var(--ok);background:var(--ok-s);border-radius:999px;padding:3px 8px}
+  .lead{font-size:11.5px;color:var(--g2);margin-bottom:12px}
+  .lead b{color:var(--ink)}
+  /* par/waste table (FR-08) */
+  .tbl{border:1.5px solid var(--g4);border-radius:14px;overflow:hidden}
+  .tr{display:grid;grid-template-columns:1.5fr .7fr .7fr .8fr 1.3fr;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--g4)}
+  .tr:last-child{border-bottom:none}
+  .tr.hd{background:var(--g5)}
+  .tr.hd span{font-size:10px;font-weight:900;color:var(--g2);letter-spacing:.03em}
+  .tr .nm{font-size:13.5px;font-weight:700}
+  .tr .nm small{display:block;font-size:10px;color:var(--g2);font-weight:500}
+  .tr .num{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+  .tr .left{font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}
+  .tr .left.warn{color:var(--time)}
+  .seg{display:inline-flex;border:1.5px solid var(--g4);border-radius:9px;overflow:hidden}
+  .seg button{border:none;background:#fff;font-family:var(--font);font-size:11px;font-weight:900;padding:7px 10px;cursor:pointer;color:var(--g2);border-right:1.5px solid var(--g4)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--ink);color:#fff}
+  .feed{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--g2);background:var(--g5);border-radius:11px;padding:10px 13px;margin-top:10px}
+  .feed b{color:var(--ink)}
+  .feed svg{width:14px;height:14px;stroke:var(--ok);flex:none}
+  .done-sec{display:flex;align-items:center;gap:12px;border:1.5px solid var(--g4);border-radius:13px;padding:12px 15px;margin-bottom:10px;background:#fff}
+  .done-sec .ck{width:28px;height:28px;border-radius:50%;background:var(--ok-s);display:grid;place-items:center;flex:none}
+  .done-sec .ck svg{width:15px;height:15px;stroke:var(--ok);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .done-sec .t b{font-size:13.5px;font-weight:900;display:block}.done-sec .t small{font-size:10.5px;color:var(--g2)}
+  .done-sec .st{margin-left:auto;font-size:10.5px;font-weight:900;color:var(--ok);background:var(--ok-s);border-radius:999px;padding:5px 11px}
+  /* right col: handover note (FR-23) + summary */
+  .card{border:1.5px solid var(--g4);border-radius:14px;padding:15px 16px;margin-bottom:14px}
+  .card.now{border-color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+  .chip{font-size:11px;font-weight:800;background:var(--g5);border:1.5px solid var(--g4);border-radius:999px;padding:5px 11px}
+  .chip b{font-variant-numeric:tabular-nums}
+  .note{border:1.5px dashed var(--g3);border-radius:11px;padding:12px 13px;font-size:12.5px;color:var(--ink);line-height:1.55;min-height:78px;margin-top:8px}
+  .note .ph{color:var(--g3)}
+  .auto-to{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--g2);margin-top:9px}
+  .auto-to svg{width:13px;height:13px;stroke:var(--ink);flex:none}
+  .by{display:flex;align-items:center;gap:7px;margin-top:10px}
+  .by .av{width:26px;height:26px;border-radius:50%;background:var(--g5);display:grid;place-items:center;font-size:11px;font-weight:900}
+  .by small{font-size:10.5px;color:var(--g2)}
+  .sum{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:6px}
+  .sm{border:1.5px solid var(--g4);border-radius:11px;padding:10px 12px}
+  .sm small{font-size:10px;color:var(--g2);font-weight:700;display:block}
+  .sm b{font-size:21px;font-weight:900;font-variant-numeric:tabular-nums}
+  .sm b em{font-size:12px;font-style:normal;color:var(--g2);font-weight:700}
+  .sm .lt{color:var(--time)}
+  .exp{display:flex;gap:8px;margin-top:10px}
+  .exp button{flex:1;border:1.5px solid var(--g4);background:#fff;font-family:var(--font);font-size:11.5px;font-weight:900;color:var(--ink);border-radius:9px;padding:9px;cursor:pointer}
+  /* footer */
+  .foot{border-top:1px solid var(--g4);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;background:#fff}
+  .foot small{font-size:11px;color:var(--g2)}
+  .cta{display:inline-flex;align-items:center;gap:9px;background:var(--ink);color:#fff;font-family:var(--font);font-size:14.5px;font-weight:900;border:none;border-radius:13px;padding:13px 24px;cursor:pointer}
+  .cta svg{width:17px;height:17px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>閉店・締めフロー（FR-33 ／ 申し送り FR-23 ／ パー・廃棄記録 FR-08）</b><span>1日の締めゲート：クローズチェック→衛生記録→繰越/廃棄→申し送り→日次サマリーを1本の流れで</span></div>
+  <div class="tab">
+
+    <div class="bar">
+      <div class="bL"><h1>閉店・締め</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜の部 ・ 24名 ・ 締めゲート</div></div>
+      <div class="bR"><span class="gate">1日の締めゲート</span><div class="cd"><div><small>CLOSE 22:30</small><b>T＋0:42</b></div></div></div>
+    </div>
+
+    <!-- FR-33: 1本の流れ -->
+    <div class="steps">
+      <div class="stp done"><div class="n"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div><div class="tx"><b>クローズ点検</b><small>完了 6/6</small></div></div>
+      <div class="seg-ln done"></div>
+      <div class="stp done"><div class="n"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div><div class="tx"><b>衛生記録(HACCP)</b><small>完了 ・ PDF化済</small></div></div>
+      <div class="seg-ln done"></div>
+      <div class="stp now"><div class="n">3</div><div class="tx"><b>繰越/廃棄</b><small>記録中</small></div></div>
+      <div class="seg-ln"></div>
+      <div class="stp pend"><div class="n">4</div><div class="tx"><b>申し送り</b><small>未</small></div></div>
+      <div class="seg-ln"></div>
+      <div class="stp pend"><div class="n">5</div><div class="tx"><b>日次サマリー</b><small>自動</small></div></div>
+    </div>
+
+    <div class="main">
+
+      <!-- LEFT: par/waste record (FR-08) -->
+      <div class="col colL">
+        <div class="done-sec"><div class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div><div class="t"><b>① クローズ点検 ／ ② 衛生記録(HACCP・FR-16)</b><small>消火・施錠・冷蔵庫温度・手洗い記録 … 完了</small></div><span class="st">完了</span></div>
+
+        <div class="h2">③ 本日のパー・廃棄記録 <span class="fr">FR-08</span></div>
+        <div class="lead"><b>予約◯名 → 作った → 余った</b> を記録。余りは<b>繰越（賞味期限内）</b>か<b>廃棄</b>を選択。</div>
+        <div class="tbl">
+          <div class="tr hd"><span>品目</span><span>予約</span><span>作った</span><span>余り</span><span>判定</span></div>
+          <div class="tr"><div class="nm">煮切り<small>全コース合算</small></div><div class="num">24名</div><div class="num">200ml</div><div class="left">65ml</div>
+            <div class="seg"><button class="on">繰越</button><button>廃棄</button></div></div>
+          <div class="tr"><div class="nm">鯛の昆布締め<small>本日限り</small></div><div class="num">24名</div><div class="num">14枚</div><div class="left warn">2枚</div>
+            <div class="seg"><button>繰越</button><button class="on">廃棄</button></div></div>
+          <div class="tr"><div class="nm">一番だし</div><div class="num">24名</div><div class="num">5.0L</div><div class="left">0.4L</div>
+            <div class="seg"><button class="on">繰越</button><button>廃棄</button></div></div>
+          <div class="tr"><div class="nm">穴子のツメ</div><div class="num">24名</div><div class="num">600ml</div><div class="left">120ml</div>
+            <div class="seg"><button class="on">繰越</button><button>廃棄</button></div></div>
+        </div>
+        <div class="feed"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 5v4h-4"/></svg>この実績は<b>自己補正レシピ（FR-09）</b>へ環流し、明日以降の推奨量を調整します。</div>
+        <div class="feed"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>繰越分（煮切り65ml・だし0.4L・ツメ120ml）は<b>翌日の推奨量から自動で差引（FR-42）</b>。</div>
+      </div>
+
+      <!-- RIGHT: handover note (FR-23) + summary -->
+      <div class="col">
+        <div class="h2">④ 申し送り（引き継ぎノート）<span class="fr">FR-23</span></div>
+        <div class="card now">
+          <div style="font-size:11px;font-weight:900;color:var(--g2)">残仕込み（繰越から自動転記）</div>
+          <div class="chips"><span class="chip">煮切り <b>65ml</b></span><span class="chip">一番だし <b>0.4L</b></span><span class="chip">ツメ <b>120ml</b></span></div>
+          <div class="note">明日は<b>貸切8名が17:30追加</b>。穴子は早めに仕込み。<br>2番冷蔵の真空が1袋ふくらみ → 朝に確認。<span class="ph">｜タップで追記…</span></div>
+          <div class="by"><span class="av">親</span><small>記録者：親方（タップで変更）</small></div>
+          <div class="auto-to"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><b style="color:var(--ink)">翌日のサービス設定に自動表示</b>されます</div>
+        </div>
+
+        <div class="h2">⑤ 日次サマリー <span class="auto">自動集計</span></div>
+        <div class="sum">
+          <div class="sm"><small>仕込み達成率</small><b>94<em>%</em></b></div>
+          <div class="sm"><small>遅延タスク</small><b class="lt">1<em>件</em></b></div>
+          <div class="sm"><small>客数</small><b>24<em>名</em></b></div>
+          <div class="sm"><small>廃棄</small><b>2<em>点</em></b></div>
+        </div>
+        <div class="exp"><button>CSV出力</button><button>日報PDF</button></div>
+      </div>
+
+    </div>
+
+    <div class="foot">
+      <small>締めゲート完了で本日をクローズ。繰越・申し送りは明日のボードに反映。<b>未記録があれば確認</b>。</small>
+      <button class="cta"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>締めゲートを完了して退勤</button>
+    </div>
+
+  </div>
+</body></html>

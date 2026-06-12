@@ -402,7 +402,7 @@ Restaurant ─┬─ Section ─── Staff
 | 今日のタスク（仕込みボード）＋メディア | `design/p0-wireframe-todaytask.html` | FR-01/03/05/06/11/17 |
 | コーステンプレ編集 | `design/p1-wireframe-template-editor.html` | FR-01/03/06 |
 | ダッシュボード | `design/p1-wireframe-dashboard.html` | FR-11/09/17 |
-| HACCP電子チェックシート（HACCPモード） | `design/p2-wireframe-haccp-checklist.html` | FR-16/51 |
+| HACCP電子チェックシート（HACCPモード） | `design/p2-wireframe-haccp-checklist.html` | FR-16 |
 | 仕込みボード リデザイン3案（初期） | `design/redesign-A-bigcard.html` / `redesign-B-kanban.html` / `redesign-C-focus.html` | FR-04/05 |
 | 仕込みボード 確定3テーマ（INK/帳票/朱1色） | `design/redesign2-1-ink.html` / `redesign2-2-passsheet.html` / `redesign2-3-oneaccent.html` | §13・FR-04/05 |
 | 営業中サービスボード | `design/p2-wireframe-service-board.html` | FR-19/21/22 |
@@ -439,8 +439,10 @@ Restaurant ─┬─ Section ─── Staff
 | TableCheck連携設定 | `design/p3-wireframe-tablecheck-settings.html` | FR-13 |
 | 特別仕込み（おもてなし→自動生成） | `design/p2-wireframe-special-prep.html` | FR-57 |
 | アレルギー事前確認メッセージ（店側設定＋ゲストLINE） | `design/p3-wireframe-allergy-message.html` | FR-58（Messaging API） |
+| 閉店・締めフロー（締めゲート＋パー/廃棄＋申し送り） | `design/p2-wireframe-close-flow.html` | FR-33/23/08（→FR-09/42へ環流） |
 
-> 成果物の全体インデックスは `design/README.md` を参照。
+> 成果物の全体インデックスは `design/README.md` を参照。整合チェック（FR×画面トレーサビリティ）は `coverage-matrix.md`。
+> 〔世代注記〕`p0-wireframe-service-setup`（FR-02）は予約ハブ`reservation-hub`（FR-34）へ統合済みの初期版。`p1-wireframe-settings` は設定ホーム`settings-home`（FR-52）＋5サブ画面へ分割置換した初期版。`redesign-A/B/C` は確定3テーマ`redesign2-*` の探求初期案。
 
 ---
 
