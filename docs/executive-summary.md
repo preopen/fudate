@@ -1,7 +1,7 @@
 # PrepFlow 事業サマリー（経営判断用）
 
 > コース料理を出す高級店・専門店のための「仕込み（mise-en-place）管理SaaS」。一人開発・運営前提。
-> 版：2026-06-12（要件 v1.1 時点に更新） ／ 詳細：[`requirements.md`](./requirements.md)（v1.1）・[`../design/README.md`](../design/README.md)
+> 版：2026-06-12（要件 v1.3 時点に更新） ／ 詳細：[`requirements.md`](./requirements.md)（v1.3）・[`../design/README.md`](../design/README.md)
 
 ---
 
@@ -65,14 +65,14 @@
 | P1 | 逆算・担当・廃棄・スケール則／Lite・Standard | ¥5,800/¥9,800 |
 | P1.5 | **Ops Flow（デイレール＝業務×仕込み統合）**・サブレシピ合算 | Liteに含む |
 | P2(＋2.5) | **自己補正レシピ**・営業中モード・HACCP・予約ハブ・分析・ラベル／コース版管理 | ¥19,800 |
-| P3 | 公式API・多言語・サービスリプレイ | ¥29,800〜 |
-| P3.5 | **PrepFlow Direct（直販予約ページ・送客手数料ゼロ）** | アドオン +¥9,800 |
+| P3 | **TableCheck深掘り連携（第一ターゲットの主役・申請P0）**・おもてなし自動仕込み・多言語・リプレイ | ¥29,800〜 |
+| P3.5 | **PrepFlow Direct（二次施策＝対ポータル手数料ゼロ）** | アドオン +¥9,800 |
 | P4 | **Service Sync**（自社POS／ハンディ→厨房反映） | Connect上位 |
 
 ## 7. これまでの成果物（リポジトリ格納）
 
 - **市場調査レポート**（需要・TAM/SAM/SOM・競合・価格・solo feasibility）＋ Smart Rabbitベンチマーク（`note-smartrabbit.md`）
-- **要件定義 v1.1**：`docs/requirements.md`（FR-01〜56・NFR-01〜10・3テーマ・Ops Flow/予約ハブ/Direct・軽量レシピ層・複数日リード/二部制・イベント駆動方針・ベンチマーク）
+- **要件定義 v1.3**：`docs/requirements.md`（FR-01〜58・NFR-01〜10・3テーマ・Ops Flow/予約ハブ/Direct・軽量レシピ層・複数日リード/二部制・イベント駆動方針・ベンチマーク）
 - **全画面設計 29画面**：`design/`（一覧＝`overview-gallery`。3テーマ、3ビュー、デイレール、営業中、パス、ホールUI、予約ハブ、Direct一式、仕込みアイテム編集、シミュレーション 等）
 - **動くインタラクティブ・プロトタイプ**：`design/prototype-interactive.html`（3ビュー切替＋自動ロールアップ）
 - **パイロット店向け資料**：2ページ（概要＋導入の流れ/FAQ）
