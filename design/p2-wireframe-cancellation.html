@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>店側キャンセル・ノーショー処理</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column;position:relative}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL h1{font-size:19px;font-weight:900}.bL .sub{font-size:12.5px;color:var(--g2)}
+  .cd{display:flex;align-items:center;gap:8px;background:var(--time-s);border-radius:12px;padding:8px 14px}
+  .cd small{display:block;font-size:10px;color:var(--time);font-weight:700;letter-spacing:.08em}
+  .cd b{font-size:18px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  /* dim list */
+  .listwrap{padding:16px 28px;overflow:hidden}
+  .lh{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+  .lh b{font-size:14px;font-weight:900}.lh span{font-size:12px;color:var(--g2)}
+  .res{display:grid;grid-template-columns:62px 96px 1fr auto auto;gap:12px;align-items:center;padding:13px 12px;border:1.5px solid var(--g4);border-radius:13px;margin-bottom:9px;background:#fff}
+  .res.cxl{border-color:var(--time);background:var(--time-s)}
+  .res.cxl .who b{text-decoration:line-through;color:var(--g3)}
+  .time{font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+  .src-badge{font-size:10.5px;font-weight:900;padding:4px 9px;border-radius:999px;text-align:center}
+  .sb-direct{background:var(--ink);color:#fff}.sb-mail{background:var(--g5);color:var(--g2)}
+  .who b{font-size:15px;font-weight:700}.who small{display:block;font-size:11.5px;color:var(--g2)}
+  .course{font-size:12px;font-weight:700;color:var(--ink);background:var(--g5);padding:5px 10px;border-radius:8px}
+  .pax{font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;text-align:right}
+  .cxltag{font-size:10px;font-weight:900;color:#fff;background:var(--time);padding:3px 8px;border-radius:999px}
+  /* scrim + sheet */
+  .scrim{position:absolute;inset:0;background:rgba(21,23,26,.42)}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -20px 50px rgba(0,0,0,.2);max-height:78%;display:flex;flex-direction:column;overflow:hidden}
+  .grip{width:46px;height:5px;border-radius:99px;background:#d9ddd9;margin:10px auto 4px}
+  .sh{padding:8px 26px 14px;border-bottom:1px solid var(--g4)}
+  .sh .k{font-size:11px;font-weight:900;letter-spacing:.1em;color:var(--time)}
+  .sh h2{font-size:22px;font-weight:900;margin-top:6px}
+  .sh .meta{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12.5px;color:var(--g2);flex-wrap:wrap}
+  .sh .meta .b2{font-size:10.5px;font-weight:900;background:var(--g5);color:var(--g2);padding:4px 9px;border-radius:999px}
+  .sb{padding:16px 26px;overflow:auto;display:flex;flex-direction:column;gap:18px}
+  /* impact */
+  .impact{border:1.5px solid var(--time);border-radius:14px;overflow:hidden}
+  .impact .ih{background:var(--time);color:#fff;padding:11px 15px;font-size:13px;font-weight:900;display:flex;align-items:center;gap:9px}
+  .impact .ih svg{width:17px;height:17px;stroke:#fff}
+  .ir{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--g4);font-size:13.5px;background:#fff}
+  .ir:last-child{border-bottom:none}
+  .ir .nm b{font-weight:700}.ir .nm small{display:block;font-size:11px;color:var(--g2)}
+  .ir .act{display:flex;align-items:center;gap:10px}
+  .delta{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;color:#3a6a2a}
+  .pchip2{font-size:11px;font-weight:900;padding:5px 10px;border-radius:999px}
+  .pc-auto{background:var(--ok-s);color:var(--ok)}
+  .pc-carry{background:var(--g5);color:var(--g2);border:1.5px solid var(--g4)}
+  .pc-waste{background:var(--time-s);color:var(--time);border:1.5px solid var(--time)}
+  /* deposit */
+  .dep{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1.5px solid var(--g4);border-radius:14px;padding:14px 16px}
+  .dep .t b{font-size:14.5px;font-weight:900;display:block}.dep .t small{font-size:11.5px;color:var(--g2)}
+  .seg{display:inline-flex;border:1.5px solid var(--g4);border-radius:11px;overflow:hidden}
+  .seg button{border:none;background:#fff;font-family:var(--font);font-size:12.5px;font-weight:900;padding:11px 15px;cursor:pointer;color:var(--g2);border-right:1.5px solid var(--g4)}
+  .seg button:last-child{border-right:none}
+  .seg button.keep{background:var(--ink);color:#fff}
+  .seg button.refund{background:#fff;color:var(--ink)}
+  /* waitlist */
+  .wl{display:flex;align-items:center;gap:12px;background:var(--ok-s);border-radius:13px;padding:13px 16px}
+  .wl svg{width:18px;height:18px;stroke:var(--ok);flex:none}
+  .wl b{font-size:13.5px;font-weight:900;color:var(--ok)}.wl small{display:block;font-size:11.5px;color:#2f6b3a}
+  .wl .send{margin-left:auto;background:var(--ok);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-family:var(--font);font-weight:900;font-size:12.5px;cursor:pointer}
+  /* footer */
+  .sf{display:flex;gap:12px;padding:16px 26px;border-top:1px solid var(--g4)}
+  .sf .cancel{flex:none;width:120px;height:54px;border:1.5px solid var(--g4);border-radius:13px;background:#fff;font-family:var(--font);font-size:15px;font-weight:800;color:var(--g2);cursor:pointer}
+  .sf .ok{flex:1;height:54px;border:none;border-radius:13px;background:var(--ink);color:#fff;font-family:var(--font);font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>店側キャンセル・ノーショー処理（FR-55）</b><span>予約が減った時の“下り方向”。未着手→数量自動減／仕込み済み→繰越・廃棄誘導、デポジット処理、ウェイトリスト案内</span></div>
+  <div class="tab">
+    <div class="bar"><div><h1>予約ハブ</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜</div></div><div class="cd"><div><small>SERVICE 18:00</small><b>T−2:48</b></div></div></div>
+
+    <div class="listwrap">
+      <div class="lh"><b>本日の予約（14名 → 8名）</b><span>時刻順</span></div>
+      <div class="res cxl"><span class="time">18:00</span><span class="src-badge sb-direct">Direct</span><div class="who"><b>高橋 様</b><small>キャンセル受信 15:12</small></div><span class="course">おまかせ握り</span><span class="pax">6名<span class="cxltag">取消</span></span></div>
+      <div class="res"><span class="time">20:30</span><span class="src-badge sb-direct">Direct</span><div class="who"><b>佐藤 様</b><small>わさび抜き</small></div><span class="course">おまかせ握り</span><span class="pax">2名</span></div>
+    </div>
+
+    <!-- scrim + sheet -->
+    <div class="scrim"></div>
+    <div class="sheet">
+      <div class="grip"></div>
+      <div class="sh">
+        <div class="k">キャンセルの処理</div>
+        <h2>高橋 様 ・ 6名</h2>
+        <div class="meta"><span class="b2">Direct</span><span>18:00 第一部</span><span>・ ゲストがマイページからキャンセル</span></div>
+      </div>
+      <div class="sb">
+        <!-- impact -->
+        <div class="impact">
+          <div class="ih"><svg viewBox="0 0 24 24"><path d="M20 7L9 18l-5-5"/></svg>仕込みへの影響（−6名）</div>
+          <div class="ir"><div class="nm"><b>煮切り</b><small>未着手・per_cover</small></div><div class="act"><span class="delta">−84ml</span><span class="pchip2 pc-auto">数量を自動減</span></div></div>
+          <div class="ir"><div class="nm"><b>シャリ</b><small>仕込み済み（固定バッチ）</small></div><div class="act"><span class="delta">余り +0.8升</span><span class="pchip2 pc-carry">明日へ繰越</span></div></div>
+          <div class="ir"><div class="nm"><b>白身の昆布締め</b><small>仕込み済み・本日賞味</small></div><div class="act"><span class="delta">余り 6貫</span><span class="pchip2 pc-waste">廃棄 or まかない</span></div></div>
+        </div>
+
+        <!-- deposit -->
+        <div class="dep">
+          <div class="t"><b>デポジットの処理</b><small>前日18時以降のキャンセル → 規定では返金なし（Stripe）</small></div>
+          <div class="seg"><button class="keep">没収（規定どおり）</button><button class="refund">返金する</button></div>
+        </div>
+
+        <!-- waitlist -->
+        <div class="wl">
+          <svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 10-8 0M3 21a7 7 0 0118 0"/><path d="M19 8v6M16 11h6"/></svg>
+          <div><b>空き6席 — ウェイトリストに2件</b><small>田中 様（4名）・ 渡辺 様（2名）に空席を自動案内できます</small></div>
+          <button class="send">案内を送る</button>
+        </div>
+      </div>
+      <div class="sf"><button class="cancel">あとで</button><button class="ok"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff"><path d="M5 13l4 4L19 7"/></svg>確定（仕込み反映・デポジット没収）</button></div>
+    </div>
+  </div>
+</body></html>

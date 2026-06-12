@@ -2,7 +2,7 @@
 
 軽量版PrepFlow（コース・予約主体の中〜高級飲食店向け 仕込み管理SaaS）の画面設計・図版一式。
 各成果物は **自己完結HTML＋PNG** のペア（HTMLはブラウザで直接開けます）。
-要件定義本文は [`../docs/requirements.md`](../docs/requirements.md)（v0.9）。
+要件定義本文は [`../docs/requirements.md`](../docs/requirements.md)（v1.0）。
 
 ## 確定デザイン言語
 - **白基調＋黒文字＋グレー**、アクセントは**朱 `#c2410c` 1色のみ＝「時間/NOW/遅延/緊急」専用**
@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **44画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **45画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -78,6 +78,7 @@
 | ├ プラン・支払い／データ | `p1-wireframe-billing-data.html/.png` | FR-14/15 |
 | ├ 端末管理 | `p1-wireframe-devices.html/.png` | FR-53/12 |
 | 席番アレルゲン・ラベル | `p3-wireframe-allergen-labels.html/.png` | FR-47（参考表示） |
+| 店側キャンセル・ノーショー処理 | `p2-wireframe-cancellation.html/.png` | FR-55/56 |
 
 ---
 
