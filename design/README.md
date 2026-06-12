@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **45画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **47画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -79,6 +79,8 @@
 | ├ 端末管理 | `p1-wireframe-devices.html/.png` | FR-53/12 |
 | 席番アレルゲン・ラベル | `p3-wireframe-allergen-labels.html/.png` | FR-47（参考表示） |
 | 店側キャンセル・ノーショー処理 | `p2-wireframe-cancellation.html/.png` | FR-55/56 |
+| TableCheck連携設定 | `p3-wireframe-tablecheck-settings.html/.png` | FR-13 |
+| 特別仕込み（おもてなし→自動生成） | `p2-wireframe-special-prep.html/.png` | FR-57 |
 
 ---
 

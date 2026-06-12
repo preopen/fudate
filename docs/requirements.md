@@ -436,6 +436,8 @@ Restaurant ─┬─ Section ─── Staff
 | 端末管理 設定 | `design/p1-wireframe-devices.html` | FR-53/12 |
 | 席番アレルゲン・ラベル | `design/p3-wireframe-allergen-labels.html` | FR-47 |
 | 店側キャンセル・ノーショー処理 | `design/p2-wireframe-cancellation.html` | FR-55/56 |
+| TableCheck連携設定 | `design/p3-wireframe-tablecheck-settings.html` | FR-13 |
+| 特別仕込み（おもてなし→自動生成） | `design/p2-wireframe-special-prep.html` | FR-57 |
 
 > 成果物の全体インデックスは `design/README.md` を参照。
 

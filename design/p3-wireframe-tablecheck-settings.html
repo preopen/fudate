@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TableCheck連携設定</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:26px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#8a8a8a;font-size:13px}
+  .tab{max-width:1180px;margin:0 auto;height:812px;background:#fff;border-radius:24px;box-shadow:0 30px 60px rgba(0,0,0,.16);overflow:hidden;display:flex;flex-direction:column}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--g4)}
+  .bL{display:flex;align-items:center;gap:14px}
+  .back{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--g4);border-radius:11px;padding:9px 14px;font-size:13px;font-weight:700;color:var(--g2);cursor:pointer;background:#fff}
+  .bL h1{font-size:19px;font-weight:900}
+  .save{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:var(--font);font-size:14px;font-weight:900;cursor:pointer}
+  .body{display:grid;grid-template-columns:230px 1fr;min-height:0;flex:1}
+  .nav{border-right:1px solid var(--g4);padding:16px 14px;display:flex;flex-direction:column;gap:3px;background:#fcfcfd}
+  .ni{padding:13px 14px;border-radius:12px;font-size:14px;font-weight:700;color:var(--g2);cursor:pointer}
+  .ni.on{background:var(--ink);color:#fff}
+  .cont{padding:20px 28px;overflow:auto;display:flex;flex-direction:column;gap:20px}
+  /* connection card */
+  .conn{display:flex;align-items:center;gap:14px;border:2px solid var(--ink);border-radius:16px;padding:16px 18px;background:var(--g5)}
+  .conn .lg{width:48px;height:48px;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:12px;flex:none;text-align:center;line-height:1}
+  .conn .t{flex:1}.conn .t b{font-size:16px;font-weight:900;display:block}.conn .t small{font-size:12px;color:var(--g2)}
+  .status{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:900;padding:6px 12px;border-radius:999px}
+  .status.ok{background:var(--ok-s);color:var(--ok)}
+  .status .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+  .sec h2{font-size:14.5px;font-weight:900;margin-bottom:3px}
+  .sec .d{font-size:11.5px;color:var(--g2);margin-bottom:11px}
+  /* fields toggle list */
+  .rows{border:1.5px solid var(--g4);border-radius:14px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--g4);background:#fff}
+  .row:last-child{border-bottom:none}
+  .row .t{flex:1}.row .t b{font-size:14px;font-weight:700;display:block}.row .t small{font-size:11.5px;color:var(--g2)}
+  .fmt{font-size:10.5px;font-weight:900;padding:4px 9px;border-radius:999px}
+  .fmt.st{background:var(--ok-s);color:var(--ok)}
+  .fmt.txt{background:var(--g5);color:var(--g2)}
+  .toggle{width:50px;height:30px;border-radius:999px;background:var(--ink);position:relative;flex:none}
+  .toggle:after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--g3)}.toggle.off:after{right:auto;left:3px}
+  /* course mapping */
+  .map{display:grid;grid-template-columns:1fr 28px 1fr;gap:10px;align-items:center}
+  .map .h{font-size:10.5px;font-weight:900;color:var(--g2);letter-spacing:.04em}
+  .map .tc{font-size:13.5px;font-weight:700;background:var(--g5);border-radius:9px;padding:10px 12px}
+  .map .ar{color:var(--g3);text-align:center}
+  .map .pf{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:700;border:1.5px solid var(--g4);border-radius:9px;padding:10px 12px;background:#fff}
+  .map .pf.unset{border-color:var(--time);color:var(--time)}
+  .map .pf .cv{color:var(--g3)}
+  .autobadge{font-size:10px;font-weight:900;color:var(--ok);background:var(--ok-s);border-radius:999px;padding:3px 8px;margin-left:6px}
+  .note{font-size:11px;color:var(--g2);margin-top:10px;display:flex;gap:8px;line-height:1.6}
+  .note svg{width:15px;height:15px;stroke:var(--g2);flex:none;margin-top:1px}
+  .synced{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--g2)}
+  .synced b{color:var(--ink)}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>TableCheck連携設定（FR-13）</b><span>第一ターゲットの主役。CRM/Sync APIで予約・コース・席・おもてなし（アレルギー/好み）を構造化で取得</span></div>
+  <div class="tab">
+    <div class="bar">
+      <div class="bL"><button class="back">← 設定</button><h1>TableCheck連携</h1></div>
+      <button class="save">保存</button>
+    </div>
+    <div class="body">
+      <div class="nav">
+        <div class="ni on">接続</div>
+        <div class="ni">取得する項目</div>
+        <div class="ni">コースの対応づけ</div>
+        <div class="ni">同期ログ</div>
+      </div>
+      <div class="cont">
+        <!-- connection -->
+        <div class="conn">
+          <div class="lg">Table<br>Check</div>
+          <div class="t"><b>鮨 はやし（TableCheck）</b><small>CRM v1 / Sync v1 ・ Webサイト「TableCheck連携済み」</small></div>
+          <span class="status ok"><span class="dot"></span>接続済み</span>
+        </div>
+        <div class="synced"><svg viewBox="0 0 24 24" width="15" height="15" stroke="#70757b"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5"/></svg>最終同期 <b>1分前</b> ・ Webhookで即時受信 ・ 本日 14名 / 5件 取込</div>
+
+        <!-- fields -->
+        <div class="sec">
+          <h2>取得する項目</h2>
+          <div class="d">CRM v1 から取得し、仕込み・席番表示に使います。アレルギーは参考表示（最終確認は人）。</div>
+          <div class="rows">
+            <div class="row"><div class="t"><b>来店時刻・人数・席タイプ</b><small>逆算・数量算出の基礎</small></div><span class="fmt st">構造化</span><div class="toggle"></div></div>
+            <div class="row"><div class="t"><b>コース（事前選択）</b><small>数量算出を完全自動化</small></div><span class="fmt st">構造化</span><div class="toggle"></div></div>
+            <div class="row"><div class="t"><b>おもてなし：アレルギー</b><small>席番アレルゲン表示（参考・NFR-06）</small></div><span class="fmt st">構造化/タグ</span><div class="toggle"></div></div>
+            <div class="row"><div class="t"><b>おもてなし：好み・記念日</b><small>特別仕込みの自動生成（FR-57）</small></div><span class="fmt st">構造化/タグ</span><div class="toggle"></div></div>
+            <div class="row"><div class="t"><b>会員・VIPランク</b><small>VIP卓フラグ</small></div><span class="fmt st">構造化</span><div class="toggle"></div></div>
+            <div class="row"><div class="t"><b>予約メモ（特記）</b><small>そのまま表示</small></div><span class="fmt txt">自由文</span><div class="toggle"></div></div>
+          </div>
+        </div>
+
+        <!-- course mapping -->
+        <div class="sec">
+          <h2>コースの対応づけ <span class="autobadge">大半は自動</span></h2>
+          <div class="d">TableCheckのコースを、PrepFlowのコーステンプレに紐付け。名前が一致すれば自動。差異だけ確認します。</div>
+          <div class="map">
+            <div class="h">TableCheck のコース</div><div class="h"></div><div class="h">PrepFlow テンプレ</div>
+            <div class="tc">おまかせコース ¥16,500</div><div class="ar">→</div><div class="pf">本日のおまかせ・握り <span class="cv">✓</span></div>
+            <div class="tc">特別おまかせ ¥22,000</div><div class="ar">→</div><div class="pf">特別おまかせ <span class="cv">✓</span></div>
+            <div class="tc">ランチ ¥8,800</div><div class="ar">→</div><div class="pf unset">未対応 → 選択 ▾</div>
+          </div>
+          <div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>未対応のコースで予約が入ると、サービス設定で「コース未確定」として確認を促します（取りこぼし防止）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>
