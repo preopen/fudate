@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>アレルギー事前確認メッセージ（FR-58）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#e7e8e9;color:var(--ink);-webkit-font-smoothing:antialiased;padding:24px;line-height:1.42}
+  .head{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .head b{font-size:18px}.head span{font-size:13px;color:#8a8a8a}
+  .stage{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 384px;gap:24px;align-items:start}
+  .lbl{font-size:12px;font-weight:900;color:var(--time);margin:0 0 9px 2px}
+  /* store side panel */
+  .panel{background:#fff;border-radius:20px;box-shadow:0 24px 56px rgba(0,0,0,.14);overflow:hidden}
+  .pbar{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--g4)}
+  .pbar .l{display:flex;align-items:center;gap:12px}
+  .pbar .back{width:30px;height:30px;border-radius:9px;border:1.5px solid var(--g4);display:grid;place-items:center}
+  .pbar .back svg{width:15px;height:15px;stroke:var(--ink)}
+  .pbar h1{font-size:17px;font-weight:900}.pbar .sub{font-size:11.5px;color:var(--g2)}
+  .pbar .mode{font-size:10px;font-weight:900;color:var(--time);background:var(--time-s);padding:5px 10px;border-radius:999px}
+  .pbody{padding:18px 22px;display:flex;flex-direction:column;gap:18px}
+  /* master toggle */
+  .master{display:flex;align-items:center;gap:14px;border:1.5px solid var(--g4);border-radius:14px;padding:15px 16px}
+  .master .t b{font-size:15px;font-weight:900;display:block}.master .t small{font-size:11.5px;color:var(--g2)}
+  .toggle{width:54px;height:32px;border-radius:999px;background:var(--ink);position:relative;flex:none}
+  .toggle:after{content:"";position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--g3)}.toggle.off:after{right:auto;left:3px}
+  .sec h2{font-size:13.5px;font-weight:900;margin-bottom:9px}
+  .rows{border:1.5px solid var(--g4);border-radius:13px;overflow:hidden}
+  .row{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--g4);background:#fff}
+  .row:last-child{border-bottom:none}
+  .row .t{flex:1}.row .t b{font-size:13.5px;font-weight:700;display:block}.row .t small{font-size:11px;color:var(--g2)}
+  .val{font-size:13px;font-weight:900;background:var(--g5);border-radius:9px;padding:8px 13px}
+  .seg{display:inline-flex;border:1.5px solid var(--g4);border-radius:9px;overflow:hidden}
+  .seg button{border:none;background:#fff;font-family:var(--font);font-size:11.5px;font-weight:900;padding:8px 11px;cursor:pointer;color:var(--g2);border-right:1.5px solid var(--g4)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--ink);color:#fff}
+  /* sent log */
+  .log{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px solid var(--g4);border-radius:12px;margin-bottom:8px;background:#fff}
+  .log .av{width:34px;height:34px;border-radius:50%;background:var(--g5);display:grid;place-items:center;font-weight:900;font-size:13px;flex:none}
+  .log .t{flex:1}.log .t b{font-size:13.5px;font-weight:700}.log .t small{display:block;font-size:11px;color:var(--g2)}
+  .lst{font-size:10.5px;font-weight:900;padding:5px 10px;border-radius:999px;white-space:nowrap}
+  .lst.sent{background:var(--g5);color:var(--g2)}
+  .lst.rep-ok{background:var(--ok-s);color:var(--ok)}
+  .lst.rep-chg{background:var(--time-s);color:var(--time)}
+  /* RIGHT: phone preview */
+  .phone{background:#111;border-radius:30px;padding:10px;box-shadow:0 24px 56px rgba(0,0,0,.22)}
+  .screen{background:#fff;border-radius:22px;overflow:hidden;height:660px;display:flex;flex-direction:column}
+  .ph-top{display:flex;align-items:center;gap:9px;padding:13px 16px;border-bottom:1px solid var(--g4);background:var(--g5)}
+  .ph-top .ic{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:11px}
+  .ph-top b{font-size:13.5px;font-weight:900}.ph-top small{display:block;font-size:10.5px;color:var(--g2)}
+  .ph-top .ch{margin-left:auto;font-size:10px;font-weight:900;color:var(--g2);background:#fff;border:1.5px solid var(--g4);border-radius:999px;padding:4px 9px}
+  .thread{flex:1;overflow:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;background:#fbfbfa}
+  .day{align-self:center;font-size:10.5px;color:var(--g3);font-weight:700}
+  .bub{max-width:84%;border-radius:16px;padding:12px 14px;font-size:13.5px;line-height:1.55}
+  .bub.in{align-self:flex-start;background:#fff;border:1px solid var(--g4);border-bottom-left-radius:5px}
+  .bub.in b{font-weight:900}
+  .bub .alg{display:inline-flex;align-items:center;gap:6px;font-weight:900;color:var(--time);background:var(--time-s);border-radius:8px;padding:5px 10px;margin:6px 0}
+  .bub .qa{display:flex;flex-direction:column;gap:7px;margin-top:9px}
+  .bub .qbtn{border:1.5px solid var(--ink);border-radius:10px;padding:10px;font-size:12.5px;font-weight:900;text-align:center;color:var(--ink);background:#fff}
+  .bub .qbtn.alt{border-color:var(--g4);color:var(--g2)}
+  .bub small.disc{display:block;font-size:10.5px;color:var(--g2);margin-top:8px;line-height:1.5}
+  .bub.out{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:5px;font-weight:700}
+  .sys{align-self:center;font-size:10.5px;color:var(--g2);background:var(--ok-s);color:#2f6b3a;border-radius:999px;padding:5px 12px;font-weight:800}
+  .powered{text-align:center;font-size:9.5px;color:var(--g3);font-weight:700;padding:8px}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="head"><b>アレルギー事前確認メッセージ（FR-58・Messaging API）</b><span>左＝店側の設定・送信状況／右＝ゲスト受信のプレビュー。参考確認・最終判断は人（NFR-06）</span></div>
+  <div class="stage">
+
+    <!-- store side -->
+    <div>
+      <div class="lbl">店側（設定・送信状況）</div>
+      <div class="panel">
+        <div class="pbar"><div class="l"><button class="back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><div><h1>事前確認メッセージ</h1><div class="sub">TableCheck Messaging API 経由</div></div></div><span class="mode">任意機能</span></div>
+        <div class="pbody">
+          <div class="master"><div class="t"><b>アレルギー登録がある予約に自動送信</b><small>OFFなら送らない（店ごとに選択）</small></div><div class="toggle"></div></div>
+
+          <div class="sec">
+            <h2>送信ルール</h2>
+            <div class="rows">
+              <div class="row"><div class="t"><b>送信タイミング</b><small>来店からの逆算</small></div><div class="seg"><button>前々日</button><button class="on">前日 18:00</button><button>当日朝</button></div></div>
+              <div class="row"><div class="t"><b>チャネル</b><small>TableCheckの通知設定に準拠</small></div><span class="val">LINE / メール</span></div>
+              <div class="row"><div class="t"><b>言語</b><small>予約者の言語に自動</small></div><span class="val">日本語 / EN 自動</span></div>
+              <div class="row"><div class="t"><b>返信で変更があれば店に通知</b><small>厨房の仕込み再確認へ</small></div><div class="toggle"></div></div>
+            </div>
+          </div>
+
+          <div class="sec">
+            <h2>本日送信分（前日18:00）</h2>
+            <div class="log"><div class="av">高</div><div class="t"><b>高橋 様（卓3・席2）</b><small>甲殻類アレルギー ・ 6/11 18:00来店</small></div><span class="lst rep-ok">確認OK</span></div>
+            <div class="log"><div class="av">渡</div><div class="t"><b>渡辺 様（卓5）</b><small>特になし（好みのみ）</small></div><span class="lst sent">送信済</span></div>
+            <div class="log"><div class="av">佐</div><div class="t"><b>佐藤 様（卓6・席1）</b><small>苦手:わさび → <b>「ナッツも不可」と追記</b></small></div><span class="lst rep-chg">変更あり</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- guest preview -->
+    <div>
+      <div class="lbl">ゲスト側（受信プレビュー）</div>
+      <div class="phone">
+        <div class="screen">
+          <div class="ph-top"><div class="ic">鮨</div><div><b>鮨 はやし</b><small>ご予約の確認</small></div><span class="ch">LINE</span></div>
+          <div class="thread">
+            <div class="day">6月10日（前日）</div>
+            <div class="bub in">
+              高橋様、明日<b>6/11 18:00</b>のご来店を楽しみにお待ちしております。
+              <div class="alg">⚠ アレルギー：甲殻類</div>
+              上記で承っております。お間違いないかご確認ください。
+              <div class="qa">
+                <div class="qbtn">この内容で間違いない</div>
+                <div class="qbtn alt">内容を修正する</div>
+              </div>
+              <small class="disc">※ アレルギー対応は可能な範囲で努めますが、製造工程上の微量混入まで保証はできかねます。当日も改めて確認いたします。</small>
+            </div>
+            <div class="bub out">この内容で間違いないです</div>
+            <div class="sys">✓ 店舗に「確認OK」を通知しました</div>
+            <div class="powered">通知：TableCheck ・ 仕込み：Powered by PrepFlow</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body></html>
