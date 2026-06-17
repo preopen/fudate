@@ -60,3 +60,50 @@ WS2：オフライン同期の技術検証（CODEX_HANDOFF.md §5）。候補順
 - WS9 P0統合・TestFlight（または Release アーカイブ）＝ §0 DoD 全項目
 
 > 各WSの受入は CODEX_HANDOFF.md §4 を参照。P0スコープ外（締め/予約ハブUI/モード/多店舗/信頼性運用網の残り）は P1+。
+
+---
+
+## ■ 連続実装ゴールプロンプト：現状 → ステージングまで一気通貫（自走ループ）
+UI正本固定が効き、WS0/WS1＋ボード雛形＋snapshot固定まで green の状態から、**逐一承認を待たずに WS2→WS9 を自走**でステージングまで運ぶための1枚。**そのまま貼る**：
+
+```
+【ゴール】CODEX_HANDOFF.md §0 のDoD(1〜9)を全て満たし、P0をステージング可能（TestFlight内部配布 または Releaseアーカイブ成功）にする。下記の「止まるゲート」以外は承認を待たず WS2→WS9 を連続実装する。
+
+【スコープ厳守＝P0のみ】オンボーディング／活性化／サービス設定(人数手入力)／仕込みボード(今これ・皿ごと・担当・着地予測)／シミュレーション／設定(最小)＋認証。締め・予約ハブUI・モード・多店舗・信頼性運用網の残りはP1+＝作らない（スコープ拡大禁止）。
+
+【毎WS不変の前提】
+- UI正本固定：docs/ui-fidelity-contract.md を厳守（Liquid Glass=機能層のみ／朱=時間/NOW/遅延のみ／色・フォント・角丸はDesignTokens経由のみ／ボードは上部バー＋セグメント切替）。各View冒頭に `// 正本: design/<該当ファイル>`。
+- golden/*.json は常に green（Engineの数値・ロジックは変更しない）。snapshotテストは正本の番人＝壊さない。意図的なUI変更時のみ、先に design/ のワイヤーを更新→参照画像を承認更新。
+- ガードレール（CODEX_HANDOFF §6）。秘密情報はコミットしない。
+
+【自走ループ：WS2→WS9 を順に。各WSで】
+1) 受入(CODEX_HANDOFF §4)＋対応ワイヤー(contract §2)を読む。
+2) ブランチ ws<N>-<slug>、1WS=1PR で実装。
+3) 自己検証（すべて green 必須）：
+   - swift test --package-path packages/Engine
+   - cd apps/ios && xcodegen generate && xcodebuild build -scheme PrepFlow -destination 'platform=iOS Simulator,name=iPad Pro 11-inch,OS=26.5'
+   - xcodebuild test ... -only-testing:PrepFlowSnapshotTests （snapshot回帰／同一シミュ条件 iPad Pro 11-inch・OS=26.5 で比較）
+   - swiftlint --strict（0 violations）／ swiftformat --lint
+   - UI：contract §3 チェックリスト全項目＋「実機/シミュ スクショ ↔ 正本ワイヤーPNG」横並びをPRに添付。色ハードコード grep 0。
+4) 全green→PRを ready/merge し、承認を待たず次WSへ自動で進む。各WS完了を1行で報告。
+
+【WS順と要点】
+- WS2 同期スパイク（GOゲート）：contract無関係・§5基準で PowerSync(Swift)→GRDB自作→SwiftData の順に検証。最初に合格した方式を確定し docs/architecture.md D2 に追記。★ここだけは結果(合否と採用方式)を報告して一旦止まる。全滅なら診断して停止。
+- WS3 スキーマ＋データ層：data-schema.md の★テーブル＋RLSテナント分離テスト green。
+- WS4 ボード完成：今これ/皿ごと/担当/着地予測、チェックオフ→ロールアップを Engine 配線、オフライン動作、Liquid Glass(contract)。snapshot更新。
+- WS5 Catalogエディタ(テキスト)：階層CRUD→ボード数量に反映。
+- WS6 サービス設定＋人数手入力：T0/covers→calcQty/schedule がボードに反映。
+- WS7 シミュレーション＋活性化＋WasteLog入力：実績vs推奨、活性化サマリー(自店の削減見込み)。
+- WS8 認証：Sign in with Apple＋マジックリンク(招待制)＋RLS経路テスト。
+- WS9 統合＋ステージング：DoD §0 全項目。資格情報があればTestFlight内部、無ければReleaseアーカイブ成功まで。
+
+【止まる/確認するゲート（それ以外は自走）】
+A. WS2の合否＝GOゲート：結果を報告して指示を仰ぐ。
+B. 秘密情報/資格情報が必要なとき（Supabase URL/anon key、Sign in with Apple、Apple Developerアカウント/TestFlight）：無ければローカルSQLite縮退で前進し、必要物を「不足リスト」に明記して継続。
+C. docs/golden/ワイヤーで解決できない真の曖昧さ。
+
+【最終報告】WS2〜9の状態表／green項目／人手が要る項目(秘密・TestFlight)／ステージング手順・成果物。常に golden と snapshot を green に保て。
+```
+
+> 注：シミュレータ/OSは実機環境に合わせる（現状 iPad Pro 11-inch・OS=26.5）。snapshot は同一条件で比較すること。
+
