@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>多店舗オーナー切替 — Liquid Glass（FR-66）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdee0;color:var(--ink);-webkit-font-smoothing:antialiased;padding:22px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}.cap b{font-size:18px}.cap span{color:#7c7f82;font-size:13px}
+  .ipad{width:1180px;margin:0 auto;padding:14px;background:#0b0c0d;border-radius:42px;box-shadow:0 44px 90px rgba(0,0,0,.34),inset 0 0 0 2px #2a2c2e}
+  .screen{position:relative;height:812px;border-radius:28px;overflow:hidden;background:#eef1f3}
+  .ambient{position:absolute;inset:0;background:radial-gradient(130% 90% at 20% 0%,#ffffff 0%,#eef1f4 55%,#e6eaec 100%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(72px)}.blob.warm{width:400px;height:400px;right:-30px;top:-110px;background:rgba(220,140,70,.18)}.blob.cool{width:520px;height:520px;left:-130px;top:300px;background:rgba(150,180,200,.20)}
+  .glass{background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 34px rgba(20,23,26,.14),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 1px rgba(0,0,0,.03)}
+  .topbar{position:absolute;top:14px;left:14px;right:14px;height:64px;border-radius:20px;display:flex;align-items:center;gap:14px;padding:0 18px;z-index:6}
+  .ownch{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.7);border-radius:12px;padding:8px 14px;font-size:14px;font-weight:900;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .ownch .av{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:900}
+  .ownch svg{width:14px;height:14px;stroke:var(--g2)}
+  .topbar h1{font-size:17px;font-weight:900}
+  .scope{margin-left:auto;font-size:11px;font-weight:800;color:var(--g2);background:rgba(20,23,26,.05);border-radius:999px;padding:7px 13px}
+  .content{position:absolute;inset:0;padding:92px 28px 22px;overflow:auto}
+  /* cross summary */
+  .cross{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .cs{border:1px solid var(--g4);border-radius:14px;background:#fff;padding:13px 15px;box-shadow:0 1px 2px rgba(20,23,26,.04)}
+  .cs small{font-size:11px;color:var(--g2);font-weight:700}.cs b{display:block;font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;margin-top:3px}.cs .t{color:var(--time)}
+  .sh{font-size:13px;font-weight:900;color:var(--g2);margin:4px 0 10px}
+  .stores{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .store{border:1px solid var(--g4);border-radius:16px;background:#fff;padding:16px 18px;box-shadow:0 1px 2px rgba(20,23,26,.04)}
+  .store.alert{border-color:var(--time)}
+  .store .hd{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .store .logo{width:40px;height:40px;border-radius:11px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:15px}
+  .store .nm b{font-size:16px;font-weight:900;display:block}.store .nm small{font-size:11.5px;color:var(--g2)}
+  .store .enter{margin-left:auto;font-size:13px;font-weight:900;color:#fff;background:var(--ink);border:none;border-radius:10px;padding:10px 16px;cursor:pointer}
+  .store .stat{display:flex;gap:18px}
+  .st1{font-size:11px;color:var(--g2);font-weight:700}.st1 b{display:block;font-size:18px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:2px}.st1 b.t{color:var(--time)}
+  .store.prep{opacity:.7}.store.prep .logo{background:var(--g3)}
+  .badge{font-size:10px;font-weight:900;border-radius:999px;padding:4px 10px}.badge.ok{background:var(--ok-s);color:var(--ok)}.badge.al{background:var(--time-s);color:var(--time)}.badge.pr{background:var(--g5);color:var(--g2)}
+  .share{margin-top:14px;display:flex;align-items:center;gap:12px;border:1.5px dashed var(--g3);border-radius:14px;padding:14px 16px;background:#fff}
+  .share .ic{width:34px;height:34px;border-radius:10px;background:var(--g5);display:grid;place-items:center}.share .ic svg{width:18px;height:18px;stroke:var(--ink)}
+  .share .t{flex:1}.share .t b{font-size:14px;font-weight:900}.share .t small{display:block;font-size:11.5px;color:var(--g2)}
+  .share button{font-size:12.5px;font-weight:900;color:var(--ink);background:#fff;border:1.5px solid var(--g4);border-radius:10px;padding:10px 15px;cursor:pointer}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>多店舗オーナー切替（FR-66）</b><span>オーナーが自分の複数店を切替・横断で俯瞰・テンプレ使い回し。本部一斉配信・組織統制はやらない＝個人の店切替に限定</span></div>
+  <div class="ipad"><div class="screen">
+    <div class="ambient"><div class="blob warm"></div><div class="blob cool"></div></div>
+
+    <div class="content">
+      <div class="cross">
+        <div class="cs"><small>店舗数</small><b>3</b></div>
+        <div class="cs"><small>本日の合計予約</small><b>46名</b></div>
+        <div class="cs"><small>平均 仕込み達成率</small><b>86%</b></div>
+        <div class="cs"><small>要対応アラート</small><b class="t">1</b></div>
+      </div>
+
+      <div class="sh">あなたの店舗（タップで入る）</div>
+      <div class="stores">
+        <div class="store">
+          <div class="hd"><div class="logo">本</div><div class="nm"><b>鮨 はやし 本店</b><small>カウンター10席 ・ 夜14名</small></div><button class="enter">入る →</button></div>
+          <div class="stat"><div class="st1">達成率<b>94%</b></div><div class="st1">開店まで<b>T−2:48</b></div><div class="st1">アラート<b>0</b></div><div style="margin-left:auto"><span class="badge ok">順調</span></div></div>
+        </div>
+        <div class="store alert">
+          <div class="hd"><div class="logo">銀</div><div class="nm"><b>はやし 銀座</b><small>カウンター8席 ・ 夜18名</small></div><button class="enter">入る →</button></div>
+          <div class="stat"><div class="st1">達成率<b>78%</b></div><div class="st1">開店まで<b class="t">T−1:10</b></div><div class="st1">遅延<b class="t">1</b></div><div style="margin-left:auto"><span class="badge al">要確認</span></div></div>
+        </div>
+        <div class="store">
+          <div class="hd"><div class="logo">恵</div><div class="nm"><b>はやし 恵比寿</b><small>テーブル12席 ・ 夜14名</small></div><button class="enter">入る →</button></div>
+          <div class="stat"><div class="st1">達成率<b>88%</b></div><div class="st1">開店まで<b>T−3:20</b></div><div class="st1">アラート<b>0</b></div><div style="margin-left:auto"><span class="badge ok">順調</span></div></div>
+        </div>
+        <div class="store prep">
+          <div class="hd"><div class="logo">＋</div><div class="nm"><b>新店を追加</b><small>2店目以降は店舗数で課金拡張</small></div><button class="enter" style="background:var(--g3)">設定 →</button></div>
+          <div class="stat"><span class="badge pr">セットアップ</span></div>
+        </div>
+      </div>
+
+      <div class="share">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/></svg></div>
+        <div class="t"><b>コーステンプレを店間で共有</b><small>本店の「おまかせ握り」を銀座・恵比寿へコピー（各店で個別編集可）。※本部からの強制配信はしない</small></div>
+        <button>テンプレを共有</button>
+      </div>
+    </div>
+
+    <div class="topbar glass">
+      <div class="ownch"><span class="av">林</span>林 オーナー<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+      <h1>店舗オーバービュー</h1>
+      <span class="scope">個人オーナーの店切替 ・ 本部統制なし</span>
+    </div>
+  </div></div>
+</body></html>

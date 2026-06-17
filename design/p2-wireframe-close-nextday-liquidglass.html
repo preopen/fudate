@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>締め→翌日ループ＋廃棄理由 — Liquid Glass（FR-68）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdee0;color:var(--ink);-webkit-font-smoothing:antialiased;padding:22px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}.cap b{font-size:18px}.cap span{color:#7c7f82;font-size:13px}
+  .ipad{width:1180px;margin:0 auto;padding:14px;background:#0b0c0d;border-radius:42px;box-shadow:0 44px 90px rgba(0,0,0,.34),inset 0 0 0 2px #2a2c2e}
+  .screen{position:relative;height:812px;border-radius:28px;overflow:hidden;background:#eef1f3}
+  .ambient{position:absolute;inset:0;background:radial-gradient(130% 90% at 84% 4%,#ffffff 0%,#eef1f4 52%,#e6eaec 100%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px)}.blob.warm{width:400px;height:400px;right:-40px;top:-100px;background:rgba(220,140,70,.22)}.blob.cool{width:520px;height:520px;left:-140px;top:300px;background:rgba(150,180,200,.20)}
+  .glass{background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 34px rgba(20,23,26,.14),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 1px rgba(0,0,0,.03)}
+  .glass-time{background:rgba(194,65,12,.13);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);border:1px solid rgba(194,65,12,.30);box-shadow:0 10px 28px rgba(194,65,12,.16),inset 0 1px 0 rgba(255,255,255,.55)}
+  .topbar{position:absolute;top:14px;left:14px;right:14px;height:66px;border-radius:20px;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 22px;z-index:6}
+  .bL h1{font-size:18px;font-weight:900}.bL .sub{font-size:12px;color:var(--g2)}
+  .bR{display:flex;align-items:center;gap:12px}
+  .gatebadge{font-size:10.5px;font-weight:900;color:#fff;background:var(--ink);padding:6px 12px;border-radius:999px}
+  .cd{display:flex;align-items:center;gap:9px;border-radius:14px;padding:7px 14px}.cd small{display:block;font-size:10px;color:var(--time);font-weight:800;letter-spacing:.08em}.cd b{font-size:18px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  .steps{position:absolute;top:90px;left:14px;right:14px;height:54px;border-radius:18px;display:flex;align-items:center;padding:0 18px;z-index:6}
+  .stp{display:flex;align-items:center;gap:8px}.stp .n{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;flex:none;border:2px solid var(--g3);color:var(--g2);background:rgba(255,255,255,.6)}
+  .stp.done .n{background:var(--ink);border-color:var(--ink);color:#fff}.stp.now .n{border-color:var(--ink);color:var(--ink);background:#fff}.stp .tx{font-size:11.5px;font-weight:900}.stp.pend .tx{color:var(--g3)}
+  .stp .n svg{width:13px;height:13px;stroke:#fff;stroke-width:3}.seg-ln{flex:1;height:2px;background:rgba(20,23,26,.12);margin:0 10px}.seg-ln.done{background:var(--ink)}
+  .main{position:absolute;left:0;right:0;top:152px;bottom:88px;display:grid;grid-template-columns:1fr 392px;overflow:hidden}
+  .col{overflow:auto;padding:14px 22px}.colL{border-right:1px solid rgba(20,23,26,.07)}
+  .h2{font-size:13.5px;font-weight:900;display:flex;align-items:center;gap:8px;margin-bottom:4px}.h2 .fr{font-size:9.5px;font-weight:900;color:var(--g2);background:rgba(20,23,26,.06);border-radius:999px;padding:3px 8px}.h2 .new{font-size:9.5px;font-weight:900;color:#fff;background:var(--ink);border-radius:999px;padding:3px 8px}
+  .lead{font-size:11.5px;color:var(--g2);margin-bottom:12px}.lead b{color:var(--ink)}
+  .tbl{border:1px solid var(--g4);border-radius:14px;overflow:hidden;background:#fff}
+  .tr{display:grid;grid-template-columns:1.3fr .6fr .7fr 1fr 1.5fr;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--g4)}.tr:last-child{border-bottom:none}.tr.hd{background:#fbfbfc}.tr.hd span{font-size:10px;font-weight:900;color:var(--g2)}
+  .tr .nm{font-size:13.5px;font-weight:700}.tr .nm small{display:block;font-size:10px;color:var(--g2);font-weight:500}
+  .tr .num{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}.tr .left{font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}.tr .left.warn{color:var(--time)}
+  .seg{display:inline-flex;border:1px solid var(--g4);border-radius:8px;overflow:hidden}.seg button{border:none;background:#fff;font-family:var(--font);font-size:10px;font-weight:900;padding:6px 7px;cursor:pointer;color:var(--g2);border-right:1px solid var(--g4)}.seg button:last-child{border-right:none}.seg button.on{background:var(--ink);color:#fff}
+  .seg.j button.on{background:var(--time);color:#fff}
+  .dash{font-size:11px;color:var(--g3);font-weight:700}
+  .feed{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--g2);background:rgba(20,23,26,.04);border-radius:11px;padding:9px 13px;margin-top:10px}.feed b{color:var(--ink)}.feed svg{width:14px;height:14px;stroke:var(--ok);flex:none}
+  /* next day preview (opaque, ink-accent = new loop) */
+  .nd{border:1.5px solid var(--ink);border-radius:16px;background:#fff;overflow:hidden}
+  .ndh{display:flex;align-items:center;gap:10px;padding:13px 16px;background:var(--ink);color:#fff}
+  .ndh b{font-size:14px;font-weight:900}.ndh small{font-size:11px;color:#b9bdc1;margin-left:auto}
+  .ndrow{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--g4)}.ndrow:last-child{border-bottom:none}
+  .ndrow .t{flex:1}.ndrow .t b{font-size:14px;font-weight:800}.ndrow .t small{display:block;font-size:11px;color:var(--g2)}
+  .lead-tag{font-size:10px;font-weight:900;color:var(--ink);background:var(--g5);border:1px solid var(--g4);border-radius:999px;padding:4px 9px;white-space:nowrap}
+  .resv{width:54px;height:30px;border-radius:999px;background:var(--ink);position:relative;flex:none;cursor:pointer}.resv:after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff}
+  .resv.off{background:var(--g3)}.resv.off:after{right:auto;left:3px}
+  .ndnote{font-size:11px;color:var(--g2);padding:12px 16px;background:#fbfbfc;line-height:1.55}.ndnote b{color:var(--ink)}
+  .foot{position:absolute;left:14px;right:14px;bottom:14px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 20px;z-index:6}
+  .foot small{font-size:11px;color:var(--g2)}.foot small b{color:var(--ink)}
+  .cta{display:inline-flex;align-items:center;gap:9px;background:var(--ink);color:#fff;font-family:var(--font);font-size:14.5px;font-weight:900;border:none;border-radius:13px;padding:12px 22px;cursor:pointer;box-shadow:0 8px 20px rgba(20,23,26,.26)}.cta svg{width:17px;height:17px;stroke:#fff;stroke-width:2.6}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>締め→翌日ループ完結＋廃棄理由タグ（FR-68）</b><span>廃棄に理由タグ（作りすぎのみ自己補正へ）＋締め時に翌日の前倒し仕込みをプレビュー＆着手予約＝朝↔夜が1本に</span></div>
+  <div class="ipad"><div class="screen">
+    <div class="ambient"><div class="blob warm"></div><div class="blob cool"></div></div>
+
+    <div class="topbar glass">
+      <div class="bL"><h1>閉店・締め</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜の部 ・ 24名</div></div>
+      <div class="bR"><span class="gatebadge">1日の締めゲート</span><div class="cd glass-time"><div><small>CLOSE 22:30</small><b>T＋0:42</b></div></div></div>
+    </div>
+
+    <div class="steps glass">
+      <div class="stp done"><div class="n"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div><div class="tx">クローズ点検</div></div><div class="seg-ln done"></div>
+      <div class="stp done"><div class="n"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div><div class="tx">衛生記録</div></div><div class="seg-ln done"></div>
+      <div class="stp now"><div class="n">3</div><div class="tx">繰越/廃棄（理由）</div></div><div class="seg-ln"></div>
+      <div class="stp pend"><div class="n">4</div><div class="tx">申し送り</div></div><div class="seg-ln"></div>
+      <div class="stp pend"><div class="n">5</div><div class="tx">翌日プレビュー</div></div>
+    </div>
+
+    <div class="main">
+      <div class="col colL">
+        <div class="h2">③ パー・廃棄記録 ＋ 廃棄理由タグ <span class="fr">FR-08/68</span></div>
+        <div class="lead">余りは<b>繰越/廃棄</b>。廃棄は<b>理由</b>を選ぶ → <b>「作りすぎ」由来のみ自己補正(FR-09)へ反映</b>（品質/期限は別管理・係数を歪めない）。</div>
+        <div class="tbl">
+          <div class="tr hd"><span>品目</span><span>作った</span><span>余り</span><span>繰越/廃棄</span><span>廃棄理由</span></div>
+          <div class="tr"><div class="nm">煮切り<small>全コース合算</small></div><div class="num">200ml</div><div class="left">65ml</div><div class="seg"><button class="on">繰越</button><button>廃棄</button></div><span class="dash">— 繰越</span></div>
+          <div class="tr"><div class="nm">鯛の昆布締め<small>本日限り</small></div><div class="num">14枚</div><div class="left warn">2枚</div><div class="seg"><button>繰越</button><button class="on">廃棄</button></div><div class="seg j"><button class="on">作りすぎ</button><button>期限</button><button>品質</button></div></div>
+          <div class="tr"><div class="nm">穴子のツメ</div><div class="num">600ml</div><div class="left">120ml</div><div class="seg"><button class="on">繰越</button><button>廃棄</button></div><span class="dash">— 繰越</span></div>
+          <div class="tr"><div class="nm">先付けの和え物</div><div class="num">24食</div><div class="left warn">3食</div><div class="seg"><button>繰越</button><button class="on">廃棄</button></div><div class="seg j"><button>作りすぎ</button><button class="on">品質</button><button>期限</button></div></div>
+        </div>
+        <div class="feed"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 5v4h-4"/></svg>「作りすぎ」＝<b>昆布締め2枚のみ</b>を係数学習へ。「品質」廃棄（和え物）は<b>学習から除外</b>＝推奨が無駄に増えない。</div>
+      </div>
+
+      <div class="col">
+        <div class="h2">⑤ 翌日の前倒し仕込み（プレビュー）<span class="new">締め→朝を1本に</span></div>
+        <div class="nd">
+          <div class="ndh"><b>明日 6/12(金) 夜</b><small>予約 18名見込み（前倒し分）</small></div>
+          <div class="ndrow"><div class="t"><b>真鯛の昆布締め</b><small>一晩（前日仕込み）・親方</small></div><span class="lead-tag">今夜 着手</span><div class="resv"></div></div>
+          <div class="ndrow"><div class="t"><b>赤身の漬け</b><small>半日（明朝でも可）・親方</small></div><span class="lead-tag">明朝でも可</span><div class="resv off"></div></div>
+          <div class="ndrow"><div class="t"><b>一番だしの仕込み準備</b><small>前日に昆布を water out</small></div><span class="lead-tag">今夜 着手</span><div class="resv"></div></div>
+          <div class="ndnote"><b>FR-40 の複数日リードを締め時にプレビュー。</b>「今夜 着手」をONにすると、明日のボードに完了として引き継がれ、繰越分（煮切り65ml 等）も差引済みで反映されます。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot glass">
+      <small>締めゲート完了で本日をクローズ。<b>廃棄理由・繰越・翌日着手</b>が明日のボードと学習に反映。</small>
+      <button class="cta"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>締めゲートを完了して退勤</button>
+    </div>
+  </div></div>
+</body></html>

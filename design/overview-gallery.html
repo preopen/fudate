@@ -37,7 +37,7 @@
   <div class="hero">
     <svg class="logo" viewBox="0 0 48 48" fill="none"><rect x="6" y="7" width="16" height="34" rx="8" stroke="currentColor" stroke-width="4"/><path d="M24 11h7c6.6 0 12 5.4 12 12s-5.4 12-12 12h-7" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M24 24h14" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
     <b>PrepFlow 設計一覧</b>
-    <div class="meta">全画面サムネ集 ・ 2026-06-12<br>要件 <em>v1.3</em> ／ デザイン：白基調＋黒＋<em>朱（時間のみ）</em></div>
+    <div class="meta">全画面サムネ集 ・ 2026-06-12<br>要件 <em>v1.5</em> ／ デザイン：白基調＋黒＋<em>朱（時間のみ）</em>／iOS Liquid Glass</div>
   </div>
   <div class="pad">
 
@@ -55,11 +55,12 @@
 
     <!-- B prep board -->
     <div class="sec">
-      <div class="sk"><span class="n">B ── 仕込みボード（確定3テーマ＋3ビュー＋実装スキン）</span><span class="ln"></span><span class="ct">8</span></div>
+      <div class="sk"><span class="n">B ── 仕込みボード（確定3テーマ＋3ビュー＋実装スキン）</span><span class="ln"></span><span class="ct">9</span></div>
       <div class="grid">
         <div class="card"><div class="thumb"><img src="p0-wireframe-board-liquidglass.png"></div><div class="lab"><b>今これ：Liquid Glass版</b><span class="tag">実装スキン・A-12</span></div></div>
         <div class="card"><div class="thumb"><img src="p1-wireframe-view-dishes-liquidglass.png"></div><div class="lab"><b>皿ごと：Liquid Glass版</b><span class="tag">実装スキン</span></div></div>
         <div class="card"><div class="thumb"><img src="p1-wireframe-view-staff-liquidglass.png"></div><div class="lab"><b>担当：Liquid Glass版</b><span class="tag">実装スキン</span></div></div>
+        <div class="card"><div class="thumb"><img src="p1-wireframe-board-eta-liquidglass.png"></div><div class="lab"><b>着地予測「間に合う/危ない」</b><span class="tag fr">FR-59・v1.5</span></div></div>
         <div class="card"><div class="thumb"><img src="redesign2-1-ink.png"></div><div class="lab"><b>テーマ：INK</b><span class="tag">完全モノクロ・今これ</span></div></div>
         <div class="card"><div class="thumb"><img src="redesign2-2-passsheet.png"></div><div class="lab"><b>テーマ：PASS SHEET</b><span class="tag">帳票</span></div></div>
         <div class="card"><div class="thumb"><img src="redesign2-3-oneaccent.png"></div><div class="lab"><b>テーマ：ONE ACCENT</b><span class="tag">朱1色・今これ</span></div></div>
@@ -70,7 +71,7 @@
 
     <!-- C daily ops -->
     <div class="sec">
-      <div class="sk"><span class="n">C ── 日次運用・設定</span><span class="ln"></span><span class="ct">19</span></div>
+      <div class="sk"><span class="n">C ── 日次運用・設定</span><span class="ln"></span><span class="ct">23</span></div>
       <div class="grid">
         <div class="card"><div class="thumb"><img src="p0-wireframe-onboarding.png"></div><div class="lab"><b>オンボーディング</b><span class="tag fr">NFR-07</span></div></div>
         <div class="card"><div class="thumb"><img src="p0-wireframe-service-setup.png"></div><div class="lab"><b>サービス設定/予約取込 〔初期・予約ハブへ統合〕</b><span class="tag fr">FR-02/10</span></div></div>
@@ -91,6 +92,10 @@
         <div class="card"><div class="thumb"><img src="p1-wireframe-template-editor-liquidglass.png"></div><div class="lab"><b>テンプレ編集：LG版</b><span class="tag">実装スキン・P0</span></div></div>
         <div class="card"><div class="thumb"><img src="p0-wireframe-service-setup-liquidglass.png"></div><div class="lab"><b>サービス設定：LG版</b><span class="tag">実装スキン・P0</span></div></div>
         <div class="card"><div class="thumb"><img src="p1-wireframe-settings-home-liquidglass.png"></div><div class="lab"><b>設定ホーム：LG版</b><span class="tag">実装スキン・P0</span></div></div>
+        <div class="card"><div class="thumb"><img src="p0-wireframe-activation-liquidglass.png"></div><div class="lab"><b>活性化サマリー（TTV）</b><span class="tag fr">FR-63・v1.5</span></div></div>
+        <div class="card"><div class="thumb"><img src="p1-wireframe-multistore-liquidglass.png"></div><div class="lab"><b>多店舗オーナー切替</b><span class="tag fr">FR-66・v1.5</span></div></div>
+        <div class="card"><div class="thumb"><img src="p1-wireframe-reliability-liquidglass.png"></div><div class="lab"><b>信頼性運用網（solo SRE）</b><span class="tag fr">FR-67・v1.5</span></div></div>
+        <div class="card"><div class="thumb"><img src="p2-wireframe-close-nextday-liquidglass.png"></div><div class="lab"><b>締め→翌日＋廃棄理由</b><span class="tag fr">FR-68・v1.5</span></div></div>
       </div>
     </div>
 
@@ -151,7 +156,7 @@
 
   </div>
   <div class="foot">
-    <span><span class="dot"></span><b>59画面 / 7カテゴリ</b></span>
+    <span><span class="dot"></span><b>64画面 / 7カテゴリ</b></span>
     <span>動くプロトタイプ：<b>prototype-interactive.html</b>（3ビュー切替＋自動ロールアップ）</span>
     <span>要件定義：<b>docs/requirements.md</b>（v0.9）</span>
     <span>索引：<b>design/README.md</b></span>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>着地予測ボード — Liquid Glass（FR-59）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdee0;color:var(--ink);-webkit-font-smoothing:antialiased;padding:22px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}.cap b{font-size:18px}.cap span{color:#7c7f82;font-size:13px}
+  .ipad{width:1180px;margin:0 auto;padding:14px;background:#0b0c0d;border-radius:42px;box-shadow:0 44px 90px rgba(0,0,0,.34),inset 0 0 0 2px #2a2c2e}
+  .screen{position:relative;height:812px;border-radius:28px;overflow:hidden;background:#eef1f3}
+  .ambient{position:absolute;inset:0;background:radial-gradient(130% 90% at 70% 0%,#ffffff 0%,#eef1f4 52%,#e6eaec 100%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px)}.blob.warm{width:480px;height:480px;right:-60px;top:-120px;background:rgba(220,120,60,.30)}.blob.cool{width:520px;height:520px;left:-120px;top:280px;background:rgba(150,180,200,.22)}
+  .glass{background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 34px rgba(20,23,26,.14),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 1px rgba(0,0,0,.03)}
+  .glass-time{background:rgba(194,65,12,.13);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);border:1px solid rgba(194,65,12,.30);box-shadow:0 10px 28px rgba(194,65,12,.16),inset 0 1px 0 rgba(255,255,255,.55)}
+  .topbar{position:absolute;top:14px;left:14px;right:14px;height:72px;border-radius:22px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 16px 0 22px;z-index:5}
+  .bL h1{font-size:18px;font-weight:900}.bL .sub{font-size:12px;color:var(--g2)}
+  .sw{justify-self:center;display:inline-flex;gap:3px;padding:4px;border-radius:999px;background:rgba(20,23,26,.06)}
+  .sw button{border:none;background:none;font-family:var(--font);font-size:14px;font-weight:800;color:var(--g2);padding:9px 22px;border-radius:999px;cursor:pointer}
+  .sw button.on{background:rgba(255,255,255,.92);color:var(--ink);box-shadow:0 2px 8px rgba(20,23,26,.16)}
+  .bR{display:flex;align-items:center;gap:12px;justify-self:end}
+  .cd{display:flex;align-items:center;gap:10px;border-radius:16px;padding:8px 15px}
+  .cd small{display:block;font-size:10px;color:var(--time);font-weight:800;letter-spacing:.08em}.cd b{font-size:20px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  .content{position:absolute;inset:0;display:grid;grid-template-columns:1fr 372px;padding:100px 0 16px}
+  .focus{padding:0 28px;display:flex;flex-direction:column;gap:14px;overflow:auto}
+  /* ETA hero (opaque, 朱=time/delay) */
+  .eta{border:1.5px solid var(--time);border-radius:18px;background:#fff;overflow:hidden}
+  .eta .top{display:flex;align-items:center;gap:16px;padding:18px 20px;background:var(--time-s)}
+  .eta .big{font-size:40px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .eta .lab{font-size:12px;color:#9a3a0e;font-weight:800}.eta .lab b{font-size:15px;display:block;color:var(--time)}
+  .eta .warn{margin-left:auto;font-size:15px;font-weight:900;color:#fff;background:var(--time);padding:9px 16px;border-radius:999px}
+  .eta .calc{display:flex;gap:22px;padding:14px 20px;font-size:13px;color:var(--g2)}
+  .eta .calc b{color:var(--ink);font-size:16px;font-variant-numeric:tabular-nums;display:block}
+  .sg h3{font-size:13px;font-weight:900;margin-bottom:8px;color:var(--g2)}
+  .sgrow{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--g4);border-radius:14px;background:#fff;margin-bottom:9px;box-shadow:0 1px 2px rgba(20,23,26,.04)}
+  .sgrow .ic{width:38px;height:38px;border-radius:11px;background:var(--ink);display:grid;place-items:center;flex:none}.sgrow .ic svg{width:19px;height:19px;stroke:#fff}
+  .sgrow .t{flex:1}.sgrow .t b{font-size:15px;font-weight:800}.sgrow .t small{display:block;font-size:11.5px;color:var(--g2)}
+  .sgrow .save{font-size:13px;font-weight:900;color:var(--ok);white-space:nowrap}
+  .sgrow .do{font-size:13px;font-weight:900;color:#fff;background:var(--ink);border:none;border-radius:10px;padding:10px 16px;cursor:pointer}
+  /* right rail: timeline with predicted overrun */
+  .rail{padding:0 22px;border-left:1px solid rgba(20,23,26,.07);display:flex;flex-direction:column;overflow:auto}
+  .rh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.rh b{font-size:14px;font-weight:900}.rh span{font-size:12px;color:var(--g2)}
+  .ti{position:relative;padding:9px 8px 9px 18px;border-radius:10px;margin-bottom:3px}
+  .ti:before{content:"";position:absolute;left:4px;top:14px;width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid var(--g3)}
+  .ti.done:before{background:var(--ink);border-color:var(--ink)}.ti.now{background:rgba(194,65,12,.10)}.ti.now:before{background:var(--time);border-color:var(--time);box-shadow:0 0 0 4px rgba(194,65,12,.18)}
+  .ti .tt{font-size:14px;font-weight:700}.ti.done .tt{color:var(--g3);text-decoration:line-through}.ti .tm{font-size:11.5px;color:var(--g2);font-variant-numeric:tabular-nums;margin-top:2px}.ti.now .tm{color:var(--time);font-weight:900}
+  .t0line{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px dashed var(--ink);border-radius:11px;margin:6px 0;font-size:13px;font-weight:900}
+  .overrun{display:flex;align-items:center;gap:8px;padding:11px 13px;border-radius:11px;background:var(--time);color:#fff;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}
+  svg{stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>当日ボード：着地予測「間に合う／危ない」（FR-59）</b><span>残タスク×所要 vs 開店までの残り時間で着地時刻を常時計算し、遅れそうなら先回り提案。朱＝時間/遅延</span></div>
+  <div class="ipad"><div class="screen">
+    <div class="ambient"><div class="blob warm"></div><div class="blob cool"></div></div>
+
+    <div class="content">
+      <div class="focus">
+        <div class="eta">
+          <div class="top"><div><div class="big">着地 18:12</div><div class="lab">現在のペースでの全皿そろい予測<b>開店 18:00 を 12分 超過</b></div></div><span class="warn">⚠ 危ない</span></div>
+          <div class="calc"><span>残りタスク<b>3件</b></span><span>所要の合計<b>47分</b></span><span>開店まで<b>35分</b></span><span>不足<b style="color:var(--time)">−12分</b></span></div>
+        </div>
+        <div class="sg">
+          <h3>先回り提案（タップで適用 → 着地が早まります）</h3>
+          <div class="sgrow"><div class="ic"><svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 10-8 0M3 21a7 7 0 0118 0"/></svg></div><div class="t"><b>応援：ガルドの手が空く（16:30）→ 親方を支援</b><small>「椀種の準備」をガルドへ移し、親方は煮切り→吸地に集中</small></div><span class="save">−9分</span><button class="do">適用</button></div>
+          <div class="sgrow"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div><div class="t"><b>並行：吸地を先に着手（待ち時間に煮切りを冷ます）</b><small>順序入替で段取りの空き時間を詰める</small></div><span class="save">−5分</span><button class="do">適用</button></div>
+          <div class="sgrow"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg></div><div class="t"><b>相談：水菓子ソースを開店後の手すきに後ろ倒し</b><small>提供順で間に合う範囲。シェフ承認で実行</small></div><span class="save">−6分</span><button class="do">検討</button></div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <div class="rh"><b>逆算 ＋ 予測ライン</b><span>T = 18:00</span></div>
+        <div class="ti done"><div class="tt">ネタの仕込み</div><div class="tm">13:30 ・ 完了</div></div>
+        <div class="ti done"><div class="tt">シャリを炊く</div><div class="tm">14:00 ・ 完了</div></div>
+        <div class="ti now"><div class="tt">煮切り仕込み</div><div class="tm">15:00 ・ NOW</div></div>
+        <div class="ti"><div class="tt">ソースを炊く</div><div class="tm">16:00 ・ T−2:00</div></div>
+        <div class="ti"><div class="tt">盛り付けの準備</div><div class="tm">16:30 ・ T−1:30</div></div>
+        <div class="ti"><div class="tt">吸地を引く</div><div class="tm">17:00 ・ T−1:00</div></div>
+        <div class="t0line"><svg viewBox="0 0 24 24" width="15" height="15" stroke="#15171a"><path d="M5 12h14"/></svg>開店 T=0 ・ 18:00</div>
+        <div class="overrun"><svg viewBox="0 0 24 24" width="15" height="15" stroke="#fff"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg>予測 18:12 ・ +12分（提案適用で 18:00 に戻せます）</div>
+      </div>
+    </div>
+
+    <div class="topbar glass">
+      <div class="bL"><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜 ・ 14名</div></div>
+      <div class="sw"><button class="on">今これ</button><button>皿ごと</button><button>担当</button></div>
+      <div class="bR"><div class="cd glass-time"><div><small>SERVICE 18:00</small><b>T−0:35</b></div></div></div>
+    </div>
+  </div></div>
+</body></html>

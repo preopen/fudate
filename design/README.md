@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **59画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **64画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -54,6 +54,15 @@
 | └ 設定ホーム（LG・P0） | `p1-wireframe-settings-home-liquidglass.html/.png` | 上部バー＋トースト（ダークガラス）|
 
 > **P0実装6画面は Liquid Glass で完全カバー**：オンボーディング／テンプレ編集／サービス設定／ボード（今これ・皿ごと）／シミュレーション／設定ホーム。SwiftUI実装の視覚基準。
+
+### v1.5 追加機能の Liquid Glass ワイヤー（`proposal-optimization.md` 採用分）
+| 画面 | ファイル | 対応FR |
+|---|---|---|
+| 着地予測ボード「間に合う/危ない」 | `p1-wireframe-board-eta-liquidglass.html/.png` | FR-59 |
+| 活性化サマリー（シミュ先行オンボ・TTV） | `p0-wireframe-activation-liquidglass.html/.png` | FR-63 |
+| 多店舗オーナー切替（本部統制でない） | `p1-wireframe-multistore-liquidglass.html/.png` | FR-66 |
+| 信頼性運用網（solo版SRE） | `p1-wireframe-reliability-liquidglass.html/.png` | FR-67 |
+| 締め→翌日ループ＋廃棄理由タグ | `p2-wireframe-close-nextday-liquidglass.html/.png` | FR-68 |
 
 ## 4. 確定テーマの画面（モノクロ＋朱）
 
