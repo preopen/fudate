@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **49画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **50画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -42,6 +42,7 @@
 |---|---|---|
 | 第1世代（白基調＋2色） | `redesign-A-bigcard` / `redesign-B-kanban` / `redesign-C-focus` | ビッグカード／担当カンバン／フォーカス |
 | 第2世代（確定・配色削減） | `redesign2-1-ink` / `redesign2-2-passsheet` / `redesign2-3-oneaccent` | INK（完全モノクロ）／PASS SHEET（帳票）／ONE ACCENT（朱1色）— **3テーマとも採用（要件§13）** |
+| **実装スキン（iOS / Liquid Glass）** | `p0-wireframe-board-liquidglass.html/.png` | **今これボードの Liquid Glass 版**（iPad/iOS 26）。グラス=機能レイヤーのみ・コンテンツ不透明・朱=時間（A-12）。SwiftUI実装の視覚基準 |
 
 ## 4. 確定テーマの画面（モノクロ＋朱）
 

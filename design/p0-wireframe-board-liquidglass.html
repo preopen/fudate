@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>今これボード — Liquid Glass（iPad / iOS 26）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdee0;color:var(--ink);-webkit-font-smoothing:antialiased;padding:22px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#7c7f82;font-size:13px}
+  /* iPad frame */
+  .ipad{width:1180px;margin:0 auto;padding:14px;background:#0b0c0d;border-radius:42px;box-shadow:0 44px 90px rgba(0,0,0,.34),inset 0 0 0 2px #2a2c2e}
+  .screen{position:relative;height:812px;border-radius:28px;overflow:hidden;background:#eef1f3}
+  /* ambient (so glass refracts something) */
+  .ambient{position:absolute;inset:0;background:radial-gradient(130% 90% at 14% 4%,#ffffff 0%,#eef1f4 52%,#e6eaec 100%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px)}
+  .blob.warm{width:460px;height:460px;right:-60px;top:-120px;background:rgba(220,140,70,.30)}
+  .blob.cool{width:520px;height:520px;left:-120px;top:240px;background:rgba(150,180,200,.28)}
+  .blob.warm2{width:300px;height:300px;left:36%;bottom:-120px;background:rgba(225,170,120,.20)}
+
+  /* ---------- CONTENT LAYER (opaque / high-contrast — A-12) ---------- */
+  .content{position:absolute;inset:0;display:grid;grid-template-columns:1fr 372px;padding:100px 0 108px}
+  .focus{padding:4px 34px 0;display:flex;flex-direction:column;min-height:0}
+  .nowtag{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;color:var(--time);font-weight:900;font-size:14px;padding:9px 15px;border-radius:999px;font-variant-numeric:tabular-nums;
+          background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.28)}
+  .focus h2{font-size:40px;font-weight:900;letter-spacing:-.02em;margin-top:14px;color:var(--ink)}
+  .fmeta{display:flex;gap:10px;margin-top:12px}
+  .chip{font-size:14.5px;font-weight:700;padding:8px 14px;border-radius:11px;background:#fff;border:1px solid var(--g4);color:var(--ink);font-variant-numeric:tabular-nums}
+  .chip.q{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .subs{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+  .srow{display:flex;align-items:center;gap:16px;padding:15px 18px;border-radius:16px;background:#fff;border:1px solid var(--g4);box-shadow:0 1px 2px rgba(20,23,26,.04)}
+  .srow.done{background:#fbfbfc}
+  .sc{width:50px;height:50px;border-radius:50%;border:2.5px solid var(--g3);display:grid;place-items:center;flex:none;background:#fff}
+  .sc.on{background:var(--ink);border-color:var(--ink)}
+  .sc svg{width:24px;height:24px;stroke:#fff}
+  .srow p{font-size:18.5px;font-weight:700;flex:1}
+  .srow.done p{color:var(--g3);text-decoration:line-through}
+  .srow small{font-size:13.5px;color:var(--g2);font-variant-numeric:tabular-nums}
+  /* right rail (content) */
+  .rail{padding:4px 26px 0;display:flex;flex-direction:column;min-height:0;border-left:1px solid rgba(20,23,26,.07)}
+  .rh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .rh b{font-size:14px;font-weight:900}.rh span{font-size:12.5px;color:var(--g2)}
+  .track{height:6px;border-radius:99px;background:rgba(20,23,26,.10);margin-bottom:15px;overflow:hidden}
+  .track i{display:block;height:100%;width:36%;background:var(--ink)}
+  .tl{position:relative;padding-left:18px}
+  .tl:before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:rgba(20,23,26,.10)}
+  .ti{position:relative;padding:9px 8px 9px 12px;border-radius:12px;margin-bottom:2px}
+  .ti:before{content:"";position:absolute;left:-17px;top:16px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--g3)}
+  .ti.done:before{background:var(--ink);border-color:var(--ink)}
+  .ti.now{background:rgba(194,65,12,.10)}
+  .ti.now:before{background:var(--time);border-color:var(--time);box-shadow:0 0 0 4px rgba(194,65,12,.18)}
+  .ti .tt{font-size:14.5px;font-weight:700}
+  .ti.done .tt{color:var(--g3);text-decoration:line-through}
+  .ti .tm{font-size:12px;color:var(--g2);font-variant-numeric:tabular-nums;margin-top:2px}
+  .ti.now .tm{color:var(--time);font-weight:900}
+
+  /* ---------- GLASS CHROME LAYER (functional only — A-12) ---------- */
+  .glass{background:rgba(255,255,255,.46);
+    -webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+    border:1px solid rgba(255,255,255,.6);
+    box-shadow:0 12px 34px rgba(20,23,26,.14),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 1px rgba(0,0,0,.03)}
+  .glass-dark{background:rgba(17,19,22,.5);
+    -webkit-backdrop-filter:blur(30px) saturate(160%);backdrop-filter:blur(30px) saturate(160%);
+    border:1px solid rgba(255,255,255,.14);color:#fff;
+    box-shadow:0 12px 34px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.2)}
+  .glass-time{background:rgba(194,65,12,.13);
+    -webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);
+    border:1px solid rgba(194,65,12,.30);
+    box-shadow:0 10px 28px rgba(194,65,12,.16),inset 0 1px 0 rgba(255,255,255,.55)}
+
+  /* top bar */
+  .topbar{position:absolute;top:14px;left:14px;right:14px;height:72px;border-radius:22px;
+          display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 16px 0 22px;z-index:5}
+  .bL h1{font-size:18px;font-weight:900}.bL .sub{font-size:12px;color:var(--g2)}
+  /* segmented switcher (glass) */
+  .sw{justify-self:center;display:inline-flex;gap:3px;padding:4px;border-radius:999px;background:rgba(20,23,26,.06);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .sw button{border:none;background:none;font-family:var(--font);font-size:14px;font-weight:800;color:var(--g2);padding:9px 22px;border-radius:999px;cursor:pointer}
+  .sw button.on{background:rgba(255,255,255,.92);color:var(--ink);box-shadow:0 2px 8px rgba(20,23,26,.16),inset 0 1px 0 #fff}
+  .bR{display:flex;align-items:center;gap:12px;justify-self:end}
+  .cov{font-size:14px;font-weight:700;color:var(--g2)}.cov b{color:var(--ink);font-size:17px}
+  /* countdown island (time glass) */
+  .cd{display:flex;align-items:center;gap:10px;border-radius:16px;padding:8px 15px}
+  .cd .ring{--p:62;width:32px;height:32px;border-radius:50%;background:conic-gradient(var(--time) calc(var(--p)*1%),rgba(194,65,12,.22) 0);display:grid;place-items:center}
+  .cd .ring i{width:22px;height:22px;border-radius:50%;background:#fbeee7}
+  .cd small{display:block;font-size:10px;color:var(--time);font-weight:800;letter-spacing:.08em}
+  .cd b{font-size:20px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+
+  /* bottom action bar (glass) */
+  .bottombar{position:absolute;left:14px;right:14px;bottom:14px;height:88px;border-radius:24px;
+             display:flex;align-items:center;gap:14px;padding:12px 14px;z-index:5}
+  .gatewrap{display:flex;align-items:center;gap:12px;border-radius:16px;padding:13px 18px;flex:none}
+  .gatewrap .gi{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+  .gatewrap .gi svg{width:18px;height:18px;stroke:#fff}
+  .gatewrap b{font-size:14.5px;font-weight:900;display:block;line-height:1.15}
+  .gatewrap small{font-size:11px;color:#b9bdc1}
+  .gatewrap .tm{margin-left:14px;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums}
+  .spacer{flex:1}
+  .alt{height:60px;padding:0 22px;border-radius:16px;font-family:var(--font);font-size:15px;font-weight:800;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:9px}
+  .alt svg{width:19px;height:19px;stroke:var(--ink)}
+  .big{height:60px;padding:0 30px;border:none;border-radius:16px;background:var(--ink);color:#fff;font-family:var(--font);font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:11px;cursor:pointer;box-shadow:0 8px 22px rgba(20,23,26,.28)}
+  .big svg{width:24px;height:24px;stroke:#fff}
+
+  svg{stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  /* note strip */
+  .note{max-width:1180px;margin:14px auto 0;display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:#5d6064}
+  .note b{color:var(--ink)}
+  .sw-glass-legend{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+</style></head>
+<body>
+  <div class="cap"><b>今これボード ― Liquid Glass 版（iPad / iOS 26）</b><span>既存 redesign2-3-oneaccent の再スキン。Apple HIG準拠でグラスは「機能レイヤー」のみ</span></div>
+
+  <div class="ipad">
+    <div class="screen">
+      <div class="ambient"><div class="blob warm"></div><div class="blob cool"></div><div class="blob warm2"></div></div>
+
+      <!-- CONTENT (opaque, high-contrast) -->
+      <div class="content">
+        <div class="focus">
+          <span class="nowtag">● NOW ・ 15:00 ／ T−3:00</span>
+          <h2>煮切り仕込み</h2>
+          <div class="fmeta"><span class="chip q">200ml ・ 14名分</span><span class="chip">40分</span><span class="chip">親方</span></div>
+          <div class="subs">
+            <div class="srow done"><div class="sc on"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><p>酒・みりんを煮切る</p><small>10分</small></div>
+            <div class="srow"><div class="sc"></div><p>たまり・濃口を合わせ ひと煮立ち</p><small>15分</small></div>
+            <div class="srow"><div class="sc"></div><p>味見基準を確認し 冷暗所へ</p><small>15分</small></div>
+          </div>
+        </div>
+        <div class="rail">
+          <div class="rh"><b>逆算スケジュール</b><span>T = 18:00</span></div>
+          <div class="track"><i></i></div>
+          <div class="tl">
+            <div class="ti done"><div class="tt">ネタの仕込み</div><div class="tm">13:30 ・ T−4:30</div></div>
+            <div class="ti done"><div class="tt">シャリを炊く</div><div class="tm">14:00 ・ T−4:00</div></div>
+            <div class="ti now"><div class="tt">煮切り仕込み</div><div class="tm">15:00 ・ T−3:00 ・ NOW</div></div>
+            <div class="ti"><div class="tt">ソースを炊く</div><div class="tm">16:00 ・ T−2:00</div></div>
+            <div class="ti"><div class="tt">盛り付けの準備</div><div class="tm">16:30 ・ T−1:30</div></div>
+            <div class="ti"><div class="tt">吸地を引く</div><div class="tm">17:00 ・ T−1:00</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GLASS top bar -->
+      <div class="topbar glass">
+        <div class="bL"><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜 ・ 14名</div></div>
+        <div class="sw"><button class="on">今これ</button><button>皿ごと</button><button>担当</button></div>
+        <div class="bR">
+          <span class="cov"><b>5</b> / 14</span>
+          <div class="cd glass-time"><div class="ring"><i></i></div><div><small>SERVICE 18:00</small><b>T−2:48</b></div></div>
+        </div>
+      </div>
+
+      <!-- GLASS bottom action bar -->
+      <div class="bottombar glass">
+        <div class="gatewrap glass-dark"><div class="gi"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div><b>ライン点検</b><small>全5皿そろって開店ゲート</small></div><span class="tm">17:30</span></div>
+        <div class="spacer"></div>
+        <button class="alt glass"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>手順・動画</button>
+        <button class="big"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>すべて完了 → 次へ</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="sw-glass-legend"><span class="dot glass" style="border:1px solid #cfd2d5"></span><b>グラス＝機能レイヤーのみ</b>：ツールバー／ビュー切替／カウントダウン／下部操作</span>
+    <span class="sw-glass-legend"><span class="dot" style="background:#fff;border:1px solid #e9ebed"></span><b>不透明・高コントラスト</b>：タスクカード・数値・タイムライン（厨房のグランス可読性＝安全要件）</span>
+    <span class="sw-glass-legend"><span class="dot" style="background:#c2410c"></span><b>朱＝時間だけ</b>（グラスtint含む）</span>
+    <span>Reduce Transparency / Increase Contrast 尊重</span>
+  </div>
+</body></html>
