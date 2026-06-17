@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrepFlow — 縦ぎりスライス② 予約連携（TableCheck / Direct）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#eef0f1;color:var(--ink);-webkit-font-smoothing:antialiased;padding:36px 30px 44px;line-height:1.4}
+  .page{width:1900px;margin:0 auto}
+  .head{display:flex;align-items:baseline;gap:16px;margin-bottom:6px}
+  .head b{font-size:26px;font-weight:900}.head span{font-size:14px;color:var(--g2)}
+  .sublead{font-size:13.5px;color:var(--g2);margin-bottom:26px}.sublead b{color:var(--ink)}
+  .slice{background:#fff;border:1px solid var(--g4);border-radius:22px;box-shadow:0 18px 44px rgba(20,23,26,.08);padding:22px 24px 26px;margin-bottom:26px}
+  .sh{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .sh .tag{font-size:12px;font-weight:900;color:#fff;background:var(--ink);border-radius:999px;padding:6px 14px}
+  .sh .tag.star{background:var(--time)}
+  .sh b{font-size:18px;font-weight:900}.sh span{font-size:12.5px;color:var(--g2)}
+  .sh .pill{margin-left:auto;font-size:11px;font-weight:900;border-radius:999px;padding:5px 12px}
+  .pill.main{background:var(--time-s);color:var(--time)}.pill.sub{background:var(--g5);color:var(--g2)}
+  .rail{display:flex;align-items:stretch;gap:0}
+  .step{width:286px;flex:none;border:1.5px solid var(--g4);border-radius:16px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  .step.hot{border-color:var(--time)}
+  .step .thumb{height:184px;overflow:hidden;background:#dcdee0;border-bottom:1px solid var(--g4)}
+  .step .thumb img{width:100%;height:100%;object-fit:cover;object-position:center 46%}
+  .step .body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column}
+  .step .num{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:900;color:var(--g2)}
+  .step .num i{width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-style:normal}
+  .step.hot .num i{background:var(--time)}
+  .step h3{font-size:15.5px;font-weight:900;margin:7px 0 4px}
+  .step p{font-size:12px;color:var(--g2);line-height:1.5}
+  .step .fr{margin-top:auto;padding-top:8px;font-size:10.5px;font-weight:900;color:var(--g2)}
+  .step .fr em{font-style:normal;color:var(--ink)}.step.hot .fr em{color:var(--time)}
+  .arr{flex:none;width:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding-top:66px}
+  .arr .lbl{font-size:10.5px;font-weight:900;color:var(--ink);background:var(--g5);border:1px solid var(--g4);border-radius:999px;padding:5px 9px;text-align:center;line-height:1.3}
+  .arr .ln svg{width:60px;height:18px;stroke:var(--ink);stroke-width:2.2;fill:none}
+  .arr.hot .ln svg{stroke:var(--time)}.arr.hot .lbl{color:var(--time);background:var(--time-s);border-color:#f0c4ab}
+  /* convergence */
+  .conv{background:var(--ink);border-radius:22px;padding:24px 26px;color:#fff}
+  .conv .eh{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .conv .eh b{font-size:17px;font-weight:900}.conv .eh span{font-size:12px;color:#aab0b6}
+  .cflow{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+  .src2{display:flex;flex-direction:column;gap:10px}
+  .node{border:1px solid #34373c;background:#1c1f23;border-radius:12px;padding:12px 16px;flex:none}
+  .node b{font-size:13.5px;font-weight:900;color:#fff;display:block}.node small{font-size:10.5px;color:#9aa0a6}
+  .node.tc{border-color:#7a3a1e;background:#2a1a12}.node.tc b{color:#ef8a52}
+  .node.big{padding:16px 20px}.node.big b{font-size:15px}
+  .parr{width:44px;display:grid;place-items:center}.parr svg{width:22px;height:16px;stroke:#7a7f85;stroke-width:2.4;fill:none}
+  .cnote{margin-top:18px;display:flex;gap:24px;flex-wrap:wrap;font-size:12px;color:#aab0b6}
+  .cnote span{display:inline-flex;align-items:flex-start;gap:7px;max-width:560px;line-height:1.5}
+  .cnote b{color:#fff}.cnote i{width:12px;height:12px;border-radius:3px;flex:none;margin-top:3px}
+  svg{stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+<div class="page">
+  <div class="head"><b>PrepFlow — 縦ぎりスライス② 予約連携</b><span>TableCheck深掘り（主役）と Direct（二次）の2本の通し動線。どちらも予約ハブ→Engine→日次スライスBへ合流</span></div>
+  <div class="sublead">取得チャネルは2つでも、<b>正規化された Reservation を 1つの仕込みエンジンに流す</b>のは同じ。各矢印は画面間で渡るデータ。<b>予約は台帳でなくハブ</b>（席割り・顧客DBは持たない）。</div>
+
+  <!-- SLICE C : TableCheck -->
+  <div class="slice">
+    <div class="sh"><span class="tag star">C</span><b>TableCheck連携スライス</b><span>CRM/Messaging API で構造化取得 → おもてなしを仕込みに活かす（FR-13/57/58）</span><span class="pill main">第一ターゲットの主役 ・ 申請P0</span></div>
+    <div class="rail">
+      <div class="step hot">
+        <div class="thumb"><img src="p3-wireframe-tablecheck-settings.png"></div>
+        <div class="body"><span class="num"><i>1</i>TableCheck連携設定</span><h3>CRM/Messaging API 接続</h3><p>コンポーネント別審査→接続。Sync v1 Webhook→pullで即時同期。コースも構造化で取得。</p><div class="fr">FR-13 ・ <em>構造化: 日時/人数/コース/席/おもてなし/VIP</em></div></div>
+      </div>
+      <div class="arr hot"><div class="lbl">構造化予約<br>＋おもてなし</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-reservation-hub-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>2</i>予約ハブ</span><h3>構造化✓で合算・正規化</h3><p>複数ソースを正規化。TableCheckは「構造化✓」表示。重複警告。台帳業務はしない。</p><div class="fr">FR-34 ・ <em>席別アレルギー/好み/記念日/VIP</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">好み・記念日<br>NG食材・VIP</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-special-prep.png"></div>
+        <div class="body"><span class="num"><i>3</i>特別仕込み（自動生成）</span><h3>おもてなし→特別タスク</h3><p>記念日デザート・NG抜き対応・VIP卓フラグを自動生成。不要ならスキップ。</p><div class="fr">FR-57 ・ <em>卓ごとの特別仕込みタスク</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">登録アレルギー<br>（来店前）</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step hot">
+        <div class="thumb"><img src="p3-wireframe-allergy-message.png"></div>
+        <div class="body"><span class="num"><i>4</i>事前確認メッセージ</span><h3>来店前にアレルギー確認</h3><p>Messaging APIで「甲殻類で承っています、お間違いないか」を自動送信。返信で店に通知。</p><div class="fr">FR-58 ・ <em>確認OK/変更 → 厨房再確認</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">席別の<br>注意（参考）</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p0-wireframe-board-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>5</i>当日ボード＋席別表示</span><h3>キッチンに席別アレルゲン</h3><p>席番チップ／注意ラベルで全員に伝達。<b>参考表示・最終確認は人</b>（NFR-06）。</p><div class="fr">FR-26/47 ・ <em>→ 日次スライスB へ</em></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLICE D : Direct -->
+  <div class="slice">
+    <div class="sh"><span class="tag">D</span><b>Directスライス</b><span>自社直販の予約ページ → 構造化で取得 → キャンセル耐性（FR-35/36/55/56）</span><span class="pill sub">二次施策 ・ 対 食べログ/ぐるなび手数料ゼロ＋自社導線</span></div>
+    <div class="rail">
+      <div class="step">
+        <div class="thumb"><img src="p3-wireframe-direct-settings.png"></div>
+        <div class="body"><span class="num"><i>1</i>Direct設定（店舗側）</span><h3>枠・コース・デポジット</h3><p>営業日×スロットの直販割当、コース公開、事前決済（必須/任意/なし）を設定。</p><div class="fr">FR-36 ・ <em>公開アロットメント枠</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">公開枠<br>（空き）</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p3-wireframe-direct-booking.png"></div>
+        <div class="body"><span class="num"><i>2</i>Direct予約ページ（ゲスト）</span><h3>コース選択・アレルギー・決済</h3><p>スロット→人数→コース事前選択（必須）→席別アレルギー→事前決済/デポジット。</p><div class="fr">FR-35 ・ <em>全て構造化された予約</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">確定<br>＋リマインド</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p3-wireframe-direct-mypage.png"></div>
+        <div class="body"><span class="num"><i>3</i>確定メール＋マイページ</span><h3>リマインド・変更・取消</h3><p>ゲスト側で確認/変更/キャンセル（英語対応）。no-show削減のリマインド。</p><div class="fr">FR-35+ ・ <em>確定covers（構造化）</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">構造化covers<br>手数料ゼロ</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-reservation-hub-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>4</i>予約ハブ</span><h3>Direct＝構造化✓で合算</h3><p>TableCheck等と同じハブに合流。Directの価値＝送客手数料ゼロ＋自社ブランド導線。</p><div class="fr">FR-34 ・ <em>確定covers → 仕込み</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">減った/消えた<br>差分</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-cancellation.png"></div>
+        <div class="body"><span class="num"><i>5</i>キャンセル耐性</span><h3>ノーショー＋ウェイトリスト</h3><p>減算→繰越/廃棄誘導・デポジット処理。満枠時の空き待ちをキャンセルで自動案内。</p><div class="fr">FR-55/56 ・ <em>仕込み差分 → 繰越/廃棄</em></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- convergence -->
+  <div class="conv">
+    <div class="eh"><b>合流：2つのチャネル → 1つのハブ → 1つのEngine</b><span>取得元が違っても、正規化Reservationを同じ純関数に流す＝二重開発を避ける</span></div>
+    <div class="cflow">
+      <div class="src2">
+        <div class="node tc"><b>TableCheck CRM/Messaging</b><small>構造化・主役・申請P0（FR-13）</small></div>
+        <div class="node"><b>PrepFlow Direct</b><small>構造化・二次・自社導線（FR-35）</small></div>
+      </div>
+      <div class="parr"><svg viewBox="0 0 22 16"><path d="M1 8h14M13 3l5 5-5 5"/></svg></div>
+      <div class="node big"><b>予約ハブ（正規化）</b><small>合算・重複警告・差分検知（FR-34）／台帳は持たない</small></div>
+      <div class="parr"><svg viewBox="0 0 22 16"><path d="M1 8h14M13 3l5 5-5 5"/></svg></div>
+      <div class="node big"><b>Engine：diffPlan / calcQty / schedule</b><small>追い仕込み・数量・逆算（純Swift）</small></div>
+      <div class="parr"><svg viewBox="0 0 22 16" stroke="#ef8a52"><path d="M1 8h14M13 3l5 5-5 5"/></svg></div>
+      <div class="node tc big"><b>→ 日次スライスB</b><small>仕込みボード・着地予測・締め</small></div>
+    </div>
+    <div class="cnote">
+      <span><i style="background:#ef8a52"></i><b>戦略：</b>TableCheck自体が席数連動の月額＝送客手数料ゼロ。よってDirectの手数料優位は<b>対 食べログ/ぐるなび限定</b>。TableCheck層では深掘り連携(C)が主役、Directは「ポータル依存を減らしたい/良い台帳が無い店」向けの二次。</span>
+      <span><i style="background:#34373c;border:1px solid #5a5e63"></i><b>やらない：</b>キッチン→空席の書き戻し閉ループ／席割り・顧客DB・口コミ集客。アレルゲンは参考・人が確定（NFR-06）。</span>
+    </div>
+  </div>
+</div>
+</body></html>
