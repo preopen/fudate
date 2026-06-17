@@ -412,6 +412,7 @@ Restaurant ─┬─ Section ─── Staff
 |---|---|---|
 | 競合ポジショニング図 | `design/competitive-positioning.html` | §1.1 |
 | 画面遷移図（フロー） | `design/flow-screen-map.html` | 全体 |
+| 縦ぎりスライス（通し動線＋Engineパイプライン） | `design/flow-vertical-slice.html` | 全体・§6/§14・architecture §3 |
 | オンボーディング（業態テンプレ選択） | `design/p0-wireframe-onboarding.html` | NFR-07 |
 | 本日のサービス設定／予約メール取込 | `design/p0-wireframe-service-setup.html` | FR-02 / FR-10 |
 | 今日のタスク（仕込みボード）＋メディア | `design/p0-wireframe-todaytask.html` | FR-01/03/05/06/11/17 |

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrepFlow — 縦ぎりスライス（エンドツーエンドのフロー）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#eef0f1;color:var(--ink);-webkit-font-smoothing:antialiased;padding:36px 30px 44px;line-height:1.4}
+  .page{width:1860px;margin:0 auto}
+  .head{display:flex;align-items:baseline;gap:16px;margin-bottom:6px}
+  .head b{font-size:26px;font-weight:900}
+  .head span{font-size:14px;color:var(--g2)}
+  .sublead{font-size:13.5px;color:var(--g2);margin-bottom:26px}
+  .sublead b{color:var(--ink)}
+  /* slice */
+  .slice{background:#fff;border:1px solid var(--g4);border-radius:22px;box-shadow:0 18px 44px rgba(20,23,26,.08);padding:22px 24px 26px;margin-bottom:26px}
+  .sh{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .sh .tag{font-size:12px;font-weight:900;color:#fff;background:var(--ink);border-radius:999px;padding:6px 14px}
+  .sh .tag.loop{background:var(--time)}
+  .sh b{font-size:18px;font-weight:900}
+  .sh span{font-size:12.5px;color:var(--g2)}
+  .rail{display:flex;align-items:stretch;gap:0}
+  .step{width:286px;flex:none;border:1.5px solid var(--g4);border-radius:16px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  .step.hot{border-color:var(--time)}
+  .step .thumb{height:188px;overflow:hidden;background:#dcdee0;border-bottom:1px solid var(--g4)}
+  .step .thumb img{width:100%;height:100%;object-fit:cover;object-position:center 58%}
+  .step .body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column}
+  .step .num{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:900;color:var(--g2)}
+  .step .num i{width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-style:normal}
+  .step.hot .num i{background:var(--time)}
+  .step h3{font-size:15.5px;font-weight:900;margin:7px 0 4px}
+  .step p{font-size:12px;color:var(--g2);line-height:1.5}
+  .step .fr{margin-top:auto;padding-top:8px;font-size:10.5px;font-weight:900;color:var(--g2)}
+  .step .fr em{font-style:normal;color:var(--ink)}
+  .step.hot .fr em{color:var(--time)}
+  .step .branch{margin-top:8px;font-size:10.5px;color:var(--g2);background:var(--g5);border-radius:8px;padding:7px 9px;line-height:1.45}
+  /* arrow with data label */
+  .arr{flex:none;width:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding-top:70px}
+  .arr .lbl{font-size:10.5px;font-weight:900;color:var(--ink);background:var(--g5);border:1px solid var(--g4);border-radius:999px;padding:5px 9px;text-align:center;line-height:1.3;white-space:nowrap}
+  .arr .ln{display:flex;align-items:center;color:var(--g3)}
+  .arr .ln svg{width:60px;height:18px;stroke:var(--ink);stroke-width:2.2;fill:none}
+  .arr.hot .ln svg{stroke:var(--time)}.arr.hot .lbl{color:var(--time);background:var(--time-s);border-color:#f0c4ab}
+  /* loop back card */
+  .loopback{width:150px;flex:none;border:1.5px dashed var(--time);border-radius:16px;background:var(--time-s);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:16px;color:var(--time)}
+  .loopback svg{width:34px;height:34px;stroke:var(--time);stroke-width:2.4;fill:none}
+  .loopback b{font-size:14px;font-weight:900}.loopback small{font-size:11px;font-weight:700}
+  /* engine pipeline */
+  .engine{background:var(--ink);border-radius:22px;padding:22px 24px;color:#fff}
+  .engine .eh{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .engine .eh b{font-size:17px;font-weight:900}
+  .engine .eh span{font-size:12px;color:#aab0b6}
+  .engine .eh .pill{font-size:11px;font-weight:900;color:#fff;background:#2a2d31;border-radius:999px;padding:5px 12px}
+  .pipe{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+  .fn{border:1px solid #34373c;background:#1c1f23;border-radius:12px;padding:11px 14px;flex:none}
+  .fn b{font-size:13px;font-weight:900;font-family:ui-monospace,monospace;color:#fff;display:block}
+  .fn small{font-size:10.5px;color:#9aa0a6}
+  .fn.t{border-color:#7a3a1e;background:#2a1a12}.fn.t b{color:#ef8a52}
+  .parr{width:30px;display:grid;place-items:center;color:#5a5e63}
+  .parr svg{width:18px;height:14px;stroke:#7a7f85;stroke-width:2.4;fill:none}
+  .foot{margin-top:18px;font-size:12px;color:var(--g2);display:flex;gap:22px;flex-wrap:wrap}
+  .foot span{display:inline-flex;align-items:center;gap:7px}
+  .foot i{width:13px;height:13px;border-radius:3px;display:inline-block}
+  svg{stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+<div class="page">
+  <div class="head"><b>PrepFlow — 縦ぎりスライス</b><span>確定ワイヤーをつないだエンドツーエンドの通し動線（フロー）・iOS Liquid Glass</span></div>
+  <div class="sublead">機能を横に並べるのではなく、<b>1本の価値の流れを縦に貫いて</b>見る。各矢印は<b>画面間で渡るデータ</b>。下段は同じ流れを支える <b>Engine（純Swift）の関数パイプライン</b>。</div>
+
+  <!-- SLICE A : onboarding -->
+  <div class="slice">
+    <div class="sh"><span class="tag">A</span><b>導入スライス（一度きり）</b><span>空状態を作らず、“価値を見せてから”始める ＝ 活性化（FR-63）</span></div>
+    <div class="rail">
+      <div class="step">
+        <div class="thumb"><img src="p0-wireframe-onboarding-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>1</i>オンボーディング</span><h3>業態を選ぶ</h3><p>鮨/ビストロ等を選ぶとコース・仕込みサンプルを自動投入。空テンプレ問題を回避。</p><div class="fr">NFR-07 ・ <em>サンプル投入</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">業態テンプレ<br>＋過去2週の予約</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step hot">
+        <div class="thumb"><img src="p0-wireframe-activation-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>2</i>活性化サマリー</span><h3>自店の削減見込みを見る</h3><p>過去2週の予約から「−12.4%／¥38,000／的中88%」を提示。“アハ体験”。</p><div class="fr">FR-63/39 ・ <em>係数を初期化</em></div></div>
+      </div>
+      <div class="arr hot"><div class="lbl">初期化した係数<br>（1人前量）</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p0-wireframe-board-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>3</i>初回ボード生成</span><h3>そのまま日次運用へ</h3><p>約15分で「今日の仕込み」が立ち上がる。以降は下のBループを毎日くり返す。</p><div class="fr">FR-04 ・ <em>→ 日次スライスへ</em></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLICE B : daily loop -->
+  <div class="slice">
+    <div class="sh"><span class="tag loop">B</span><b>日次運用スライス（毎日くり返す）</b><span>予約 → 仕込み → 先回り → 営業 → 締め → 翌日 ＝ 1本の T− 軸</span></div>
+    <div class="rail">
+      <div class="step">
+        <div class="thumb"><img src="p0-wireframe-service-setup-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>1</i>サービス設定</span><h3>人数を確定</h3><p>コース別人数と開店(T0)を確定。P2では予約ハブ(FR-34)に昇格・複数ソース合算。</p><div class="fr">FR-02 ・ <em>14名 / T0 18:00</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">確定covers<br>＋開店時刻</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p0-wireframe-board-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>2</i>仕込みボード「今これ」</span><h3>数量・逆算で仕込む</h3><p>人数×係数÷歩留りで数量、T0逆算で着手時刻。タップでロールアップ。</p><div class="fr">FR-03/05/06 ・ <em>数量・着手時刻</em></div>
+        <div class="branch">俯瞰の分岐：皿ごと（FR-04/05）／担当（FR-07）に切替可</div></div>
+      </div>
+      <div class="arr hot"><div class="lbl">残タスク×所要<br>vs 開店まで</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step hot">
+        <div class="thumb"><img src="p1-wireframe-board-eta-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>3</i>着地予測</span><h3>「間に合う／危ない」</h3><p>現在ペースの着地時刻を常時計算。遅れそうなら応援/並行/後ろ倒しを先回り提案。</p><div class="fr">FR-59 ・ <em>18:12→提案で18:00</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">開店 → 営業<br>（提供・パー減）</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-close-nextday-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>4</i>締め → 翌日</span><h3>廃棄理由＋前倒し予約</h3><p>繰越/廃棄(理由)を記録→自己補正へ。翌日の前倒し仕込みを今夜トグルで予約。</p><div class="fr">FR-33/68/08 ・ <em>繰越・今夜着手</em></div></div>
+      </div>
+      <div class="arr hot"><div class="lbl">繰越差引<br>＋係数補正</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="loopback">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg>
+        <b>翌日へ</b><small>繰越・前倒し・<br>育った係数を反映</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENGINE pipeline (same slice, technical reading) -->
+  <div class="engine">
+    <div class="eh"><b>同じ流れを支える Engine（純Swift・I/Oなし・golden test）</b><span>＝「縦ぎりスライス」の技術版：UIを剥いだ1本のデータ変換</span><span class="pill">architecture.md §3</span></div>
+    <div class="pipe">
+      <div class="fn"><b>covers</b><small>確定人数（FR-02/34）</small></div>
+      <div class="parr"><svg viewBox="0 0 18 14"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn"><b>calcQty / aggregate</b><small>数量・サブレシピ合算（FR-03/37/38）</small></div>
+      <div class="parr"><svg viewBox="0 0 18 14"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn"><b>schedule</b><small>T0逆算・prep_day（FR-06/40/41）</small></div>
+      <div class="parr"><svg viewBox="0 0 18 14"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn"><b>rollup</b><small>子全完了→親（FR-05）</small></div>
+      <div class="parr"><svg viewBox="0 0 18 14"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn t"><b>etaProjection</b><small>着地予測・遅延（FR-59）</small></div>
+      <div class="parr"><svg viewBox="0 0 18 14"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn"><b>diffPlan</b><small>追い仕込み/減算（FR-19/34/55）</small></div>
+      <div class="parr"><svg viewBox="0 0 18 14"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn"><b>WasteLog</b><small>作った/余った＋理由（FR-08/68）</small></div>
+      <div class="parr"><svg viewBox="0 0 18 14"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn"><b>selfCorrect</b><small>係数を補正（FR-09）</small></div>
+      <div class="parr"><svg viewBox="0 0 18 14"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn"><b>applyCarryover</b><small>翌日へ差引（FR-42）</small></div>
+      <div class="parr" style="color:var(--time)"><svg viewBox="0 0 18 14" stroke="#ef8a52"><path d="M1 7h12M11 3l4 4-4 4"/></svg></div>
+      <div class="fn t"><b>→ 翌日 covers</b><small>ループ（育った係数）</small></div>
+    </div>
+    <div class="foot" style="color:#aab0b6">
+      <span><i style="background:#ef8a52"></i>朱＝時間/着地予測/ループ</span>
+      <span>各関数は引数で受けて値を返すだけ＝オフラインでもオンデバイスで動く（NFR-01）</span>
+      <span>テスト期待値は確定ワイヤーの数値（煮切り200ml/残65ml 等）＝golden/*.json</span>
+    </div>
+  </div>
+</div>
+</body></html>
