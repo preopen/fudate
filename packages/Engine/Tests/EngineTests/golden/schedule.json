@@ -1,0 +1,31 @@
+{
+  "function": "schedule",
+  "fr": ["FR-06", "FR-40", "FR-41"],
+  "semantics": "start = T0 - lead_min_before_open（着手時刻）。finish = start + duration_min（完了見込）。lead が日を跨ぐ場合は prep_day_offset を負方向に算出し、営業日カレンダーの定休日はスキップして直前の営業日に置く。",
+  "cases": [
+    {
+      "name": "nikiri_same_day",
+      "note": "開店18:00・lead180分 → 着手15:00／所要40分 → 完了15:40",
+      "input": { "service_date": "2026-06-11", "T0": "18:00", "task": { "id": "nikiri", "lead_min_before_open": 180, "duration_min": 40 } },
+      "expect": { "prep_day_offset": 0, "start": "15:00", "finish": "15:40" }
+    },
+    {
+      "name": "neta_same_day",
+      "note": "lead270分 → 13:30／所要45分 → 14:15",
+      "input": { "service_date": "2026-06-11", "T0": "18:00", "task": { "id": "neta", "lead_min_before_open": 270, "duration_min": 45 } },
+      "expect": { "prep_day_offset": 0, "start": "13:30", "finish": "14:15" }
+    },
+    {
+      "name": "kobujime_overnight_prev_day",
+      "note": "真鯛の昆布締め lead1200分(20h) → 前日22:00着手（prep_day −1）",
+      "input": { "service_date": "2026-06-12", "T0": "18:00", "task": { "id": "kobujime", "lead_min_before_open": 1200, "duration_min": 30 }, "calendar": { "closed_weekdays": [] } },
+      "expect": { "prep_day_offset": -1, "start": "22:00", "finish": "22:30" }
+    },
+    {
+      "name": "lead_skips_closed_day",
+      "note": "前倒し分(24h)が定休日に当たる → 直前の営業日へスキップ（明示closed_datesで判定）",
+      "input": { "service_date": "2026-06-16", "T0": "18:00", "task": { "id": "tsuke", "lead_min_before_open": 1440, "duration_min": 20 }, "calendar": { "closed_dates": ["2026-06-15"] } },
+      "expect": { "prep_day_offset": -2, "prep_date": "2026-06-14", "start": "18:00", "finish": "18:20", "skipped": ["2026-06-15"] }
+    }
+  ]
+}

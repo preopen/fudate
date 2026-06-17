@@ -1,0 +1,58 @@
+{
+  "function": "diffPlan",
+  "fr": ["FR-19", "FR-34", "FR-55"],
+  "semantics": "1つの差分関数の3トリガ。raw_delta = delta_covers * coeff_per_cover / yield（丸めなし）。new_total は calcQty(new_covers) で再計算。既に仕込み済のタスクが減る場合は carryover/廃棄 候補にする。増加・パー閾値割れは『追い仕込み』added に積む。",
+  "cases": [
+    {
+      "name": "cancel_table3_reservation_reduced",
+      "note": "卓3（6名）キャンセル → 煮切り −84ml（architecture と一致）",
+      "input": {
+        "task": { "id": "nikiri", "scale_mode": "per_cover", "coeff_per_cover": 14.0, "yield": 1.0, "round_step": 10, "status": "not_started" },
+        "current_covers": 14,
+        "change": { "type": "reservation_cancelled", "delta_covers": -6, "course": "omakase" }
+      },
+      "expect": {
+        "reduced": [ { "task": "nikiri", "raw_delta": -84.0, "new_covers": 8, "new_total": 110, "carryover_candidate": false } ],
+        "added": []
+      }
+    },
+    {
+      "name": "cancel_after_prepped_to_carryover",
+      "note": "仕込み済の場合は繰越/廃棄誘導（FR-42/08）",
+      "input": {
+        "task": { "id": "nikiri", "scale_mode": "per_cover", "coeff_per_cover": 14.0, "yield": 1.0, "round_step": 10, "status": "done" },
+        "current_covers": 14,
+        "change": { "type": "reservation_cancelled", "delta_covers": -6, "course": "omakase" }
+      },
+      "expect": {
+        "reduced": [ { "task": "nikiri", "raw_delta": -84.0, "new_covers": 8, "new_total": 110, "carryover_candidate": true } ],
+        "added": []
+      }
+    },
+    {
+      "name": "reservation_increased_oimashikomi",
+      "note": "予約増（営業前）→ 追い仕込みを自動生成（FR-34）",
+      "input": {
+        "task": { "id": "nikiri", "scale_mode": "per_cover", "coeff_per_cover": 14.0, "yield": 1.0, "round_step": 10, "status": "done" },
+        "current_covers": 14,
+        "change": { "type": "reservation_added", "delta_covers": 4, "course": "omakase" }
+      },
+      "expect": {
+        "added": [ { "task": "nikiri", "qty": 56.0, "reason": "reservation_increase" } ],
+        "reduced": []
+      }
+    },
+    {
+      "name": "par_depleted_oimashikomi",
+      "note": "営業中パー閾値割れ → 追い仕込み（FR-19・同機構）",
+      "input": {
+        "task": { "id": "nikiri", "scale_mode": "per_cover", "coeff_per_cover": 14.0, "yield": 1.0, "round_step": 10, "made_total": 200 },
+        "change": { "type": "par_depleted", "remaining_qty": 40, "threshold_pct": 0.25 }
+      },
+      "expect": {
+        "added": [ { "task": "nikiri", "reason": "par_depleted", "below_threshold": true } ],
+        "reduced": []
+      }
+    }
+  ]
+}

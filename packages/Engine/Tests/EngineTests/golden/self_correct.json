@@ -1,0 +1,38 @@
+{
+  "function": "selfCorrect",
+  "fr": ["FR-09"],
+  "semantics": "used = made - leftover。used_per_cover = used / covers。suggested_coeff = mean(used_per_cover over lookback)（小数1桁に丸め）。exclude=true（貸切/イベント等）の回は除外。提案のみ（適用は別操作）。廃棄理由が『品質/期限』のものは学習対象外（FR-68）＝made/leftoverに含めない前提でWasteLogが渡る。",
+  "cases": [
+    {
+      "name": "nikiri_downward_suggestion",
+      "note": "実績平均から係数を 14.0 → 12.4 に下げる提案",
+      "input": {
+        "task_id": "nikiri",
+        "current_coeff_per_cover": 14.0,
+        "config": { "lookback": 3, "mode": "suggest_only" },
+        "history": [
+          { "service_date": "2026-06-10", "covers": 14, "made": 200, "leftover": 30 },
+          { "service_date": "2026-06-09", "covers": 12, "made": 180, "leftover": 24 },
+          { "service_date": "2026-06-08", "covers": 16, "made": 220, "leftover": 28 }
+        ]
+      },
+      "expect": { "current_coeff_per_cover": 14.0, "suggested_coeff_per_cover": 12.4, "samples_used": 3 }
+    },
+    {
+      "name": "exclude_anomaly_kashikiri",
+      "note": "貸切(exclude)の回は平均から除外 → 通常3回のみで算出",
+      "input": {
+        "task_id": "nikiri",
+        "current_coeff_per_cover": 14.0,
+        "config": { "lookback": 4, "mode": "suggest_only" },
+        "history": [
+          { "service_date": "2026-06-10", "covers": 14, "made": 200, "leftover": 30 },
+          { "service_date": "2026-06-09", "covers": 12, "made": 180, "leftover": 24 },
+          { "service_date": "2026-06-08", "covers": 16, "made": 220, "leftover": 28 },
+          { "service_date": "2026-06-07", "covers": 30, "made": 600, "leftover": 250, "exclude": true }
+        ]
+      },
+      "expect": { "current_coeff_per_cover": 14.0, "suggested_coeff_per_cover": 12.4, "samples_used": 3 }
+    }
+  ]
+}

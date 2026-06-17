@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  engine:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test --package-path packages/Engine
+      - run: swift test --package-path packages/SyncSpike
+      - run: swift test --package-path packages/Data
+
+  app:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen swiftlint
+      - run: cd apps/ios && xcodegen generate
+      - run: swiftlint --strict
+      - run: >
+          xcodebuild build
+          -project apps/ios/PrepFlow.xcodeproj
+          -scheme PrepFlow
+          -destination 'generic/platform=iOS Simulator'
+      - run: >
+          xcodebuild test
+          -project apps/ios/PrepFlow.xcodeproj
+          -scheme PrepFlow
+          -destination 'platform=iOS Simulator,name=iPad Pro 11-inch (M5),OS=26.5'
+          -only-testing:PrepFlowSnapshotTests

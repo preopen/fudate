@@ -1,0 +1,23 @@
+included:
+  - apps
+  - packages
+excluded:
+  - packages/Engine/.build
+  - packages/SyncSpike/.build
+  - packages/Data/.build
+  - apps/ios/PrepFlow.xcodeproj
+disabled_rules:
+  - identifier_name
+  - large_tuple
+  - trailing_comma
+opt_in_rules:
+  - empty_count
+line_length:
+  warning: 180
+  error: 240
+type_body_length:
+  warning: 400
+  error: 600
+file_length:
+  warning: 900
+  error: 1100

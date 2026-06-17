@@ -1,0 +1,67 @@
+name: PrepFlow
+options:
+  bundleIdPrefix: com.prepflow
+  deploymentTarget:
+    iOS: "26.0"
+packages:
+  Engine:
+    path: ../../packages/Engine
+  DesignTokens:
+    path: ../../packages/DesignTokens
+  PrepFlowData:
+    path: ../../packages/Data
+  GRDB:
+    url: https://github.com/groue/GRDB.swift
+    from: "7.0.0"
+  SnapshotTesting:
+    url: https://github.com/pointfreeco/swift-snapshot-testing
+    revision: ad5e3190cc63dc288f28546f9c6827efc1e9d495
+targets:
+  PrepFlow:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    resources:
+      - Sources/PrepFlow/Resources
+    dependencies:
+      - package: Engine
+      - package: DesignTokens
+      - package: PrepFlowData
+      - package: GRDB
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prepflow.app
+        SWIFT_VERSION: 6.0
+        TARGETED_DEVICE_FAMILY: 2
+        SUPPORTS_MACCATALYST: NO
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Sources/PrepFlow/Info.plist
+  PrepFlowSnapshotTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests/PrepFlowSnapshotTests
+    dependencies:
+      - target: PrepFlow
+      - package: Engine
+      - package: PrepFlowData
+      - package: SnapshotTesting
+        product: SnapshotTesting
+    settings:
+      base:
+        SWIFT_VERSION: 6.0
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  PrepFlow:
+    build:
+      targets:
+        PrepFlow: all
+        PrepFlowSnapshotTests: [test]
+    test:
+      targets:
+        - PrepFlowSnapshotTests
+    run:
+      config: Debug
+    archive:
+      config: Release
