@@ -2,20 +2,22 @@
 
 | 項目 | 内容 |
 |---|---|
-| 版 / 日付 | v1.0 / 2026-06-12 |
+| 版 / 日付 | v1.2 / 2026-06-12 |
 | 対応要件 | `requirements.md` v1.4（FR-01〜58） |
 | 目的 | コーディング（Sonnetへの発注）開始前に、**モジュール分割と「決めるべきこと」を確定する単一ソース** |
 | 読者 | 実装担当（Sonnet）への発注の元仕様。画面はワイヤー（`design/`）、要件は v1.4、実装単位は本書が正 |
+| **D1 方針（v1.2）** | **iOS専用ネイティブアプリ＋Apple Liquid Glass デザインで確定**（まずはiPad＝高単価ターゲットに集中）。**Liquid Glass はApple HIG準拠で「機能レイヤー（chrome/操作/一時UI）のみ・コンテンツ層は不透明高コントラスト」**＝厨房のグランス可読性を死守（§A-12）。残る最終分岐は **D1a：実装方式（SwiftUIネイティブ ｜ React Native/Expo on iOS 26）の1点のみ**。**推奨＝RN/Expo on iOS 26**（expo-glass-effect/@expo/uiで本物のLiquid Glass・engine純TSをWeb共有・Sonnet生成精度最高・将来Android）。SwiftUI選択時はengineをSwift化しWeb共有を諦める |
 
 ---
 
 ## 0. 結論
 
 1. **複雑性監査**：仕様は「広いが防御線が効いている」（§2.2のOut明文化・モード既定OFF・MoSCoW/フェーズ分割）。ただし**そのまま実装に持ち込むと、同型の機能が3〜4箇所で別実装になる**リスクがあった。→ 共有エンジンとして一本化（§1.1）し、要件側の整理4点を v1.4 に反映。
-2. **コーディング開始判定：条件付きGO。**
+2. **コーディング開始判定：GO（条件付き）。**
    - 仕様側の前提は充足：S優先の画面穴ゼロ（coverage-matrix）・データモデル§6・イベント語彙§14・本書のモジュール分割。
-   - 残る前提は2つ：**D1（技術スタック）の確定**、**WS2 同期スパイクの合格**（R-1「オフライン縮退」＝No-Go級リスク）。
-   - → D1確定後ただちに WS0–WS2 へ着手可。**全面GO（画面実装の量産）は WS2 合格後**。
+   - **D1 は iOS専用＋Liquid Glass で確定（上表）。** 残る決定は **D1a（実装方式 SwiftUI vs RN/Expo）＝engineの言語を左右**する1点のみ。**`engine`の関数仕様（§3）・データモデル（§6）・モジュール責務（§2）は D1a に依存しない**ため、仕様確定作業は先行できる。
+   - GOゲートは2つ：**D1a の確定** と **WS2 同期スパイクの合格**（R-1「オフライン縮退」＝No-Go級）。D1a確定後、WS0/WS1（骨格・engine）即着手、**全面GO（画面量産）は WS2 合格後**。
+   - ※本書 §2.1/§3/§7/§A は**推奨のRN/Expo路線（engine純TS）**で記述。SwiftUI路線を採る場合、engineはSwift・Web共有なし・モーションはSwiftUI標準（A-11読替）に変わる。
 3. **49画面 ≠ 49実装。** `design/` は探求・世代記録を含む。P0の実装画面は**6枚**（§6）。
 
 ---
@@ -112,20 +114,25 @@ mode-label・mode-haccp・connector-tablecheck・direct・service-sync
 | A-3 | ID/テナント | ULID・全行 `tenant_id`・soft delete（復元・監査） |
 | A-4 | 文字列の一元化 | 日本語文字列は1ファイルに集約。i18nフレームワークはP3まで導入しない（FR-18への保険のみ） |
 | A-5 | 課金は委譲 | Stripe Checkout＋Customer Portal。自前課金UIは作らない |
-| A-6 | テーマ/ビュー | テーマ=CSS変数のみ・3ビュー=同一クエリの3レイアウト |
-| A-7 | 印刷 | FR-44/16のPDF出力は print CSS（PDF生成ライブラリ不採用） |
+| A-6 | テーマ/ビュー | **共有デザイントークン（TS定数：色/間隔/モーション）**を RN(StyleSheet) と Web(CSS) が参照。3ビュー=同一クエリの3レイアウト。テーマ差し替えはトークンのみ |
+| A-7 | 印刷 | FR-44/16のPDF出力は **Web側(Next.js)の print CSS** で生成（RNから共有Web経由で呼ぶ）。PDF生成ライブラリ不採用 |
 | A-8 | entitlements | プラン→機能フラグの**データ表**。コード内のプラン分岐は禁止 |
-| A-9 | リポジトリ | 本リポジトリに monorepo（`packages/engine`・`apps/web`・`apps/server` 想定） |
-| A-10 | PWA一本 | ネイティブアプリは作らない（§2.2維持）。タブレットはホーム画面追加で運用 |
+| A-9 | リポジトリ | 本リポジトリに monorepo：`packages/engine`（純TS・共有IP）・`packages/tokens`（デザイントークン）・`apps/mobile`（Expo/RN・厨房アプリ）・`apps/web`（Next.js・ゲスト/Direct/LP/課金）・`apps/server`（or Supabase） |
+| A-10 | iOS専用ネイティブ＋薄いWeb | 厨房アプリは **iOSネイティブ（iPad中心）**。実装方式は D1a（SwiftUI ｜ RN/Expo on iOS 26）。ゲスト/課金/LP のみ Web（Next.js）。**まずはiOSに集中**（Androidは将来）。PWAは不採用（Safariストレージ退避リスク回避） |
+| A-11 | モーション | FR-22（toast→banner→全画面反転＋音）・T−カウントダウン・NOW遷移・パー減少・ロールアップ完了をモーションで階層化。RN/Expo路線＝**react-native-reanimated**（UIスレッド・spring）／SwiftUI路線＝標準アニメーション＋`matchedGeometryEffect`等。Liquid Glassの`GlassEffectContainer`のmorphを遷移演出に活用可 |
+| A-12 | **Liquid Glass 規律（最重要）** | Apple HIG準拠：**Liquid Glass は機能レイヤー（ツールバー/ビュー切替/シート/フローティング操作・カウントダウンchrome）のみ。タスクカード・数値・3段階アラート＝コンテンツ層は不透明・高コントラスト**に保つ（厨房はグランス可読性が安全要件）。グラスの tint は**朱＝時間だけ**（確定規律を継承）。**Reduce Transparency / Increase Contrast を尊重**（フロスト化・縁取りでフォールバック）。`design/` 49枚は**レイアウト/IA/導線の参照**として有効、視覚スキンのみ Liquid Glass 化 |
 
 ---
 
-## 5. 未決（ユーザー判断が必要）
+## 5. 決定と残る分岐
 
-| # | 論点 | 推奨 |
+| # | 論点 | 状態（v1.2） |
 |---|---|---|
-| D1 | 技術スタック | **TypeScript＋Next.js(React)＋Supabase(Postgres/Auth)＋PowerSync(オフライン同期)**。理由：React系は情報量最多＝AI生成の精度が最も安定／マネージド中心で NFR-04（solo運用）／PowerSync は Postgres↔ローカルSQLite の実績ある同期で R-1 を既製品に寄せられる |
-| D2 | 同期エンジン（R-1スパイク） | スパイク順：① PowerSync → ② Replicache/Zero → ③ RxDB＋最小自作。**合格基準**：2端末のチェックオフ相互反映＜2秒／機内モード30分→復帰で無損失マージ／競合規則＝完了は冪等・数値はLWW＋履歴保持／2世代前のタブレットで体感即時（NFR-03） |
+| D1 | プラットフォーム/デザイン | ✅ **確定：iOS専用ネイティブ＋Apple Liquid Glass**（iPad中心・高単価ターゲット集中）。Liquid Glassは§A-12の規律（機能レイヤーのみ・コンテンツ不透明・朱tint=時間・Reduce Transparency尊重） |
+| **D1a** | **実装方式（唯一の未決）** | **SwiftUIネイティブ ｜ React Native/Expo on iOS 26**。推奨＝**RN/Expo**（expo-glass-effect/@expo/uiで本物のLiquid Glass・`engine`純TSをWeb共有・Sonnet生成精度最高・将来Android）。SwiftUIは最高忠実度/性能だがengineがSwift・Web共有なし・新APIのAI生成は要レビュー |
+| D2 | 同期エンジン（**GOゲート・WS2**） | ネイティブSQLite前提。RN路線：① **PowerSync(RN SDK)** → ② WatermelonDB → ③ op-sqlite＋最小自作。SwiftUI路線：① **GRDB＋自作同期** or ② PowerSync(Swift)。**合格基準**：2台のチェックオフ相互反映＜2秒／機内モード30分→復帰で無損失マージ／完了は冪等・数値はLWW＋履歴保持／2世代前のiPadで体感即時（NFR-03）。ネイティブSQLなのでブラウザ退避リスクは無し＝焦点は競合解決と性能 |
+
+> 残る決定は **D1a（実装方式）1点**。確定すれば WS0/WS1 即着手、GOゲートは WS2（D2スパイク）。
 
 ---
 
@@ -141,11 +148,11 @@ mode-label・mode-haccp・connector-tablecheck・direct・service-sync
 
 | WS | 内容 | 受入条件 | 依存 |
 |---|---|---|---|
-| WS0 | monorepo骨格・CI・lint・型 | build/test green | D1 |
-| WS1 | `engine` 全関数＋golden tests | §3の全関数がワイヤー数値の期待値で green | WS0 |
-| WS2 | **同期スパイク**（D2） | §5 D2の合格基準。**不合格なら次候補で再試行＝GOゲート** | WS0 |
-| WS3 | スキーマ＋データ層（§6モデル） | マイグレーション＋CRUD＋tenant分離テスト | WS2 |
-| WS4 | boardシェル（今これ/皿ごと・チェックオフ・ロールアップ） | ワイヤー再現・操作体感即時・オフライン動作 | WS1/3 |
+| WS0 | monorepo骨格（Expo＋Next＋packages）・CI・lint・型 | build/test green・Expo起動・Next起動 | — |
+| WS1 | `engine` 全関数＋golden tests（純TS） | §3の全関数がワイヤー数値の期待値で green | WS0 |
+| WS2 | **同期スパイク**（D2・PowerSync RN） | §5 D2の合格基準。**不合格なら次候補で再試行＝唯一のGOゲート** | WS0 |
+| WS3 | スキーマ＋データ層（§6モデル・PowerSync/Supabase） | マイグレーション＋CRUD＋tenant分離テスト | WS2 |
+| WS4 | boardシェル（RN・今これ/皿ごと・チェックオフ・ロールアップ・Reanimated） | ワイヤー再現・操作体感即時・オフライン動作・モーション | WS1/3 |
 | WS5 | catalogエディタ（テキスト） | 階層CRUD・係数/歩留り入力 | WS3 |
 | WS6 | serviceday設定＋人数入力 | T0設定→ボード数量反映 | WS3 |
 | WS7 | シミュレーション並走＋WasteLog入力 | 実績vs推奨の差分表示 | WS4/6 |
