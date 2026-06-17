@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>コーステンプレ編集 — Liquid Glass（iPad / iOS 26）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdee0;color:var(--ink);-webkit-font-smoothing:antialiased;padding:22px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}.cap b{font-size:18px}.cap span{color:#7c7f82;font-size:13px}
+  .ipad{width:1180px;margin:0 auto;padding:14px;background:#0b0c0d;border-radius:42px;box-shadow:0 44px 90px rgba(0,0,0,.34),inset 0 0 0 2px #2a2c2e}
+  .screen{position:relative;height:812px;border-radius:28px;overflow:hidden;background:#eef1f3}
+  .ambient{position:absolute;inset:0;background:radial-gradient(130% 90% at 80% 0%,#ffffff 0%,#eef1f4 55%,#e6eaec 100%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(72px)}.blob.warm{width:380px;height:380px;right:-30px;top:-110px;background:rgba(220,140,70,.20)}.blob.cool{width:520px;height:520px;left:-140px;top:300px;background:rgba(150,180,200,.20)}
+  .glass{background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 34px rgba(20,23,26,.14),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 1px rgba(0,0,0,.03)}
+  .topbar{position:absolute;top:14px;left:14px;right:14px;height:64px;border-radius:20px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 20px;z-index:6}
+  .crumb{font-size:14px;color:var(--g2)}.crumb b{color:var(--ink);font-weight:900}
+  .acts{display:flex;gap:10px}
+  .gbtn{font-size:13px;font-weight:800;color:var(--ink);background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.7);border-radius:11px;padding:10px 15px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .save{font-size:13px;font-weight:900;color:#fff;background:var(--ink);border:none;border-radius:11px;padding:11px 18px;cursor:pointer;box-shadow:0 8px 18px rgba(20,23,26,.24)}
+  .body{position:absolute;left:0;right:0;top:92px;bottom:0;display:grid;grid-template-columns:312px 1fr;overflow:hidden}
+  /* tree (opaque) */
+  .tree{border-right:1px solid rgba(20,23,26,.07);padding:16px;overflow:auto;background:rgba(252,252,253,.6)}
+  .tree h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--g2);font-weight:900;margin-bottom:10px}
+  .ndish{display:flex;align-items:center;gap:7px;padding:9px 10px;font-weight:900;font-size:14px;background:#fff;border:1px solid var(--g4);border-radius:10px}
+  .ncomp{display:flex;align-items:center;gap:7px;padding:8px 10px 8px 22px;font-size:13px;color:var(--ink)}
+  .ntask{display:flex;align-items:center;gap:7px;padding:7px 10px 7px 34px;font-size:12.5px;color:var(--g2);border-radius:9px}
+  .ntask.sel{background:var(--ink);color:#fff;font-weight:800}
+  .dt{width:7px;height:7px;border-radius:50%;background:var(--ink);flex:none}.dt.t{background:var(--time)}.ntask.sel .dt{background:#fff}
+  .add{display:block;width:100%;text-align:left;font-size:12px;color:var(--g2);background:none;border:1px dashed var(--g3);border-radius:9px;padding:8px 10px;margin-top:8px;cursor:pointer}
+  /* detail (opaque) */
+  .detail{padding:18px 24px;overflow:auto}
+  .detail h2{font-size:20px;font-weight:900}.detail .path{font-size:12px;color:var(--g3);margin:2px 0 16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .field label{font-size:12px;color:var(--g2);font-weight:800;display:block;margin-bottom:5px}
+  .input{border:1px solid var(--g4);border-radius:10px;background:#fff;padding:11px 12px;font-size:14px;color:var(--ink)}
+  .ri{display:flex;gap:8px}.ri .input{flex:1}.unit{display:inline-flex;align-items:center;padding:0 12px;background:var(--g5);border:1px solid var(--g4);border-radius:10px;font-size:13px;color:var(--g2)}
+  .hint{font-size:11px;color:var(--g2);margin-top:5px}.hint b{color:var(--time);font-weight:900}
+  .ph{color:var(--g3)}
+  .media{border:1px solid var(--g4);border-radius:14px;padding:14px;background:#fff;margin-top:4px}
+  .media h4{font-size:13px;font-weight:900;margin-bottom:10px}
+  .thumbs{display:flex;gap:10px;flex-wrap:wrap}
+  .thumb{width:90px;height:66px;border-radius:10px;background:repeating-linear-gradient(45deg,#eceef0,#eceef0 7px,#f5f6f7 7px,#f5f6f7 14px);display:grid;place-items:center;color:var(--g2);font-size:11px;position:relative;text-align:center;border:1px solid var(--g4)}
+  .thumb .vb{position:absolute;bottom:4px;right:4px;background:rgba(21,23,26,.8);color:#fff;font-size:9px;padding:2px 5px;border-radius:999px}
+  .thumb.add{border:1.5px dashed var(--g3);background:#fff;color:var(--ink);font-weight:900}
+  svg{stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>コーステンプレ編集 ― Liquid Glass 版（iPad / iOS 26）</b><span>料理→構成要素→サブ仕込みの階層と数量/逆算/メディア。グラスは上部バーのみ・編集面は不透明</span></div>
+  <div class="ipad"><div class="screen">
+    <div class="ambient"><div class="blob warm"></div><div class="blob cool"></div></div>
+
+    <div class="body">
+      <div class="tree">
+        <h3>構成（階層）</h3>
+        <div class="ndish">▾ 🍣 本日のおまかせ・握り</div>
+        <div class="ncomp"><span class="dt"></span>構成要素：シャリ</div>
+        <div class="ntask"><span class="dt"></span>米を炊く・赤酢で合わせる</div>
+        <div class="ncomp"><span class="dt t"></span>構成要素：煮切り・ツメ</div>
+        <div class="ntask sel"><span class="dt"></span>煮切り仕込み（編集中）</div>
+        <div class="ncomp"><span class="dt"></span>構成要素：ネタの仕込み</div>
+        <div class="ntask"><span class="dt"></span>白身の昆布締め・赤身の漬け</div>
+        <button class="add" style="margin-left:24px;width:calc(100% - 24px)">＋ サブ仕込みを追加</button>
+        <button class="add">＋ 構成要素を追加</button>
+        <button class="add">＋ 料理を追加</button>
+      </div>
+
+      <div class="detail">
+        <h2>煮切り仕込み</h2>
+        <div class="path">本日のおまかせ・握り › 煮切り・ツメ</div>
+        <div class="grid2">
+          <div class="field"><label>サブ仕込み名</label><div class="input">煮切り仕込み</div></div>
+          <div class="field"><label>担当セクション</label><div class="input">親方</div></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>1人前の必要量（FR-03）</label><div class="ri"><div class="input">14</div><span class="unit">ml / 人</span></div><div class="hint">予約人数 × この値 ÷ 歩留り＝当日必要量を自動算出</div></div>
+          <div class="field"><label>歩留り</label><div class="ri"><div class="input">95</div><span class="unit">%</span></div></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>所要時間（FR-06）</label><div class="ri"><div class="input">40</div><span class="unit">分</span></div></div>
+          <div class="field"><label>着手リード（開店の何分前）</label><div class="ri"><div class="input">180</div><span class="unit">分前</span></div><div class="hint">開店18:00 −(リード+所要)→ 着手目安 <b>15:00</b> を自動表示</div></div>
+        </div>
+        <div class="field" style="margin-bottom:14px"><label>手順テキスト</label><div class="input ph">酒・みりんを煮切り、たまり・濃口を加えてひと煮立ち。塩度◯%／とろみ◯で火を止め冷暗所へ。</div></div>
+        <div class="field"><label>手順メディア（親方の基準を残す＝脱属人化・FR-01）</label>
+          <div class="media"><h4>▦ 写真・動画</h4>
+            <div class="thumbs"><div class="thumb">手順写真1</div><div class="thumb">手順写真2</div><div class="thumb">完成見本<div class="vb">写真</div></div><div class="thumb">動画<div class="vb">▶ 1:20</div></div><div class="thumb add">＋ 追加</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar glass">
+      <div class="crumb">テンプレート / <b>本日のおまかせ・握り</b></div>
+      <div class="acts"><button class="gbtn">当日ボードでプレビュー</button><button class="save">保存</button></div>
+    </div>
+  </div></div>
+</body></html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>設定ホーム — Liquid Glass（iPad / iOS 26）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--ok:#3a6a2a;--ok-s:#e4efdd;--time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdee0;color:var(--ink);-webkit-font-smoothing:antialiased;padding:22px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}.cap b{font-size:18px}.cap span{color:#7c7f82;font-size:13px}
+  .ipad{width:1180px;margin:0 auto;padding:14px;background:#0b0c0d;border-radius:42px;box-shadow:0 44px 90px rgba(0,0,0,.34),inset 0 0 0 2px #2a2c2e}
+  .screen{position:relative;height:812px;border-radius:28px;overflow:hidden;background:#eef1f3}
+  .ambient{position:absolute;inset:0;background:radial-gradient(130% 90% at 20% 2%,#ffffff 0%,#eef1f4 55%,#e6eaec 100%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(72px)}.blob.warm{width:380px;height:380px;right:-30px;top:-100px;background:rgba(220,140,70,.18)}.blob.cool{width:520px;height:520px;left:-130px;top:300px;background:rgba(150,180,200,.20)}
+  .glass{background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 34px rgba(20,23,26,.14),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 1px rgba(0,0,0,.03)}
+  .glass-dark{background:rgba(17,19,22,.62);-webkit-backdrop-filter:blur(30px) saturate(160%);backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,.14);color:#fff;box-shadow:0 14px 36px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.2)}
+  .topbar{position:absolute;top:14px;left:14px;right:14px;height:64px;border-radius:20px;display:flex;align-items:center;gap:14px;padding:0 18px;z-index:6}
+  .back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.7);border-radius:11px;padding:9px 14px;font-size:13px;font-weight:800;color:var(--g2);cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .topbar h1{font-size:18px;font-weight:900}
+  .search{flex:1;max-width:340px;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.7);border-radius:12px;padding:10px 14px;color:var(--g3);font-size:13px;margin-left:6px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .search svg{width:16px;height:16px;stroke:var(--g3)}
+  .lock{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:900;color:var(--ok);background:var(--ok-s);border-radius:999px;padding:8px 14px}.lock svg{width:14px;height:14px;stroke:var(--ok)}
+  .grid{position:absolute;inset:0;padding:92px 28px 80px;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
+  .gcard{border:1px solid var(--g4);border-radius:16px;background:#fff;box-shadow:0 1px 2px rgba(20,23,26,.04)}
+  .gh{display:flex;align-items:center;gap:10px;padding:13px 16px 9px}
+  .gh .ic{width:30px;height:30px;border-radius:9px;background:var(--g5);display:grid;place-items:center}.gh .ic svg{width:16px;height:16px;stroke:var(--ink)}
+  .gh b{font-size:14px;font-weight:900}
+  .it{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid var(--g4);cursor:pointer}
+  .it .k{font-size:13.5px;font-weight:700;flex:1}.it .v{font-size:12.5px;color:var(--g2);font-variant-numeric:tabular-nums;text-align:right}.it .v.t{color:var(--time);font-weight:900}.it .ch{color:var(--g3);font-size:14px}
+  .modes{grid-column:1/-1;border:1px solid var(--g4);border-radius:16px;background:#fff;padding:13px 16px;box-shadow:0 1px 2px rgba(20,23,26,.04)}
+  .modes .gh{padding:0 0 10px}
+  .mrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .mcard{display:flex;align-items:center;gap:11px;border:1px solid var(--g4);border-radius:13px;padding:12px 14px}
+  .mcard.on{border-color:var(--ink)}
+  .mcard .mi{width:34px;height:34px;border-radius:10px;background:var(--ink);display:grid;place-items:center;flex:none}.mcard .mi svg{width:18px;height:18px;stroke:#fff}
+  .mcard.off .mi{background:var(--g5)}.mcard.off .mi svg{stroke:var(--g2)}
+  .mcard .mt{flex:1}.mcard .mt b{font-size:14px;font-weight:900;display:block}.mcard .mt small{font-size:11px;color:var(--g2)}
+  .stbadge{font-size:10px;font-weight:900;padding:4px 9px;border-radius:999px}.stbadge.on{background:var(--ink);color:#fff}.stbadge.addon{background:var(--time-s);color:var(--time)}
+  .modenote{font-size:11px;color:var(--g2);margin-top:9px}
+  .toast{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:700;z-index:7}
+  .toast .i{width:22px;height:22px;border-radius:50%;background:#fff;display:grid;place-items:center}.toast .i svg{width:13px;height:13px;stroke:var(--ink);stroke-width:3}
+  .toast a{color:#f0a070;font-weight:900;text-decoration:underline;cursor:pointer}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>設定ホーム ― Liquid Glass 版（iPad / iOS 26）</b><span>1機能1場所・即時保存＋トースト取消（FR-52/54）。グラスは上部バー＋トーストのみ・設定カードは不透明</span></div>
+  <div class="ipad"><div class="screen">
+    <div class="ambient"><div class="blob warm"></div><div class="blob cool"></div></div>
+
+    <div class="grid">
+      <div class="gcard">
+        <div class="gh"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7M5 9v11h14V9"/></svg></span><b>店舗</b></div>
+        <div class="it"><span class="k">店舗情報</span><span class="v">鮨 はやし ・ カウンター10席</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">営業帯（T=0）</span><span class="v">夜 第一部 18:00 ／ 第二部 20:30</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">営業日カレンダー</span><span class="v">月曜定休 ・ 臨時休 6/16</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">T−規律</span><span class="v t">点検 T−0:30 ・ 遅延猶予 +10分</span><span class="ch">›</span></div>
+      </div>
+      <div class="gcard">
+        <div class="gh"><span class="ic"><svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 10-8 0M3 21a7 7 0 0118 0"/></svg></span><b>チーム・端末</b></div>
+        <div class="it"><span class="k">セクション・スタッフ</span><span class="v">4セクション ・ 5名</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">この端末</span><span class="v">厨房1（iPad）・ ビュー上書きなし</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">設定ロック（PIN）</span><span class="v">ON ・ 日常操作はロックしない</span><span class="ch">›</span></div>
+      </div>
+      <div class="gcard">
+        <div class="gh"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span><b>表示</b></div>
+        <div class="it"><span class="k">デフォルトのテーマ</span><span class="v">ONE ACCENT（朱＝時間のみ）</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">デフォルトのビュー</span><span class="v">今これ</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">夜厨房（ダーク）</span><span class="v">OFF</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">多言語</span><span class="v">準備中（P3）</span><span class="ch">›</span></div>
+      </div>
+      <div class="gcard">
+        <div class="gh"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 10h16M5 10a7 7 0 0014 0M9 4v3M12 3v4M15 4v3"/></svg></span><b>仕込み・数量</b></div>
+        <div class="it"><span class="k">自己補正レシピの既定</span><span class="v">毎週月曜 ・ 直近10回 ・ 提案のみ</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">追い仕込みの閾値</span><span class="v t">残 25% で生成</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">繰越差引</span><span class="v">ON（期限内のみ）</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">先読み日数（前倒し仕込み）</span><span class="v">3日先の予約まで</span><span class="ch">›</span></div>
+      </div>
+      <div class="modes">
+        <div class="gh"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><b>モード（任意機能 ・ ON/OFFはここだけ）</b></div>
+        <div class="mrow">
+          <div class="mcard on"><span class="mi"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/></svg></span><div class="mt"><b>ラベルモード</b><small>自動ラベル・QR残量・半製品・プリンタ</small></div><span class="stbadge on">ON</span></div>
+          <div class="mcard on"><span class="mi"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span><div class="mt"><b>HACCPモード</b><small>衛生チェック・温度記録・PDF</small></div><span class="stbadge on">ON</span></div>
+          <div class="mcard off"><span class="mi"><svg viewBox="0 0 24 24"><path d="M3 10h18M7 3v4M17 3v4M5 6h14a1 1 0 011 1v12a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1z"/></svg></span><div class="mt"><b>PrepFlow Direct</b><small>直販予約・送客手数料ゼロ</small></div><span class="stbadge addon">+¥9,800</span></div>
+        </div>
+        <div class="modenote">プリンタ・基準温度などの詳細は各モードの中だけにあります（1機能1場所）。</div>
+      </div>
+      <div class="gcard">
+        <div class="gh"><span class="ic"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg></span><b>通知</b></div>
+        <div class="it"><span class="k">アラート音</span><span class="v">ON（全画面割込みのみ鳴動）</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">段階（トースト/バナー/全画面）</span><span class="v">既定</span><span class="ch">›</span></div>
+      </div>
+      <div class="gcard">
+        <div class="gh"><span class="ic"><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 007.5.5l2-2a5 5 0 00-7-7l-1 1M14 10a5 5 0 00-7.5-.5l-2 2a5 5 0 007 7l1-1"/></svg></span><b>予約・連携</b></div>
+        <div class="it"><span class="k">公式API（TableCheck）</span><span class="v">申請中（P0開始・主役）</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">予約メール転送（FR-10）</span><span class="v">保留（需要確認後）</span><span class="ch">›</span></div>
+      </div>
+      <div class="gcard" style="grid-column:1/-1">
+        <div class="gh"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></span><b>プラン・データ</b></div>
+        <div class="it"><span class="k">プラン・支払い（Stripe・Web）</span><span class="v">Standard ¥9,800/月 ・ 年払い</span><span class="ch">›</span></div>
+        <div class="it"><span class="k">データのエクスポート</span><span class="v">CSV / JSON</span><span class="ch">›</span></div>
+      </div>
+    </div>
+
+    <div class="topbar glass">
+      <button class="back">← 今日へ</button>
+      <h1>設定</h1>
+      <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>設定を検索（例：温度、テーマ、定休日）</div>
+      <span class="lock"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>設定ロック ON ・ オーナー解除中</span>
+    </div>
+
+    <div class="toast glass-dark"><span class="i"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>保存しました（追い仕込み閾値 25%）<a>元に戻す</a></div>
+  </div></div>
+</body></html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>本日のサービス設定 — Liquid Glass（iPad / iOS 26）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdee0;color:var(--ink);-webkit-font-smoothing:antialiased;padding:22px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}.cap b{font-size:18px}.cap span{color:#7c7f82;font-size:13px}
+  .ipad{width:1180px;margin:0 auto;padding:14px;background:#0b0c0d;border-radius:42px;box-shadow:0 44px 90px rgba(0,0,0,.34),inset 0 0 0 2px #2a2c2e}
+  .screen{position:relative;height:812px;border-radius:28px;overflow:hidden;background:#eef1f3}
+  .ambient{position:absolute;inset:0;background:radial-gradient(130% 90% at 78% 2%,#ffffff 0%,#eef1f4 55%,#e6eaec 100%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(72px)}.blob.warm{width:420px;height:420px;right:-30px;top:-110px;background:rgba(220,140,70,.22)}.blob.cool{width:520px;height:520px;left:-140px;top:300px;background:rgba(150,180,200,.20)}
+  .glass{background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 34px rgba(20,23,26,.14),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 1px rgba(0,0,0,.03)}
+  .topbar{position:absolute;top:14px;left:14px;right:14px;height:64px;border-radius:20px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:6}
+  .bL h1{font-size:18px;font-weight:900}.bL .sub{font-size:12px;color:var(--g2)}
+  .step{font-size:12px;font-weight:800;color:var(--g2)}.step b{color:var(--ink)}
+  /* service header controls (glass strip) */
+  .svc{position:absolute;top:90px;left:14px;right:14px;height:62px;border-radius:18px;display:flex;align-items:center;gap:22px;padding:0 20px;z-index:6}
+  .f label{font-size:10.5px;color:var(--g2);font-weight:800;display:block;margin-bottom:3px}
+  .ctl{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);border-radius:10px;padding:7px 12px;font-size:14px;font-weight:800}
+  .toggle{display:inline-flex;border:1px solid rgba(20,23,26,.12);border-radius:999px;overflow:hidden;background:rgba(20,23,26,.05)}
+  .toggle span{font-size:13px;padding:7px 16px;color:var(--g2);font-weight:800}.toggle span.on{background:var(--ink);color:#fff}
+  .methods{margin-left:auto;display:flex;gap:6px;padding:4px;border-radius:999px;background:rgba(20,23,26,.06)}
+  .m{font-size:12.5px;font-weight:800;color:var(--g2);padding:8px 14px;border-radius:999px;cursor:pointer}
+  .m.on{background:rgba(255,255,255,.92);color:var(--ink);box-shadow:0 2px 8px rgba(20,23,26,.16)}
+  .m.dim{color:var(--g3)}
+  /* content (opaque) */
+  .cols{position:absolute;left:0;right:0;top:168px;bottom:0;display:grid;grid-template-columns:1.4fr 1fr;overflow:hidden}
+  .left{padding:14px 24px;overflow:auto}
+  .lh{font-size:14px;font-weight:900;margin-bottom:4px}.lhs{font-size:11.5px;color:var(--g2);margin-bottom:12px}
+  .res{display:grid;grid-template-columns:64px 1fr auto auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--g4);border-radius:12px;background:#fff;margin-bottom:9px;box-shadow:0 1px 2px rgba(20,23,26,.04)}
+  .res .time{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
+  .who b{font-size:14.5px;font-weight:700}.who small{display:block;font-size:11px;color:var(--g2);margin-top:2px}
+  .pax{font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+  .del{font-size:12px;color:var(--g2);background:var(--g5);border:1px solid var(--g4);border-radius:8px;padding:6px 9px;cursor:pointer}
+  .addrow{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px dashed var(--g3);border-radius:12px;padding:13px;font-size:13.5px;font-weight:800;color:var(--g2);cursor:pointer;margin-top:4px}
+  .hold{display:flex;gap:9px;align-items:center;font-size:11.5px;color:var(--g2);background:var(--g5);border-radius:11px;padding:10px 13px;margin-top:12px}
+  .hold b{color:var(--ink)}
+  /* right panel (opaque) */
+  .panel{border-left:1px solid rgba(20,23,26,.07);padding:18px;display:flex;flex-direction:column;background:rgba(252,252,253,.7)}
+  .panel h3{font-size:14px;font-weight:900;margin-bottom:12px}
+  .sum{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px dashed var(--g4)}
+  .sum .k{font-size:14px;font-weight:700}
+  .stepper{display:inline-flex;align-items:center;border:1px solid var(--g4);border-radius:10px;overflow:hidden}
+  .stepper button{width:34px;height:34px;background:var(--g5);color:var(--ink);font-size:18px;border:none;cursor:pointer}
+  .stepper .v{width:48px;text-align:center;font-weight:900;font-variant-numeric:tabular-nums}
+  .total{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1.5px solid var(--g4)}
+  .total .l{font-size:14px;font-weight:900}.total b{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+  .band{font-size:12px;color:var(--g2);margin-top:6px}.band b{color:var(--time);font-weight:900}
+  .cta{margin-top:auto;height:58px;border:none;border-radius:14px;background:var(--ink);color:#fff;font-family:var(--font);font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;box-shadow:0 8px 20px rgba(20,23,26,.26)}
+  .ctanote{font-size:11px;color:var(--g2);text-align:center;margin-top:9px}
+  svg{stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>本日のサービス設定 ― Liquid Glass 版（iPad / iOS 26）</b><span>P0は人数手入力が主（FR-10メール取込はv1.4で保留）。グラスは上部バー＋設定ストリップ・入力面は不透明</span></div>
+  <div class="ipad"><div class="screen">
+    <div class="ambient"><div class="blob warm"></div><div class="blob cool"></div></div>
+
+    <div class="cols">
+      <div class="left">
+        <div class="lh">本日の予約（手入力）</div>
+        <div class="lhs">コース別の人数を確定すると、数量算出・逆算タイムラインが生成されます。</div>
+        <div class="res"><span class="time">18:00</span><div class="who"><b>佐藤 様</b><small>記念日・乾杯シャンパン</small></div><span class="pax">2名</span><button class="del">編集</button></div>
+        <div class="res"><span class="time">18:00</span><div class="who"><b>鈴木 様</b><small>メモ：—</small></div><span class="pax">4名</span><button class="del">編集</button></div>
+        <div class="res"><span class="time">18:30</span><div class="who"><b>高橋 様</b><small>アレルギー：甲殻類（参考）</small></div><span class="pax">6名</span><button class="del">編集</button></div>
+        <div class="res"><span class="time">20:00</span><div class="who"><b>田中 様</b><small>電話予約・接待</small></div><span class="pax">2名</span><button class="del">編集</button></div>
+        <div class="addrow"><svg viewBox="0 0 24 24" width="17" height="17" stroke="#70757b"><path d="M12 5v14M5 12h14"/></svg>予約を手入力で追加</div>
+        <div class="hold"><svg viewBox="0 0 24 24" width="15" height="15" stroke="#70757b"><path d="M4 4h16v12H5.2L4 18z"/></svg><span><b>メール取込（FR-10）は準備中</b>。需要確認後に対応。当面はCSV/手入力・将来はTableCheck連携（FR-13）で自動化。</span></div>
+      </div>
+
+      <div class="panel">
+        <h3>コース別の予約人数（確定）</h3>
+        <div class="sum"><span class="k">おまかせコース</span><span class="stepper"><button>−</button><span class="v">14</span><button>＋</button></span></div>
+        <div class="sum"><span class="k">アラカルト/その他</span><span class="stepper"><button>−</button><span class="v">0</span><button>＋</button></span></div>
+        <div class="total"><span class="l">合計</span><b>14名</b></div>
+        <div class="band">来店 18:00–20:00 ・ ピーク <b>18:00（10名）</b></div>
+        <button class="cta"><svg viewBox="0 0 24 24" width="20" height="20" stroke="#fff"><path d="M5 13l4 4L19 7"/></svg>この内容で当日ボードを生成</button>
+        <div class="ctanote">確定人数＋開店時刻から 数量算出・逆算（FR-03/06）を反映</div>
+      </div>
+    </div>
+
+    <div class="topbar glass">
+      <div class="bL"><h1>本日のサービス設定</h1><div class="sub">鮨 はやし ・ STEP 1/2 → 当日ボード生成</div></div>
+      <div class="step">STEP 1/2 ・ 設定 → <b>当日ボード生成</b></div>
+    </div>
+
+    <div class="svc glass">
+      <div class="f"><label>日付</label><span class="ctl">📅 2026/06/11(木)</span></div>
+      <div class="f"><label>営業</label><span class="toggle"><span>昼</span><span class="on">夜</span></span></div>
+      <div class="f"><label>開店時刻（T=0）</label><span class="ctl">🕔 18:00</span></div>
+      <div class="methods"><span class="m on">手入力</span><span class="m dim">メール取込（準備中）</span><span class="m">CSV・貼付</span></div>
+    </div>
+  </div></div>
+</body></html>

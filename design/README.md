@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **54画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **59画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -46,7 +46,14 @@
 | ├ 皿ごとビュー（LG） | `p1-wireframe-view-dishes-liquidglass.html/.png` | 上部バー＋ゲートのみガラス |
 | ├ 担当ビュー（LG） | `p1-wireframe-view-staff-liquidglass.html/.png` | 上部バーのみガラス・カンバン不透明 |
 | ├ 閉店・締めフロー（LG） | `p2-wireframe-close-flow-liquidglass.html/.png` | 上部バー＋ステッパー＋下部操作ガラス |
-| └ 予約ハブ（LG） | `p2-wireframe-reservation-hub-liquidglass.html/.png` | 上部バー＋ソースチップガラス・重複警告は不透明 |
+| ├ 予約ハブ（LG） | `p2-wireframe-reservation-hub-liquidglass.html/.png` | 上部バー＋ソースチップガラス・重複警告は不透明 |
+| ├ オンボーディング（LG・P0） | `p0-wireframe-onboarding-liquidglass.html/.png` | 上部ステップ＋下部操作ガラス |
+| ├ コーステンプレ編集（LG・P0） | `p1-wireframe-template-editor-liquidglass.html/.png` | 上部バーガラス・編集面は不透明 |
+| ├ 本日のサービス設定（LG・P0） | `p0-wireframe-service-setup-liquidglass.html/.png` | 手入力主・メール取込は準備中（FR-10降格） |
+| ├ シミュレーション並走（LG・P0） | `p0-wireframe-simulation-liquidglass.html/.png` | 上部バーガラス・KPI/比較表は不透明 |
+| └ 設定ホーム（LG・P0） | `p1-wireframe-settings-home-liquidglass.html/.png` | 上部バー＋トースト（ダークガラス）|
+
+> **P0実装6画面は Liquid Glass で完全カバー**：オンボーディング／テンプレ編集／サービス設定／ボード（今これ・皿ごと）／シミュレーション／設定ホーム。SwiftUI実装の視覚基準。
 
 ## 4. 確定テーマの画面（モノクロ＋朱）
 
