@@ -100,7 +100,7 @@ ModeLabel・ModeHACCP・ConnectorTableCheck・Direct・ServiceSync
 | `diffPlan(_ plan: Plan, _ change: Change) -> PlanDiff` | 予約増減・残数閾値 → タスク追加（追い仕込み）/減算/繰越・廃棄候補 | 19/34/55 |
 | `selfCorrect(_ history: [WasteLog], _ cfg: CorrectionConfig) -> [CoeffSuggestion]` | lookback N回・週次/月次 → qty_coeff 提案 | 09 |
 | `applyCarryover(_ plan: Plan, _ leftovers: [Leftover]) -> Plan` | 期限内繰越 → 翌日推奨から減算 | 42 |
-| `schedule(_ tasks: [Task], _ calendar: Calendar, _ period: ServicePeriod) -> [ScheduledTask]` | T0−(リード＋所要)・定休日スキップ・prep_day 算出 | 06/40/41 |
+| `schedule(_ tasks: [Task], _ calendar: Calendar, _ period: ServicePeriod) -> [ScheduledTask]` | **着手 start = T0 − lead_min**、**完了見込 finish = start + duration**、定休日スキップ・prep_day 算出（正確な定義と例は `docs/engine-api.md`／golden vectors） | 06/40/41 |
 | `rollup(_ tree: TaskTree, _ completion: Completion) -> TaskTree` | 子全完了 → 親完了の伝播 | 05 |
 | `generateInstances(_ sources: Sources, _ day: ServiceDay) -> [TaskInstance]` | コース/定期/業務フロー → TaskInstance | 17/31/32/40 |
 

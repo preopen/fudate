@@ -1,5 +1,44 @@
-# rendering tooling (regenerate with `npm i && node design/render.mjs`)
+# --- Secrets / env ---
+.env
+.env.*
+!.env.example
+*.xcconfig.local
+Secrets.xcconfig
+GoogleService-Info.plist
+*.p8
+*.p12
+*.mobileprovision
+
+# --- Swift / Xcode ---
+.build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+.swiftpm/
+Package.resolved
+xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM
+fastlane/report.xml
+fastlane/test_output
+
+# --- Node (design/ レンダリングのみ) ---
+node_modules/
 design/node_modules/
 design/.cache/
 design/package-lock.json
-node_modules/
+npm-debug.log*
+
+# --- macOS / editor ---
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# --- Supabase local ---
+supabase/.branches/
+supabase/.temp/

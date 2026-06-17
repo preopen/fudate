@@ -1,0 +1,28 @@
+{
+  "function": "aggregateSubrecipes",
+  "fr": ["FR-38"],
+  "semantics": "複数の料理が同じサブレシピ(uses[])を参照する場合、当日は1タスクに集約し covers を合算してから calcQty する（『煮切り 合計◯ml／全コース』）。任意機能：参照が無ければ料理直下タスクのまま。",
+  "cases": [
+    {
+      "name": "shared_nikiri_two_courses",
+      "note": "おまかせ14名＋特別2名 → 煮切り 合算16名 → 224raw → 220ml",
+      "input": {
+        "subrecipe": { "id": "nikiri", "scale_mode": "per_cover", "coeff_per_cover": 14.0, "yield": 1.0, "round_step": 10, "unit": "ml" },
+        "references": [
+          { "course": "omakase", "covers": 14 },
+          { "course": "tokubetsu", "covers": 2 }
+        ]
+      },
+      "expect": { "task": "nikiri", "total_covers": 16, "raw": 224.0, "total": 220, "unit": "ml", "sources": ["omakase:14", "tokubetsu:2"] }
+    },
+    {
+      "name": "no_reference_passthrough",
+      "note": "参照が1つだけ → そのまま",
+      "input": {
+        "subrecipe": { "id": "dashi", "scale_mode": "fixed_batch", "covers_per_batch": 7, "batch_size": 2.5, "unit": "L" },
+        "references": [ { "course": "omakase", "covers": 14 } ]
+      },
+      "expect": { "task": "dashi", "total_covers": 14, "batches": 2, "total": 5.0, "unit": "L", "sources": ["omakase:14"] }
+    }
+  ]
+}

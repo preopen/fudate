@@ -1,0 +1,31 @@
+{
+  "function": "etaProjection",
+  "fr": ["FR-59"],
+  "semantics": "P0は単一ストリーム（直列）前提。landing = now + sum(remaining durations)。delay_min = landing - T0。status = on_track（delay<=0）／ tight（0<delay<=buffer_min）／ at_risk（delay>buffer_min）。buffer_min 既定=0。提案(suggestions)はP0ではstubでよいが landing/delay/status は必須。",
+  "cases": [
+    {
+      "name": "board_eta_at_risk",
+      "note": "残3タスク・所要計47分・開店まで35分 → 着地18:12・+12分・危ない（FR-59ワイヤーと一致）",
+      "input": {
+        "now": "17:25",
+        "T0": "18:00",
+        "remaining_tasks": [
+          { "id": "nikiri_finish", "duration_min": 15 },
+          { "id": "sauce", "duration_min": 17 },
+          { "id": "suiji", "duration_min": 15 }
+        ]
+      },
+      "expect": { "landing": "18:12", "delay_min": 12, "time_to_open_min": 35, "shortfall_min": 12, "status": "at_risk" }
+    },
+    {
+      "name": "on_track",
+      "note": "余裕あり → on_track（delay 負）",
+      "input": {
+        "now": "16:00",
+        "T0": "18:00",
+        "remaining_tasks": [ { "id": "a", "duration_min": 30 }, { "id": "b", "duration_min": 30 } ]
+      },
+      "expect": { "landing": "17:00", "delay_min": -60, "time_to_open_min": 120, "shortfall_min": 0, "status": "on_track" }
+    }
+  ]
+}

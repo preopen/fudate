@@ -1,0 +1,34 @@
+{
+  "function": "applyCarryover",
+  "fr": ["FR-42"],
+  "semantics": "賞味期限内(expired=false)の繰越のみ、翌営業日の推奨量から差し引く。adjusted = max(0, base - carryover_within_shelf)。在庫管理はしない＝当日推奨の補正のみ。",
+  "cases": [
+    {
+      "name": "nikiri_carryover_within_shelf",
+      "note": "煮切り 翌日推奨200ml − 繰越65ml(期限内) → 135ml（close-flowと一致）",
+      "input": {
+        "plan": [ { "task": "nikiri", "base_recommended": 200, "unit": "ml" } ],
+        "leftovers": [ { "task": "nikiri", "qty": 65, "expired": false } ]
+      },
+      "expect": { "adjusted": [ { "task": "nikiri", "adjusted_recommended": 135, "unit": "ml" } ] }
+    },
+    {
+      "name": "expired_not_subtracted",
+      "note": "期限切れの繰越は差し引かない",
+      "input": {
+        "plan": [ { "task": "nikiri", "base_recommended": 200, "unit": "ml" } ],
+        "leftovers": [ { "task": "nikiri", "qty": 65, "expired": true } ]
+      },
+      "expect": { "adjusted": [ { "task": "nikiri", "adjusted_recommended": 200, "unit": "ml" } ] }
+    },
+    {
+      "name": "carryover_exceeds_base_clamped_zero",
+      "note": "繰越が推奨を超えても負にしない（0でクランプ）",
+      "input": {
+        "plan": [ { "task": "tsume", "base_recommended": 80, "unit": "ml" } ],
+        "leftovers": [ { "task": "tsume", "qty": 120, "expired": false } ]
+      },
+      "expect": { "adjusted": [ { "task": "tsume", "adjusted_recommended": 0, "unit": "ml" } ] }
+    }
+  ]
+}
