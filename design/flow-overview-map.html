@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrepFlow — 全体動線マップ</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#eef0f1;color:var(--ink);-webkit-font-smoothing:antialiased;padding:38px 34px 46px;line-height:1.4}
+  .page{width:1480px;margin:0 auto}
+  .head{display:flex;align-items:baseline;gap:16px;margin-bottom:6px}.head b{font-size:27px;font-weight:900}.head span{font-size:14px;color:var(--g2)}
+  .sublead{font-size:13.5px;color:var(--g2);margin-bottom:24px}.sublead b{color:var(--ink)}
+  .lane{background:#fff;border:1px solid var(--g4);border-radius:20px;box-shadow:0 14px 36px rgba(20,23,26,.07);padding:18px 22px 22px;margin-bottom:18px}
+  .lane.core{border:1.5px solid var(--time);box-shadow:0 18px 44px rgba(194,65,12,.12)}
+  .lh{display:flex;align-items:center;gap:11px;margin-bottom:15px}
+  .lh .b{font-size:11px;font-weight:900;color:#fff;background:var(--ink);border-radius:7px;padding:5px 10px}
+  .lane.core .lh .b{background:var(--time)}
+  .lh b{font-size:16px;font-weight:900}.lh span{font-size:12px;color:var(--g2)}
+  .lh .sl{margin-left:auto;font-size:10.5px;font-weight:900;color:var(--g2);background:var(--g5);border-radius:999px;padding:5px 11px}
+  .row{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+  .node{border:1.5px solid var(--g4);border-radius:13px;background:#fff;padding:13px 16px;min-width:150px}
+  .node .t{font-size:14px;font-weight:900;display:block;line-height:1.25}
+  .node .s{font-size:10.5px;color:var(--g2);font-weight:700;margin-top:3px;display:block}
+  .node .fr{font-size:9.5px;font-weight:900;color:var(--time);margin-top:5px;display:block}
+  .node.ink{border-color:var(--ink)}
+  .node.star{border-color:var(--time);background:var(--time-s)}.node.star .t{color:var(--time)}
+  .node.engine{background:var(--ink);color:#fff;border-color:var(--ink);min-width:280px}.node.engine .t{color:#fff}.node.engine .s{color:#9aa0a6}.node.engine .fr{color:#ef8a52}
+  .node.board{border-color:var(--time);min-width:200px}
+  .node.mode{border-style:dashed;border-color:var(--g3);background:var(--g5);min-width:230px}
+  .node.cross{min-width:0;flex:1;text-align:center}
+  .arr{width:62px;display:grid;place-items:center;color:var(--g3)}
+  .arr svg{width:34px;height:16px;stroke:var(--ink);stroke-width:2.3;fill:none}
+  .arr.hot svg{stroke:var(--time)}
+  .arr .ev{font-size:9px;font-weight:900;color:var(--g2);text-align:center;line-height:1.2}
+  .arrcol{width:74px;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .stack{display:flex;flex-direction:column;gap:10px}
+  .conv{display:grid;place-items:center;width:54px;color:var(--g3);font-size:26px;font-weight:300}
+  /* core loop */
+  .loop{display:flex;align-items:center;gap:0;flex-wrap:nowrap;width:100%}
+  .loopback{margin-left:8px;display:flex;align-items:center;gap:8px;border:1.5px dashed var(--time);border-radius:12px;background:var(--time-s);padding:11px 14px;color:var(--time);font-size:11.5px;font-weight:900}
+  .loopback svg{width:22px;height:22px;stroke:var(--time);stroke-width:2.4;fill:none}
+  .modes-row{display:flex;align-items:center;gap:16px}
+  .sub-ev{display:flex;flex-direction:column;align-items:center;color:var(--g2);gap:3px;width:150px}
+  .sub-ev svg{width:18px;height:26px;stroke:var(--g3);stroke-width:2.2;fill:none}.sub-ev span{font-size:9.5px;font-weight:900;text-align:center;line-height:1.2}
+  .crossrow{display:flex;gap:12px}
+  .foot{margin-top:6px;display:flex;gap:22px;flex-wrap:wrap;font-size:11.5px;color:var(--g2);padding:0 4px}
+  .foot span{display:inline-flex;align-items:center;gap:7px}.foot i{width:12px;height:12px;border-radius:3px;display:inline-block}.foot b{color:var(--ink)}
+  svg{stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+<div class="page">
+  <div class="head"><b>PrepFlow — 全体動線マップ</b><span>6スライス（A導入・B日次・C TableCheck・D Direct・E ラベル・F HACCP）を1枚で俯瞰</span></div>
+  <div class="sublead">取得チャネルは複数でも、<b>正規化Reservation を 1つのEngineに流し、1つの当日ボードに集約</b>する。モードは既定OFFでボードのイベントを購読。横断機能が全レーンを支える。<b>朱＝中核ループ／時間</b>。</div>
+
+  <!-- ① acquisition -->
+  <div class="lane">
+    <div class="lh"><span class="b">①</span><b>取得・導入レーン</b><span>予約と店の立ち上げ → 予約ハブで正規化</span><span class="sl">スライス A / C / D</span></div>
+    <div class="row">
+      <div class="stack">
+        <div class="node ink"><span class="t">A 導入・活性化</span><span class="s">業態テンプレ→自店の削減見込み→初回ボード（TTV短縮）</span><span class="fr">FR-63 / NFR-07</span></div>
+        <div class="node star"><span class="t">C TableCheck連携 ★主役</span><span class="s">CRM/Messaging APIで構造化（コース/席/おもてなし/VIP）</span><span class="fr">FR-13 / 57 / 58</span></div>
+        <div class="node ink"><span class="t">D Direct（二次）</span><span class="s">自社直販ページ・手数料ゼロ・キャンセル耐性</span><span class="fr">FR-35 / 36 / 55 / 56</span></div>
+      </div>
+      <div class="conv">⟩</div>
+      <div class="arrcol"><div class="ev">reservation.<br>created/updated</div><div class="arr"><svg viewBox="0 0 34 16"><path d="M1 8h26M23 3l6 5-6 5"/></svg></div></div>
+      <div class="node ink" style="min-width:210px"><span class="t">予約ハブ（正規化）</span><span class="s">合算・重複警告・差分検知。台帳は持たない（席割り/顧客DBなし）</span><span class="fr">FR-34</span></div>
+    </div>
+  </div>
+
+  <!-- ② core loop B -->
+  <div class="lane core">
+    <div class="lh"><span class="b">②</span><b>中核ループ B（毎日くり返す）</b><span>予約 → 数量・逆算 → ボード → 先回り → 締め → 翌日</span><span class="sl">スライス B</span></div>
+    <div class="loop">
+      <div class="node ink"><span class="t">予約ハブ</span><span class="s">確定covers / T0</span></div>
+      <div class="arrcol"><div class="ev">covers</div><div class="arr hot"><svg viewBox="0 0 34 16"><path d="M1 8h26M23 3l6 5-6 5"/></svg></div></div>
+      <div class="node engine"><span class="t">Engine（純Swift・I/Oなし）</span><span class="s">calcQty / schedule / diffPlan / rollup / selfCorrect / applyCarryover</span><span class="fr">architecture §3 ・ golden test</span></div>
+      <div class="arrcol"><div class="ev">数量・逆算</div><div class="arr hot"><svg viewBox="0 0 34 16"><path d="M1 8h26M23 3l6 5-6 5"/></svg></div></div>
+      <div class="node board"><span class="t">当日ボード</span><span class="s">今これ／皿ごと／担当</span><span class="fr">FR-04/05/06/07</span></div>
+      <div class="arrcol"><div class="ev">残×所要</div><div class="arr hot"><svg viewBox="0 0 34 16"><path d="M1 8h26M23 3l6 5-6 5"/></svg></div></div>
+      <div class="node board"><span class="t">着地予測</span><span class="s">間に合う/危ない・先回り</span><span class="fr">FR-59</span></div>
+      <div class="arrcol"><div class="ev">営業→実績</div><div class="arr hot"><svg viewBox="0 0 34 16"><path d="M1 8h26M23 3l6 5-6 5"/></svg></div></div>
+      <div class="node board"><span class="t">締め→翌日</span><span class="s">廃棄理由・繰越・前倒し</span><span class="fr">FR-33/68/08</span></div>
+      <div class="loopback"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg>繰越・係数補正 ↻ 翌日</div>
+    </div>
+  </div>
+
+  <!-- ③ modes -->
+  <div class="lane">
+    <div class="lh"><span class="b">③</span><b>任意モード（既定OFF・ボードのイベントを購読）</b><span>必要な店だけ解放。両モードは冷蔵庫QR（FR-49）で合流</span><span class="sl">スライス E / F</span></div>
+    <div class="modes-row">
+      <div class="sub-ev"><span>task.completed<br>→ label.printed</span><svg viewBox="0 0 18 26"><path d="M9 25V3M4 8l5-5 5 5"/></svg></div>
+      <div class="node mode"><span class="t">E ラベル／在庫レンズ</span><span class="s">完了→自動ラベル(期限/QR)→今ある半製品(FIFO)→冷蔵庫QRレンズ→QR残量記録→繰越/自己補正へ環流</span><span class="fr" style="color:var(--g2)">FR-20/45/46/49/50 → FR-42/09</span></div>
+      <div class="sub-ev"><span>temp.logged /<br>締めゲート</span><svg viewBox="0 0 18 26"><path d="M9 25V3M4 8l5-5 5 5"/></svg></div>
+      <div class="node mode"><span class="t">F HACCP</span><span class="s">基準設定→温度記録(冷蔵庫QR/CCP)→電子チェックシート→締めゲートで記録漏れ確認→PDF出力(保健所)</span><span class="fr" style="color:var(--g2)">FR-16/51/49/33/44</span></div>
+      <div class="node mode" style="border-style:solid;border-color:var(--g4);min-width:170px"><span class="t">合流点：冷蔵庫QR</span><span class="s">かざすと 在庫＋期限（ラベル）／温度記録（HACCP）。読み取りレンズ＝WMS化しない</span><span class="fr" style="color:var(--g2)">FR-49</span></div>
+    </div>
+  </div>
+
+  <!-- ④ cross-cutting -->
+  <div class="lane">
+    <div class="lh"><span class="b">④</span><b>横断（全レーンに効く）</b><span>solo運用の生存網と成長・設定の基盤</span><span class="sl">FR-66/67・§14・NFR</span></div>
+    <div class="crossrow">
+      <div class="node cross"><span class="t">信頼性運用網</span><span class="s">同期状態の常時可視化・安全印刷・自動インシデント・自動バックアップ</span><span class="fr">FR-67 / NFR-01/04/08</span></div>
+      <div class="node cross"><span class="t">多店舗オーナー切替</span><span class="s">個人の店切替・横断ダッシュ・テンプレ共有（本部統制でない）</span><span class="fr">FR-66</span></div>
+      <div class="node cross"><span class="t">設定ホーム</span><span class="s">1機能1場所・モードON/OFF・即時保存＋取消</span><span class="fr">FR-52/54</span></div>
+      <div class="node cross"><span class="t">イベント駆動＋オフライン</span><span class="s">in-process イベント＋event_log／ネイティブSQLiteで継続動作</span><span class="fr">§14 / NFR-01</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><i style="background:#c2410c"></i><b>朱</b>＝中核ループ／時間／TableCheck主役</span>
+    <span><i style="background:#15171a"></i><b>黒</b>＝Engine・取得・確定動線</span>
+    <span><i style="background:#f6f7f8;border:1px dashed #c2c6ca"></i><b>破線</b>＝任意モード（既定OFF・イベント購読）</span>
+    <span><b>図版：</b>A/B=flow-vertical-slice ・ C/D=…-reservations ・ E/F=…-modes</span>
+  </div>
+</div>
+</body></html>

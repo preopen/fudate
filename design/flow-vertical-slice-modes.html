@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrepFlow — 縦ぎりスライス③ モード（ラベル/在庫レンズ・HACCP）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;--time:#c2410c;--time-s:#fdeee5;--ok:#3a6a2a;--ok-s:#e4efdd;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#eef0f1;color:var(--ink);-webkit-font-smoothing:antialiased;padding:36px 30px 44px;line-height:1.4}
+  .page{width:1900px;margin:0 auto}
+  .head{display:flex;align-items:baseline;gap:16px;margin-bottom:6px}.head b{font-size:26px;font-weight:900}.head span{font-size:14px;color:var(--g2)}
+  .sublead{font-size:13.5px;color:var(--g2);margin-bottom:26px}.sublead b{color:var(--ink)}
+  .slice{background:#fff;border:1px solid var(--g4);border-radius:22px;box-shadow:0 18px 44px rgba(20,23,26,.08);padding:22px 24px 26px;margin-bottom:26px}
+  .sh{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .sh .tag{font-size:12px;font-weight:900;color:#fff;background:var(--ink);border-radius:999px;padding:6px 14px}
+  .sh b{font-size:18px;font-weight:900}.sh span{font-size:12.5px;color:var(--g2)}
+  .sh .pill{margin-left:auto;font-size:11px;font-weight:900;border-radius:999px;padding:5px 12px;background:var(--g5);color:var(--g2)}
+  .rail{display:flex;align-items:stretch;gap:0}
+  .step{width:286px;flex:none;border:1.5px solid var(--g4);border-radius:16px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  .step.hot{border-color:var(--time)}
+  .step .thumb{height:184px;overflow:hidden;background:#dcdee0;border-bottom:1px solid var(--g4)}
+  .step .thumb img{width:100%;height:100%;object-fit:cover;object-position:center 46%}
+  .step .body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column}
+  .step .num{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:900;color:var(--g2)}
+  .step .num i{width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-style:normal}
+  .step.hot .num i{background:var(--time)}
+  .step h3{font-size:15.5px;font-weight:900;margin:7px 0 4px}
+  .step p{font-size:12px;color:var(--g2);line-height:1.5}
+  .step .fr{margin-top:auto;padding-top:8px;font-size:10.5px;font-weight:900;color:var(--g2)}.step .fr em{font-style:normal;color:var(--ink)}.step.hot .fr em{color:var(--time)}
+  .arr{flex:none;width:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding-top:66px}
+  .arr .lbl{font-size:10.5px;font-weight:900;color:var(--ink);background:var(--g5);border:1px solid var(--g4);border-radius:999px;padding:5px 9px;text-align:center;line-height:1.3}
+  .arr .ln svg{width:60px;height:18px;stroke:var(--ink);stroke-width:2.2;fill:none}
+  .arr.hot .ln svg{stroke:var(--time)}.arr.hot .lbl{color:var(--time);background:var(--time-s);border-color:#f0c4ab}
+  .loopback{width:150px;flex:none;border:1.5px dashed var(--ink);border-radius:16px;background:var(--g5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:16px;color:var(--ink)}
+  .loopback svg{width:32px;height:32px;stroke:var(--ink);stroke-width:2.4;fill:none}.loopback b{font-size:13.5px;font-weight:900}.loopback small{font-size:10.5px;font-weight:700;color:var(--g2)}
+  .note{margin-top:6px;background:var(--ink);color:#fff;border-radius:18px;padding:18px 24px;font-size:12.5px;line-height:1.6}
+  .note b{color:#fff}.note .row{display:flex;gap:24px;flex-wrap:wrap;color:#aab0b6}.note .row span{display:inline-flex;align-items:flex-start;gap:8px;max-width:560px}.note i{width:12px;height:12px;border-radius:3px;flex:none;margin-top:3px}
+  svg{stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+<div class="page">
+  <div class="head"><b>PrepFlow — 縦ぎりスライス③ モード</b><span>任意機能（既定OFF）。コアはモード無しで完結し、必要な店だけ解放する</span></div>
+  <div class="sublead">ラベル／HACCP は<b>モード制（既定OFF）</b>。どちらも<b>当日ボードの完了イベントを購読</b>し、両モードは<b>冷蔵庫QR（FR-49）で合流</b>（有効な方の情報だけ表示）。在庫/WMS・原価には踏み込まない。</div>
+
+  <!-- SLICE E : Label / Larder lens -->
+  <div class="slice">
+    <div class="sh"><span class="tag">E</span><b>ラベル／在庫レンズ スライス</b><span>完了→自動ラベル→QR残量→繰越→自己補正（FR-20/45/46/49/42/09）</span><span class="pill">ラベルモード ON 時 ・ 既定OFF</span></div>
+    <div class="rail">
+      <div class="step">
+        <div class="thumb"><img src="p0-wireframe-board-liquidglass.png"></div>
+        <div class="body"><span class="num"><i>1</i>仕込み完了（チェックオフ）</span><h3>完了と同時に発火</h3><p>当日ボードで完了タップ→ラベル自動発行のトリガー。手書きゼロ。</p><div class="fr">FR-05 ・ <em>event: task.completed</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">完了イベント</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-label-flow.png"></div>
+        <div class="body"><span class="num"><i>2</i>自動ラベル発行</span><h3>期限を自動印字＋残量QR</h3><p>品名・仕込み日時・使用期限（賞味から自動）・量・担当・残量QR・FIFO曜日色。</p><div class="fr">FR-20 ・ <em>Label(QR, expire_at)</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">発行ラベル<br>＋期限</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-prep-larder.png"></div>
+        <div class="body"><span class="num"><i>3</i>「今ある半製品」ビュー</span><h3>FIFO・期限アラート</h3><p>発行済みラベル＋残量で「今、冷蔵庫にある作り置き」を古い順に。期限近は警告。</p><div class="fr">FR-45 ・ <em>残量・期限（在庫ではなく半製品の現在地）</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">かざして<br>読み取り</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-fridge-lens.png"></div>
+        <div class="body"><span class="num"><i>4</i>冷蔵庫QRレンズ</span><h3>かざすと在庫＋期限</h3><p>その庫の在庫・期限を即表示（読み取り専用）。出し入れの都度スキャンはしない。</p><div class="fr">FR-49/50 ・ <em>ゾーン在庫（WMS化しない）</em></div></div>
+      </div>
+      <div class="arr hot"><div class="lbl">残った/使い切り<br>/廃棄</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step hot">
+        <div class="thumb"><img src="p2-wireframe-label-flow.png"></div>
+        <div class="body"><span class="num"><i>5</i>QR残量記録 → 環流</span><h3>手入力ゼロで学習へ</h3><p>営業後にラベルQRで残量/使い切り/廃棄を1タップ。繰越(FR-42)・自己補正(FR-09)へ。</p><div class="fr">FR-46 ・ <em>WasteLog → 翌日推奨に反映 ↻</em></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLICE F : HACCP -->
+  <div class="slice">
+    <div class="sh"><span class="tag">F</span><b>HACCP スライス</b><span>基準設定→温度記録→チェック→締めゲート→PDF（FR-16/51/49/33）</span><span class="pill">HACCPモード ON 時 ・ 既定OFF</span></div>
+    <div class="rail">
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-haccp-settings.png"></div>
+        <div class="body"><span class="num"><i>1</i>基準設定（モードON）</span><h3>チェック項目・基準温度</h3><p>衛生チェック項目と冷蔵/冷凍の基準温度・加熱CCPを設定。位置はゾーン単位の1タップ。</p><div class="fr">FR-16/51 ・ <em>基準値（temp_min/max）</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">基準値</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step hot">
+        <div class="thumb"><img src="p2-wireframe-fridge-lens.png"></div>
+        <div class="body"><span class="num"><i>2</i>温度記録</span><h3>冷蔵庫QRからその場で</h3><p>かざして温度を記録。基準超過は時間色（朱）アラート。加熱の中心温度（CCP）も。</p><div class="fr">FR-51/49 ・ <em>TempLog（逸脱は朱）</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">日次記録</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-haccp-checklist.png"></div>
+        <div class="body"><span class="num"><i>3</i>電子チェックシート</span><h3>衛生記録（紙の置換）</h3><p>日次の衛生チェックを電子化。記録者（FR-43）も残す。導入動機・粘着になる。</p><div class="fr">FR-16 ・ <em>ChecklistRecord（記録者付き）</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">締めの一部<br>として確認</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-close-flow.png"></div>
+        <div class="body"><span class="num"><i>4</i>締めゲートで記録漏れ確認</span><h3>クローズの1本に統合</h3><p>締めフロー（FR-33）の②衛生記録ステップで、HACCP記録の完了をゲート。</p><div class="fr">FR-33 ・ <em>記録漏れゼロを担保</em></div></div>
+      </div>
+      <div class="arr"><div class="lbl">月次・査察</div><div class="ln"><svg viewBox="0 0 60 18"><path d="M2 9h52M48 4l6 5-6 5"/></svg></div></div>
+      <div class="step">
+        <div class="thumb"><img src="p2-wireframe-haccp-checklist.png"></div>
+        <div class="body"><span class="num"><i>5</i>HACCP PDF 出力</span><h3>保健所提出フォーマット</h3><p>温度ログ＋チェック記録をPDFに統合。査察・提出に使える形で出力（PDFKit）。</p><div class="fr">FR-16/44 ・ <em>PDF（毎営業日くり返し ↻）</em></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <div style="font-size:14px;font-weight:900;margin-bottom:10px">モード制の一線（守る）</div>
+    <div class="row">
+      <span><i style="background:#ef8a52"></i><b>冷蔵庫QR＝レンズ（読み取り専用）。</b>出し入れの都度スキャンはさせない＝在庫/WMSに踏み込まない（R-17）。整合は点検モード（FR-50）で時々取るだけ。</span>
+      <span><i style="background:#34373c;border:1px solid #5a5e63"></i><b>既定OFF。</b>コア（仕込み）はモード無しで完結。プリンタ未接続でもPDF/プレビューにフォールバック（R-16）。アレルゲンは参考・人が確定（NFR-06）。</span>
+    </div>
+  </div>
+</div>
+</body></html>

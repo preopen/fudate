@@ -26,6 +26,8 @@
 | 画面遷移図（フロー） | `flow-screen-map.html/.png` | ①初回セットアップ ②日次運用ループ ③振り返り・管理の3レーン |
 | **縦ぎりスライス（通し動線）** | `flow-vertical-slice.html/.png` | 確定ワイヤーを1本の流れに：A導入(一度きり)＋B日次(ループ)＋Engine関数パイプライン。画面間で渡るデータを明示 |
 | **縦ぎりスライス② 予約連携** | `flow-vertical-slice-reservations.html/.png` | C TableCheck連携（主役）＋D Direct（二次）＋合流（予約ハブ→Engine→Bへ） |
+| **縦ぎりスライス③ モード** | `flow-vertical-slice-modes.html/.png` | E ラベル/在庫レンズ＋F HACCP（既定OFF・ボードのイベント購読） |
+| **全体動線マップ** | `flow-overview-map.html/.png` | 6スライス(A〜F)を1枚で俯瞰：取得→中核ループ→任意モード→横断 |
 
 ## 2. 初期ワイヤーフレーム（v0.2世代・ティール基調）
 
