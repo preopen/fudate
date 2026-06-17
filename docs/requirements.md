@@ -449,7 +449,7 @@ Restaurant ─┬─ Section ─── Staff
 
 ## 13. UIテーマ
 
-> **実装方針（v1.4／`architecture.md` D1）：iOS専用ネイティブ＋Apple Liquid Glass を採用。** 視覚スキンは下記の確定テーマ（INK/PASS SHEET/ONE ACCENT）を母体に **Liquid Glass テーマ**へ発展させる。**Apple HIG準拠で Liquid Glass は機能レイヤー（ツールバー/ビュー切替/シート/フローティング操作・カウントダウンchrome）のみに用い、タスクカード・数値・3段階アラート等のコンテンツ層は不透明・高コントラストを維持**（厨房のグランス可読性＝安全要件）。**朱＝時間の一点ルール**（グラスのtintも時間のみ）と**FR-22のモーション階層化**は継承。**Reduce Transparency / Increase Contrast を尊重**（フロスト化・縁取りでフォールバック）。`design/` の確定ワイヤー49枚は**レイアウト/IA/導線の参照**として有効。
+> **実装方針（v1.4／`architecture.md` v1.3）：iOS専用ネイティブ（iPad中心・iOS 26+）＋ SwiftUI ＋ Apple Liquid Glass を採用（D1a=SwiftUIネイティブ確定）。** 視覚スキンは下記の確定テーマ（INK/PASS SHEET/ONE ACCENT）を母体に **Liquid Glass テーマ**へ発展させる。**Apple HIG準拠で Liquid Glass は機能レイヤー（ツールバー/ビュー切替/シート/フローティング操作・カウントダウンchrome）のみに用い、タスクカード・数値・3段階アラート等のコンテンツ層は不透明・高コントラストを維持**（厨房のグランス可読性＝安全要件）。**朱＝時間の一点ルール**（グラスのtintも時間のみ）と**FR-22のモーション階層化**は継承。**Reduce Transparency / Increase Contrast を尊重**（フロスト化・縁取りでフォールバック）。`design/` の確定ワイヤー49枚は**レイアウト/IA/導線の参照**として有効。
 
 ### 13.1 母体テーマ（配色トークンの規律）
 配色は「黒文字＋白基調＋グレー」を共通骨格とし、**同一レイアウトでトークンのみ差し替える3テーマ**を設定で切替（店の文化に合わせる）。ビュー切替（今これ／皿ごと／担当）は3テーマ共通。
