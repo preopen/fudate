@@ -16,7 +16,7 @@
 
 | 成果物 | ファイル | 内容 |
 |---|---|---|
-| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **50画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
+| **設計一覧（全画面サムネ集）** | `overview-gallery.html/.png` | **54画面 / 7カテゴリ**を1枚に。各サムネにラベル＋FRタグ |
 
 ## 1. 図版（リサーチ・全体設計）
 
@@ -43,6 +43,10 @@
 | 第1世代（白基調＋2色） | `redesign-A-bigcard` / `redesign-B-kanban` / `redesign-C-focus` | ビッグカード／担当カンバン／フォーカス |
 | 第2世代（確定・配色削減） | `redesign2-1-ink` / `redesign2-2-passsheet` / `redesign2-3-oneaccent` | INK（完全モノクロ）／PASS SHEET（帳票）／ONE ACCENT（朱1色）— **3テーマとも採用（要件§13）** |
 | **実装スキン（iOS / Liquid Glass）** | `p0-wireframe-board-liquidglass.html/.png` | **今これボードの Liquid Glass 版**（iPad/iOS 26）。グラス=機能レイヤーのみ・コンテンツ不透明・朱=時間（A-12）。SwiftUI実装の視覚基準 |
+| ├ 皿ごとビュー（LG） | `p1-wireframe-view-dishes-liquidglass.html/.png` | 上部バー＋ゲートのみガラス |
+| ├ 担当ビュー（LG） | `p1-wireframe-view-staff-liquidglass.html/.png` | 上部バーのみガラス・カンバン不透明 |
+| ├ 閉店・締めフロー（LG） | `p2-wireframe-close-flow-liquidglass.html/.png` | 上部バー＋ステッパー＋下部操作ガラス |
+| └ 予約ハブ（LG） | `p2-wireframe-reservation-hub-liquidglass.html/.png` | 上部バー＋ソースチップガラス・重複警告は不透明 |
 
 ## 4. 確定テーマの画面（モノクロ＋朱）
 

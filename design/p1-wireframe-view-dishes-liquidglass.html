@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>皿ごとビュー — Liquid Glass（iPad / iOS 26）</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#15171a;--g2:#70757b;--g3:#c2c6ca;--g4:#e9ebed;--g5:#f6f7f8;
+        --time:#c2410c;--time-s:#fdeee5;--font:'Satoshi',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#dcdee0;color:var(--ink);-webkit-font-smoothing:antialiased;padding:22px;line-height:1.4}
+  .cap{max-width:1180px;margin:0 auto 12px;display:flex;align-items:baseline;gap:12px}
+  .cap b{font-size:18px}.cap span{color:#7c7f82;font-size:13px}
+  .ipad{width:1180px;margin:0 auto;padding:14px;background:#0b0c0d;border-radius:42px;box-shadow:0 44px 90px rgba(0,0,0,.34),inset 0 0 0 2px #2a2c2e}
+  .screen{position:relative;height:812px;border-radius:28px;overflow:hidden;background:#eef1f3}
+  .ambient{position:absolute;inset:0;background:radial-gradient(130% 90% at 14% 4%,#ffffff 0%,#eef1f4 52%,#e6eaec 100%)}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px)}
+  .blob.warm{width:460px;height:460px;right:-60px;top:-120px;background:rgba(220,140,70,.30)}
+  .blob.cool{width:520px;height:520px;left:-120px;top:240px;background:rgba(150,180,200,.26)}
+  /* glass */
+  .glass{background:rgba(255,255,255,.46);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.6);box-shadow:0 12px 34px rgba(20,23,26,.14),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 1px rgba(0,0,0,.03)}
+  .glass-dark{background:rgba(17,19,22,.5);-webkit-backdrop-filter:blur(30px) saturate(160%);backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,.14);color:#fff;box-shadow:0 12px 34px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.2)}
+  .glass-time{background:rgba(194,65,12,.13);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);border:1px solid rgba(194,65,12,.30);box-shadow:0 10px 28px rgba(194,65,12,.16),inset 0 1px 0 rgba(255,255,255,.55)}
+  /* top bar */
+  .topbar{position:absolute;top:14px;left:14px;right:14px;height:72px;border-radius:22px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 16px 0 22px;z-index:5}
+  .bL h1{font-size:18px;font-weight:900}.bL .sub{font-size:12px;color:var(--g2)}
+  .sw{justify-self:center;display:inline-flex;gap:3px;padding:4px;border-radius:999px;background:rgba(20,23,26,.06)}
+  .sw button{border:none;background:none;font-family:var(--font);font-size:14px;font-weight:800;color:var(--g2);padding:9px 22px;border-radius:999px;cursor:pointer}
+  .sw button.on{background:rgba(255,255,255,.92);color:var(--ink);box-shadow:0 2px 8px rgba(20,23,26,.16),inset 0 1px 0 #fff}
+  .bR{display:flex;align-items:center;gap:12px;justify-self:end}
+  .cov{font-size:14px;font-weight:700;color:var(--g2)}.cov b{color:var(--ink);font-size:17px}
+  .cd{display:flex;align-items:center;gap:10px;border-radius:16px;padding:8px 15px}
+  .cd small{display:block;font-size:10px;color:var(--time);font-weight:800;letter-spacing:.08em}
+  .cd b{font-size:20px;font-weight:900;color:var(--time);font-variant-numeric:tabular-nums}
+  /* content: dishes (opaque) */
+  .list{position:absolute;inset:0;padding:100px 28px 92px;overflow:auto}
+  .dish{border:1px solid var(--g4);border-radius:18px;margin-bottom:14px;overflow:hidden;background:#fff;box-shadow:0 1px 2px rgba(20,23,26,.04)}
+  .dh{display:flex;align-items:center;gap:14px;padding:15px 18px;background:#fbfbfc}
+  .dh .car{width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid var(--g4);display:grid;place-items:center;font-size:12px;color:var(--g2)}
+  .dh h2{font-size:18px;font-weight:900;flex:1}
+  .dh .win{font-size:12.5px;color:var(--g2);font-variant-numeric:tabular-nums}
+  .dh .frac{font-size:14px;font-weight:900;font-variant-numeric:tabular-nums;background:#fff;border:1px solid var(--g4);border-radius:999px;padding:6px 14px}
+  .dish.full .dh{background:var(--ink)}
+  .dish.full .dh h2,.dish.full .dh .frac{color:#fff}
+  .dish.full .dh .frac{background:transparent;border-color:#494c4f}
+  .dish.full .dh .win{color:#9aa0a6}
+  .dish.full .dh .car{background:#fff;border-color:#fff;color:var(--ink)}
+  .dbar{height:5px;background:var(--g4)}.dbar i{display:block;height:100%;background:var(--ink)}
+  .row{display:flex;align-items:center;gap:16px;padding:14px 18px;border-top:1px solid var(--g4)}
+  .tick{width:52px;height:52px;border-radius:50%;border:2.5px solid var(--g3);flex:none;display:grid;place-items:center;background:#fff}
+  .tick.on{background:var(--ink);border-color:var(--ink)}.tick svg{width:25px;height:25px;stroke:#fff}
+  .rt{flex:1}.rt h3{font-size:17px;font-weight:700}
+  .rt.done h3{color:var(--g3);text-decoration:line-through}
+  .meta{display:flex;gap:9px;margin-top:5px;align-items:center}
+  .qty{font-size:12.5px;font-weight:700;color:#fff;background:var(--ink);padding:4px 10px;border-radius:7px;font-variant-numeric:tabular-nums}
+  .rt.done .qty{background:var(--g4);color:var(--g2)}
+  .tm{font-size:12.5px;color:var(--g2);font-variant-numeric:tabular-nums}
+  .tm.now{color:var(--time);font-weight:900}
+  .nowflag{font-size:11px;font-weight:900;letter-spacing:.08em;color:#fff;background:var(--time);padding:4px 9px;border-radius:999px}
+  .row.now{background:rgba(194,65,12,.08)}
+  .sub{font-size:12px;color:var(--g2)}
+  /* bottom gate (glass) */
+  .gate{position:absolute;left:14px;right:14px;bottom:14px;height:64px;border-radius:18px;display:flex;align-items:center;gap:14px;padding:0 20px;z-index:5}
+  .gate .gi{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.14);display:grid;place-items:center}.gate .gi svg{width:18px;height:18px;stroke:#fff}
+  .gate b{font-size:15px;font-weight:900}.gate small{font-size:11.5px;color:#b9bdc1;margin-left:8px}
+  .gate .t{margin-left:auto;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums}
+  svg{stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+  <div class="cap"><b>皿ごとビュー ― Liquid Glass 版（iPad / iOS 26）</b><span>料理→構成要素のロールアップを俯瞰。グラスは上部バー／ゲートのみ・皿カードは不透明高コントラスト</span></div>
+  <div class="ipad"><div class="screen">
+    <div class="ambient"><div class="blob warm"></div><div class="blob cool"></div></div>
+
+    <div class="list">
+      <div class="dish full"><div class="dh"><div class="car"><svg viewBox="0 0 24 24" width="14" height="14" stroke="#15171a"><path d="M5 13l4 4L19 7"/></svg></div><h2>先付け</h2><span class="win">T−4:00 窓</span><span class="frac">仕込み完了</span></div></div>
+
+      <div class="dish">
+        <div class="dh"><div class="car">▾</div><h2>おまかせ握り</h2><span class="win">T−4:30 〜 T−2:30</span><span class="frac">2 / 3</span></div>
+        <div class="dbar"><i style="width:66%"></i></div>
+        <div class="row"><div class="tick on"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="rt done"><h3>シャリ — 米を炊く・赤酢</h3><div class="meta"><span class="qty">米 2.0升</span><span class="tm">14:00 ・ T−4:00</span></div></div></div>
+        <div class="row now"><div class="tick"></div><div class="rt"><h3>煮切り仕込み</h3><div class="meta"><span class="qty">200ml</span><span class="tm now">15:00 ・ T−3:00</span><span class="nowflag">NOW</span></div></div><span class="sub">親方</span></div>
+        <div class="row"><div class="tick on"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><div class="rt done"><h3>ネタの仕込み</h3><div class="meta"><span class="qty">各14貫</span><span class="tm">13:30 ・ T−4:30</span></div></div></div>
+      </div>
+
+      <div class="dish">
+        <div class="dh"><div class="car">▾</div><h2>椀物</h2><span class="win">T−1:30 〜 T−1:00</span><span class="frac">0 / 2</span></div>
+        <div class="dbar"><i style="width:0%"></i></div>
+        <div class="row"><div class="tick"></div><div class="rt"><h3>吸地を引く</h3><div class="meta"><span class="qty">14杯</span><span class="tm">17:00 ・ T−1:00</span></div></div><span class="sub">親方</span></div>
+        <div class="row"><div class="tick"></div><div class="rt"><h3>椀種の準備</h3><div class="meta"><span class="qty">14客</span><span class="tm">16:30 ・ T−1:30</span></div></div><span class="sub">ガルド</span></div>
+      </div>
+    </div>
+
+    <div class="topbar glass">
+      <div class="bL"><h1>本日の仕込み</h1><div class="sub">鮨 はやし ・ 6/11(木) 夜 ・ 14名</div></div>
+      <div class="sw"><button>今これ</button><button class="on">皿ごと</button><button>担当</button></div>
+      <div class="bR"><span class="cov"><b>5</b> / 14</span><div class="cd glass-time"><div><small>SERVICE 18:00</small><b>T−2:48</b></div></div></div>
+    </div>
+
+    <div class="gate glass-dark"><div class="gi"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><b>ライン点検</b><small>全4皿そろって開店ゲート</small><span class="t">17:30 ・ T−0:30</span></div>
+  </div></div>
+</body></html>

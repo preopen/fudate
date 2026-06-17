@@ -407,6 +407,8 @@ Restaurant ─┬─ Section ─── Staff
 | 仕込みボード リデザイン3案（初期） | `design/redesign-A-bigcard.html` / `redesign-B-kanban.html` / `redesign-C-focus.html` | FR-04/05 |
 | 仕込みボード 確定3テーマ（INK/帳票/朱1色） | `design/redesign2-1-ink.html` / `redesign2-2-passsheet.html` / `redesign2-3-oneaccent.html` | §13・FR-04/05 |
 | 今これボード Liquid Glass版（iPad/iOS 26・実装スキン） | `design/p0-wireframe-board-liquidglass.html` | §13・FR-04/05/06・A-12（`architecture.md`） |
+| 皿ごと／担当ビュー Liquid Glass版 | `design/p1-wireframe-view-dishes-liquidglass.html` / `p1-wireframe-view-staff-liquidglass.html` | §13・FR-04/05/07・A-12 |
+| 閉店・締めフロー／予約ハブ Liquid Glass版 | `design/p2-wireframe-close-flow-liquidglass.html` / `p2-wireframe-reservation-hub-liquidglass.html` | §13・FR-33/34・A-12 |
 | 営業中サービスボード | `design/p2-wireframe-service-board.html` | FR-19/21/22 |
 | パスビュー（卓×コース） | `design/p4-wireframe-passview.html` | FR-24/25/27 |
 | 皿ごとビュー（確定テーマ） | `design/p1-wireframe-view-dishes.html` | FR-04/05 |
