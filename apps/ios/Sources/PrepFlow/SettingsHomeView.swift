@@ -6,6 +6,9 @@ struct SettingsHomeView: View {
     let session: AuthSession
     let backToBoard: () -> Void
     let signOut: () -> Void
+    var openServiceSetup: (() -> Void)?
+    var openCatalog: (() -> Void)?
+    var openSimulation: (() -> Void)?
 
     var body: some View {
         ZStack {
@@ -16,14 +19,14 @@ struct SettingsHomeView: View {
                     HStack(alignment: .top, spacing: PrepFlowSpacing.md) {
                         SettingsCard(title: "店舗", rows: [
                             SettingsRowModel(title: "店舗情報", value: "鮨 はやし ・ カウンター14席"),
-                            SettingsRowModel(title: "営業帯（T=0）", value: "夜 第一部 18:00", isTime: true),
+                            SettingsRowModel(title: "営業帯（T=0）", value: "夜 第一部 18:00", isTime: true, action: .serviceSetup),
                             SettingsRowModel(title: "営業日カレンダー", value: "月曜定休"),
-                        ])
+                        ], perform: perform)
                         SettingsCard(title: "チーム・認証", rows: [
                             SettingsRowModel(title: "オーナー", value: session.displayName),
                             SettingsRowModel(title: "tenant", value: session.tenantID),
                             SettingsRowModel(title: "認証方式", value: session.provider.label),
-                        ])
+                        ], perform: perform)
                     }
 
                     HStack(alignment: .top, spacing: PrepFlowSpacing.md) {
@@ -31,19 +34,19 @@ struct SettingsHomeView: View {
                             SettingsRowModel(title: "デフォルトのテーマ", value: "ONE ACCENT"),
                             SettingsRowModel(title: "デフォルトのビュー", value: "今これ"),
                             SettingsRowModel(title: "夜厨房（ダーク）", value: "OFF"),
-                        ])
+                        ], perform: perform)
                         SettingsCard(title: "仕込み・数量", rows: [
                             SettingsRowModel(title: "自己補正レシピ", value: "提案のみ"),
                             SettingsRowModel(title: "追い仕込み閾値", value: "残 25%", isTime: true),
-                            SettingsRowModel(title: "繰越差引", value: "ON（期限内のみ）"),
-                        ])
+                            SettingsRowModel(title: "繰越差引", value: "ON（期限内のみ）", action: .simulation),
+                        ], perform: perform)
                     }
 
                     SettingsCard(title: "プラン・データ", rows: [
-                        SettingsRowModel(title: "プラン", value: "P0 Pilot"),
-                        SettingsRowModel(title: "データのエクスポート", value: "CSV / JSON"),
+                        SettingsRowModel(title: "プラン", value: "P0 Pilot", action: .catalog),
+                        SettingsRowModel(title: "データのエクスポート", value: "CSV / JSON", action: .simulation),
                         SettingsRowModel(title: "ローカル縮退", value: "SQLite 起動可"),
-                    ])
+                    ], perform: perform)
                 }
                 .padding(.horizontal, PrepFlowSpacing.xxl)
                 .padding(.top, PrepFlowMetric.topInset)
@@ -59,12 +62,32 @@ struct SettingsHomeView: View {
         }
         .foregroundStyle(PrepFlowColor.ink)
     }
+
+    private func perform(_ action: SettingsAction?) {
+        switch action {
+        case .serviceSetup:
+            openServiceSetup?()
+        case .catalog:
+            openCatalog?()
+        case .simulation:
+            openSimulation?()
+        case nil:
+            break
+        }
+    }
+}
+
+private enum SettingsAction: Equatable {
+    case serviceSetup
+    case catalog
+    case simulation
 }
 
 private struct SettingsRowModel: Equatable {
     let title: String
     let value: String
     var isTime = false
+    var action: SettingsAction?
 }
 
 // 正本: design/p1-wireframe-settings-home-liquidglass.png
@@ -120,6 +143,7 @@ private struct SettingsTopBar: View {
 private struct SettingsCard: View {
     let title: String
     let rows: [SettingsRowModel]
+    let perform: (SettingsAction?) -> Void
 
     var body: some View {
         VStack(spacing: PrepFlowSpacing.none) {
@@ -131,7 +155,9 @@ private struct SettingsCard: View {
                 .padding(.bottom, PrepFlowSpacing.sm)
 
             ForEach(rows, id: \.title) { row in
-                SettingsRow(row: row)
+                SettingsRow(row: row) {
+                    perform(row.action)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -146,21 +172,25 @@ private struct SettingsCard: View {
 
 private struct SettingsRow: View {
     let row: SettingsRowModel
+    let action: () -> Void
 
     var body: some View {
-        HStack(spacing: PrepFlowSpacing.md) {
-            Text(row.title)
-                .font(PrepFlowFont.smallBold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text(row.value)
-                .font(PrepFlowFont.small)
-                .foregroundStyle(row.isTime ? PrepFlowColor.time : PrepFlowColor.g2) // time-use: T0/deadline settings values
-                .lineLimit(1)
-                .minimumScaleFactor(PrepFlowMetric.textMinimumScale)
-            Text("›")
-                .font(PrepFlowFont.smallBold)
-                .foregroundStyle(PrepFlowColor.g3)
+        Button(action: action) {
+            HStack(spacing: PrepFlowSpacing.md) {
+                Text(row.title)
+                    .font(PrepFlowFont.smallBold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(row.value)
+                    .font(PrepFlowFont.small)
+                    .foregroundStyle(row.isTime ? PrepFlowColor.time : PrepFlowColor.g2) // time-use: T0/deadline settings values
+                    .lineLimit(1)
+                    .minimumScaleFactor(PrepFlowMetric.textMinimumScale)
+                Text("›")
+                    .font(PrepFlowFont.smallBold)
+                    .foregroundStyle(PrepFlowColor.g3)
+            }
         }
+        .buttonStyle(.plain)
         .padding(.horizontal, PrepFlowSpacing.md)
         .padding(.vertical, PrepFlowSpacing.sm)
         .overlay(alignment: .top) {

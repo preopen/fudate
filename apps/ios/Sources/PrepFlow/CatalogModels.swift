@@ -83,6 +83,7 @@ struct CatalogPrepTask: Identifiable, Equatable {
     var unit: String
     var durationMin: Int = 40
     var leadMinBeforeOpen: Int = 180
+    var shelfLifeDays: Int = 1
     var sectionName: String
     var instruction: String = ""
     var sort: Int
@@ -96,7 +97,8 @@ struct CatalogPrepTask: Identifiable, Equatable {
             roundStep: roundStep,
             unit: unit,
             durationMin: durationMin,
-            leadMinBeforeOpen: leadMinBeforeOpen
+            leadMinBeforeOpen: leadMinBeforeOpen,
+            shelfLifeDays: shelfLifeDays
         )
     }
 }

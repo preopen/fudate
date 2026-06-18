@@ -5,9 +5,13 @@ import SwiftUI
 
 struct SimulationView: View {
     @StateObject private var store: BoardStore
+    private let openBoard: (() -> Void)?
+    private let adjustNumbers: (() -> Void)?
 
-    init(store: BoardStore = BoardStore()) {
+    init(store: BoardStore = BoardStore(), openBoard: (() -> Void)? = nil, adjustNumbers: (() -> Void)? = nil) {
         _store = StateObject(wrappedValue: store)
+        self.openBoard = openBoard
+        self.adjustNumbers = adjustNumbers
     }
 
     var body: some View {
@@ -22,16 +26,24 @@ struct SimulationView: View {
                     SimulationResultPanel(summary: store.simulation) {
                         store.applySimulationCoefficients()
                         store.recordNikiriWaste()
+                        openBoard?()
                     }
                     .frame(width: PrepFlowMetric.railWidth)
                 }
             }
             .padding(.top, PrepFlowMetric.topInset)
 
-            SimulationTopBar {
-                store.applySimulationCoefficients()
-                store.recordNikiriWaste()
-            }
+            SimulationTopBar(
+                changePeriod: {
+                    store.changeSimulationPeriod()
+                    adjustNumbers?()
+                },
+                apply: {
+                    store.applySimulationCoefficients()
+                    store.recordNikiriWaste()
+                    openBoard?()
+                }
+            )
             .padding(PrepFlowSpacing.md)
         }
         .foregroundStyle(PrepFlowColor.ink)
@@ -41,9 +53,13 @@ struct SimulationView: View {
 // 正本: design/p0-wireframe-activation-liquidglass.png
 struct ActivationSummaryView: View {
     @StateObject private var store: BoardStore
+    private let adjustNumbers: (() -> Void)?
+    private let startFirstBoard: (() -> Void)?
 
-    init(store: BoardStore = BoardStore()) {
+    init(store: BoardStore = BoardStore(), adjustNumbers: (() -> Void)? = nil, startFirstBoard: (() -> Void)? = nil) {
         _store = StateObject(wrappedValue: store)
+        self.adjustNumbers = adjustNumbers
+        self.startFirstBoard = startFirstBoard
     }
 
     var body: some View {
@@ -85,10 +101,16 @@ struct ActivationSummaryView: View {
             VStack(spacing: PrepFlowSpacing.md) {
                 ActivationTopBar()
                 Spacer()
-                ActivationBottomBar {
-                    store.applySimulationCoefficients()
-                    store.recordNikiriWaste()
-                }
+                ActivationBottomBar(
+                    adjustNumbers: {
+                        adjustNumbers?()
+                    },
+                    apply: {
+                        store.applySimulationCoefficients()
+                        store.recordNikiriWaste()
+                        startFirstBoard?()
+                    }
+                )
             }
             .padding(PrepFlowSpacing.md)
         }
@@ -98,6 +120,7 @@ struct ActivationSummaryView: View {
 
 // 正本: design/p0-wireframe-simulation-liquidglass.png
 private struct SimulationTopBar: View {
+    let changePeriod: () -> Void
     let apply: () -> Void
 
     var body: some View {
@@ -121,7 +144,7 @@ private struct SimulationTopBar: View {
 
                 Spacer()
 
-                Button("期間を変更") {}
+                Button("期間を変更", action: changePeriod)
                     .buttonStyle(SimulationGlassButtonStyle())
                 Button("本適用する", action: apply)
                     .buttonStyle(SimulationPrimaryButtonStyle())
@@ -573,6 +596,7 @@ private struct ActivationBars: View {
 
 // 正本: design/p0-wireframe-activation-liquidglass.png
 private struct ActivationBottomBar: View {
+    let adjustNumbers: () -> Void
     let apply: () -> Void
 
     var body: some View {
@@ -590,7 +614,7 @@ private struct ActivationBottomBar: View {
                         .foregroundStyle(PrepFlowColor.g2)
                 }
                 Spacer()
-                Button("数字を調整") {}
+                Button("数字を調整", action: adjustNumbers)
                     .buttonStyle(SimulationGlassButtonStyle())
                 Button("この係数で始める → 初回ボード", action: apply)
                     .buttonStyle(SimulationPrimaryButtonStyle())

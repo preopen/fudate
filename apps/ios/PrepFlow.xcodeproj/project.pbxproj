@@ -15,6 +15,7 @@
 		44AE6862E4A347D4358F4DBC /* testBoardNowMatchesSourceWire.p0-wireframe-board-liquidglass.png in Resources */ = {isa = PBXBuildFile; fileRef = C2D401BFA3A05A805D2B8082 /* testBoardNowMatchesSourceWire.p0-wireframe-board-liquidglass.png */; };
 		44ED5034C58B252DAE1A2961 /* PrepFlowData in Frameworks */ = {isa = PBXBuildFile; productRef = 475D07E15555007BBAEB0322 /* PrepFlowData */; };
 		4DD818536F930138D05EEB4F /* CatalogModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A4C654FDBB9C10305B86A2 /* CatalogModels.swift */; };
+		4E70A62AADB66AD858A52BFB /* testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png in Resources */ = {isa = PBXBuildFile; fileRef = BA4DADAD9C37E8A9D0C7648F /* testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png */; };
 		5457F18F13DE5E64A1617C22 /* BoardChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFEF01BB3C11B19998854F9 /* BoardChrome.swift */; };
 		58109CF317BBC81A0786534E /* testSimulationMatchesSourceWire.p0-wireframe-simulation-liquidglass.png in Resources */ = {isa = PBXBuildFile; fileRef = D5B23AA2FA68F4777FA801A8 /* testSimulationMatchesSourceWire.p0-wireframe-simulation-liquidglass.png */; };
 		62004F4353B493326DF16A9B /* Engine in Frameworks */ = {isa = PBXBuildFile; productRef = 8A23825344FB0224673C2952 /* Engine */; };
@@ -78,6 +79,7 @@
 		A724BCCD2A6C5ADF4A312A49 /* Satoshi-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Medium.otf"; sourceTree = "<group>"; };
 		B0A4C654FDBB9C10305B86A2 /* CatalogModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogModels.swift; sourceTree = "<group>"; };
 		B93D69111C39D44B54F1F1AC /* Data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Data; path = ../../packages/Data; sourceTree = SOURCE_ROOT; };
+		BA4DADAD9C37E8A9D0C7648F /* testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png"; sourceTree = "<group>"; };
 		C2D401BFA3A05A805D2B8082 /* testBoardNowMatchesSourceWire.p0-wireframe-board-liquidglass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "testBoardNowMatchesSourceWire.p0-wireframe-board-liquidglass.png"; sourceTree = "<group>"; };
 		C3540741D5AF32E9BAC03591 /* ServiceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceSetupView.swift; sourceTree = "<group>"; };
 		CC115886C18221CAA1D153E1 /* Satoshi-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Regular.otf"; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 				42255E5C40BB5F7EDF94AC33 /* testBoardStaffMatchesSourceWire.p1-wireframe-view-staff-liquidglass.png */,
 				1112E428E610DA87D42F71C6 /* testCatalogEditorMatchesSourceWire.p1-wireframe-template-editor-liquidglass.png */,
 				FC1D15A8344968EC59398CC7 /* testServiceSetupMatchesSourceWire.p0-wireframe-service-setup-liquidglass.png */,
+				BA4DADAD9C37E8A9D0C7648F /* testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png */,
 				D5B23AA2FA68F4777FA801A8 /* testSimulationMatchesSourceWire.p0-wireframe-simulation-liquidglass.png */,
 			);
 			path = PrepFlowBoardSnapshotTests;
@@ -336,6 +339,7 @@
 				6706FD59C216B5567FA82653 /* testBoardStaffMatchesSourceWire.p1-wireframe-view-staff-liquidglass.png in Resources */,
 				D8EBB7B420543C6744B0146B /* testCatalogEditorMatchesSourceWire.p1-wireframe-template-editor-liquidglass.png in Resources */,
 				F10D698E85E05A627CF8F3B3 /* testServiceSetupMatchesSourceWire.p0-wireframe-service-setup-liquidglass.png in Resources */,
+				4E70A62AADB66AD858A52BFB /* testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png in Resources */,
 				58109CF317BBC81A0786534E /* testSimulationMatchesSourceWire.p0-wireframe-simulation-liquidglass.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

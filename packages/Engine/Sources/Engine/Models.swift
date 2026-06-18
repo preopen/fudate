@@ -245,6 +245,71 @@ public struct Scheduled: Sendable, Equatable {
     }
 }
 
+public enum DayrailKind: String, Sendable, Equatable {
+    case prep
+    case service
+    case close
+}
+
+public struct DayrailOperation: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var kind: DayrailKind
+    public var title: String
+    public var startOffsetMin: Int
+    public var durationMin: Int
+    public var status: TaskStatus
+
+    public init(
+        id: String,
+        kind: DayrailKind,
+        title: String,
+        startOffsetMin: Int,
+        durationMin: Int,
+        status: TaskStatus = .notStarted
+    ) {
+        self.id = id
+        self.kind = kind
+        self.title = title
+        self.startOffsetMin = startOffsetMin
+        self.durationMin = durationMin
+        self.status = status
+    }
+}
+
+public struct DayrailItem: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var kind: DayrailKind
+    public var refID: String
+    public var title: String
+    public var prepDayOffset: Int
+    public var start: String
+    public var finish: String
+    public var status: TaskStatus
+    public var sort: Int
+
+    public init(
+        id: String,
+        kind: DayrailKind,
+        refID: String,
+        title: String,
+        prepDayOffset: Int,
+        start: String,
+        finish: String,
+        status: TaskStatus,
+        sort: Int
+    ) {
+        self.id = id
+        self.kind = kind
+        self.refID = refID
+        self.title = title
+        self.prepDayOffset = prepDayOffset
+        self.start = start
+        self.finish = finish
+        self.status = status
+        self.sort = sort
+    }
+}
+
 public struct TaskNode: Codable, Sendable, Equatable, Identifiable {
     public var id: String
     public var status: TaskStatus?
@@ -325,6 +390,171 @@ public struct WasteRecord: Codable, Sendable {
     }
 }
 
+public enum WasteReason: String, Codable, Sendable, Equatable {
+    case overmade
+    case expiry
+    case quality
+    case other
+}
+
+public struct CloseTaskRecord: Sendable, Equatable {
+    public var task: String
+    public var plannedQty: Double
+    public var madeQty: Double
+    public var leftoverQty: Double
+    public var unit: String
+    public var wasteReason: WasteReason
+    public var carryoverToNext: Bool
+
+    public init(
+        task: String,
+        plannedQty: Double,
+        madeQty: Double,
+        leftoverQty: Double,
+        unit: String,
+        wasteReason: WasteReason,
+        carryoverToNext: Bool
+    ) {
+        self.task = task
+        self.plannedQty = plannedQty
+        self.madeQty = madeQty
+        self.leftoverQty = leftoverQty
+        self.unit = unit
+        self.wasteReason = wasteReason
+        self.carryoverToNext = carryoverToNext
+    }
+}
+
+public struct CarryoverItem: Sendable, Equatable {
+    public var task: String
+    public var qty: Double
+    public var unit: String
+
+    public init(task: String, qty: Double, unit: String) {
+        self.task = task
+        self.qty = qty
+        self.unit = unit
+    }
+}
+
+public struct NextDayAdjustment: Sendable, Equatable {
+    public var task: String
+    public var base: Double
+    public var adjusted: Double
+    public var unit: String
+
+    public init(task: String, base: Double, adjusted: Double, unit: String) {
+        self.task = task
+        self.base = base
+        self.adjusted = adjusted
+        self.unit = unit
+    }
+}
+
+public struct CloseLoopSummary: Sendable, Equatable {
+    public var records: [CloseTaskRecord]
+    public var carryovers: [CarryoverItem]
+    public var nextDayAdjustments: [NextDayAdjustment]
+
+    public init(records: [CloseTaskRecord], carryovers: [CarryoverItem], nextDayAdjustments: [NextDayAdjustment]) {
+        self.records = records
+        self.carryovers = carryovers
+        self.nextDayAdjustments = nextDayAdjustments
+    }
+}
+
+public enum PrepLabelStatus: String, Sendable, Equatable {
+    case active
+    case remaining
+    case used
+    case wasted
+}
+
+public struct PrepLabel: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var taskInstanceID: String
+    public var prepTaskID: String
+    public var madeQty: Double
+    public var unit: String
+    public var printedAt: String
+    public var expireAt: String
+    public var qrToken: String
+    public var status: PrepLabelStatus
+    public var remainingQty: Double?
+    public var storageUnitID: String?
+
+    public init(
+        id: String,
+        taskInstanceID: String,
+        prepTaskID: String,
+        madeQty: Double,
+        unit: String,
+        printedAt: String,
+        expireAt: String,
+        qrToken: String,
+        status: PrepLabelStatus = .active,
+        remainingQty: Double? = nil,
+        storageUnitID: String? = nil
+    ) {
+        self.id = id
+        self.taskInstanceID = taskInstanceID
+        self.prepTaskID = prepTaskID
+        self.madeQty = madeQty
+        self.unit = unit
+        self.printedAt = printedAt
+        self.expireAt = expireAt
+        self.qrToken = qrToken
+        self.status = status
+        self.remainingQty = remainingQty
+        self.storageUnitID = storageUnitID
+    }
+}
+
+public enum LarderStatus: String, Sendable, Equatable {
+    case available
+    case used
+    case wasted
+    case expired
+}
+
+public struct PrepLarderItem: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var labelID: String
+    public var prepTaskID: String
+    public var qty: Double
+    public var unit: String
+    public var expireAt: String
+    public var status: LarderStatus
+
+    public init(id: String, labelID: String, prepTaskID: String, qty: Double, unit: String, expireAt: String, status: LarderStatus) {
+        self.id = id
+        self.labelID = labelID
+        self.prepTaskID = prepTaskID
+        self.qty = qty
+        self.unit = unit
+        self.expireAt = expireAt
+        self.status = status
+    }
+}
+
+public enum LabelScanAction: Sendable, Equatable {
+    case remaining(qty: Double)
+    case used
+    case wasted(qty: Double, reason: WasteReason)
+}
+
+public struct LabelScanResult: Sendable, Equatable {
+    public var label: PrepLabel
+    public var larderItem: PrepLarderItem?
+    public var wasteRecord: CloseTaskRecord?
+
+    public init(label: PrepLabel, larderItem: PrepLarderItem?, wasteRecord: CloseTaskRecord?) {
+        self.label = label
+        self.larderItem = larderItem
+        self.wasteRecord = wasteRecord
+    }
+}
+
 public struct CoeffSuggestion: Sendable, Equatable {
     public var taskId: String
     public var current: Double
@@ -336,5 +566,280 @@ public struct CoeffSuggestion: Sendable, Equatable {
         self.current = current
         self.suggested = suggested
         self.samplesUsed = samplesUsed
+    }
+}
+
+public struct PrepEvent: Codable, Sendable, Equatable, Identifiable {
+    public var id: String
+    public var tenantID: String
+    public var type: String
+    public var payload: [String: String]
+    public var occurredAt: String
+    public var actor: String?
+
+    public init(id: String, tenantID: String, type: String, payload: [String: String] = [:], occurredAt: String, actor: String? = nil) {
+        self.id = id
+        self.tenantID = tenantID
+        self.type = type
+        self.payload = payload
+        self.occurredAt = occurredAt
+        self.actor = actor
+    }
+}
+
+public struct ServicePeriod: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var label: String
+    public var t0: String
+    public var servicePeriod: String
+
+    public init(id: String, label: String, t0: String, servicePeriod: String) {
+        self.id = id
+        self.label = label
+        self.t0 = t0
+        self.servicePeriod = servicePeriod
+    }
+}
+
+public struct ReservationSnapshot: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var covers: Int
+    public var course: String
+    public var status: String
+
+    public init(id: String, covers: Int, course: String, status: String = "confirmed") {
+        self.id = id
+        self.covers = covers
+        self.course = course
+        self.status = status
+    }
+}
+
+public enum ConnectorProvider: String, Sendable, Equatable {
+    case tablecheck
+    case toreta
+}
+
+public struct SourceReservationEvent: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var provider: ConnectorProvider
+    public var externalID: String
+    public var visitTime: String
+    public var covers: Int
+    public var course: String
+    public var partyName: String
+    public var status: String
+    public var allergyNote: String?
+    public var vipRank: String?
+
+    public init(
+        id: String,
+        provider: ConnectorProvider,
+        externalID: String,
+        visitTime: String,
+        covers: Int,
+        course: String,
+        partyName: String,
+        status: String = "confirmed",
+        allergyNote: String? = nil,
+        vipRank: String? = nil
+    ) {
+        self.id = id
+        self.provider = provider
+        self.externalID = externalID
+        self.visitTime = visitTime
+        self.covers = covers
+        self.course = course
+        self.partyName = partyName
+        self.status = status
+        self.allergyNote = allergyNote
+        self.vipRank = vipRank
+    }
+}
+
+public struct NormalizedReservation: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var source: String
+    public var externalID: String
+    public var visitTime: String
+    public var covers: Int
+    public var course: String
+    public var partyName: String
+    public var status: String
+    public var prepNote: String?
+
+    public init(
+        id: String,
+        source: String,
+        externalID: String,
+        visitTime: String,
+        covers: Int,
+        course: String,
+        partyName: String,
+        status: String,
+        prepNote: String? = nil
+    ) {
+        self.id = id
+        self.source = source
+        self.externalID = externalID
+        self.visitTime = visitTime
+        self.covers = covers
+        self.course = course
+        self.partyName = partyName
+        self.status = status
+        self.prepNote = prepNote
+    }
+}
+
+public enum DirectBookingStatus: String, Sendable, Equatable {
+    case request
+    case confirmed
+    case cancelled
+    case noshow
+}
+
+public struct DirectBooking: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var visitTime: String
+    public var covers: Int
+    public var course: String
+    public var guestName: String
+    public var guestNote: String?
+    public var status: DirectBookingStatus
+    public var stripeCheckoutID: String?
+
+    public init(
+        id: String,
+        visitTime: String,
+        covers: Int,
+        course: String,
+        guestName: String,
+        guestNote: String? = nil,
+        status: DirectBookingStatus = .request,
+        stripeCheckoutID: String? = nil
+    ) {
+        self.id = id
+        self.visitTime = visitTime
+        self.covers = covers
+        self.course = course
+        self.guestName = guestName
+        self.guestNote = guestNote
+        self.status = status
+        self.stripeCheckoutID = stripeCheckoutID
+    }
+}
+
+public struct DirectBookingCheckout: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var bookingID: String
+    public var checkoutID: String?
+    public var status: DirectBookingStatus
+    public var depositRequired: Bool
+
+    public init(
+        id: String,
+        bookingID: String,
+        checkoutID: String? = nil,
+        status: DirectBookingStatus,
+        depositRequired: Bool
+    ) {
+        self.id = id
+        self.bookingID = bookingID
+        self.checkoutID = checkoutID
+        self.status = status
+        self.depositRequired = depositRequired
+    }
+}
+
+public struct ReservationDiffSummary: Sendable, Equatable {
+    public var addedCovers: Int
+    public var cancelledCovers: Int
+    public var changedReservationIDs: [String]
+
+    public init(addedCovers: Int, cancelledCovers: Int, changedReservationIDs: [String]) {
+        self.addedCovers = addedCovers
+        self.cancelledCovers = cancelledCovers
+        self.changedReservationIDs = changedReservationIDs
+    }
+}
+
+public enum ServiceEventSource: String, Sendable, Equatable {
+    case prepflow
+    case pos
+    case kds
+    case manual
+}
+
+public enum ServiceEventKind: String, Sendable, Equatable {
+    case fire
+    case hold
+    case served
+    case remainingSync = "remaining_sync"
+}
+
+public struct ServiceSyncEvent: Sendable, Equatable, Identifiable {
+    public var id: String
+    public var source: ServiceEventSource
+    public var kind: ServiceEventKind
+    public var covers: Int
+    public var reservationID: String?
+    public var occurredAt: String
+    public var offlineSequence: Int?
+
+    public init(
+        id: String,
+        source: ServiceEventSource,
+        kind: ServiceEventKind,
+        covers: Int,
+        reservationID: String? = nil,
+        occurredAt: String,
+        offlineSequence: Int? = nil
+    ) {
+        self.id = id
+        self.source = source
+        self.kind = kind
+        self.covers = covers
+        self.reservationID = reservationID
+        self.occurredAt = occurredAt
+        self.offlineSequence = offlineSequence
+    }
+}
+
+public struct ServiceSyncState: Sendable, Equatable {
+    public var firedCovers: Int
+    public var heldCovers: Int
+    public var servedCovers: Int
+    public var remainingCovers: Int
+    public var pendingOfflineEvents: Int
+    public var pacing: PacingProposal
+
+    public init(
+        firedCovers: Int,
+        heldCovers: Int,
+        servedCovers: Int,
+        remainingCovers: Int,
+        pendingOfflineEvents: Int,
+        pacing: PacingProposal
+    ) {
+        self.firedCovers = firedCovers
+        self.heldCovers = heldCovers
+        self.servedCovers = servedCovers
+        self.remainingCovers = remainingCovers
+        self.pendingOfflineEvents = pendingOfflineEvents
+        self.pacing = pacing
+    }
+}
+
+public struct PacingProposal: Sendable, Equatable {
+    public var expectedServed: Int
+    public var actualServed: Int
+    public var delta: Int
+    public var recommendation: String
+
+    public init(expectedServed: Int, actualServed: Int, delta: Int, recommendation: String) {
+        self.expectedServed = expectedServed
+        self.actualServed = actualServed
+        self.delta = delta
+        self.recommendation = recommendation
     }
 }

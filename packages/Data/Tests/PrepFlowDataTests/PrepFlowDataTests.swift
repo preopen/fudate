@@ -15,6 +15,35 @@ final class PrepFlowDataTests: XCTestCase {
         }
     }
 
+    func testLocalForwardSliceTablesExposeTenantAuditAndSoftDeleteColumns() throws {
+        let database = try PrepFlowDatabase()
+        let requiredColumns: Set = ["id", "tenant_id", "created_at", "updated_at", "deleted_at"]
+        let forwardTables = [
+            "service_period",
+            "carryover",
+            "temp_log",
+            "label",
+            "larder_item",
+            "connector_account",
+            "source_event",
+            "direct_booking",
+            "waitlist_entry",
+            "special_prep",
+            "allergen_label",
+            "guest_message",
+            "pass_seat_flag",
+            "service_event",
+            "dayrail_item",
+            "subrecipe_aggregate",
+            "subrecipe_reference",
+        ]
+
+        for table in forwardTables {
+            let columns = try database.tableColumns(named: table)
+            XCTAssertTrue(requiredColumns.isSubset(of: columns), "\(table) missing required columns")
+        }
+    }
+
     func testCrudAndTenantScopedReadsForP0Graph() throws {
         let database = try PrepFlowDatabase()
         try seedGraph(tenantID: tenantA, suffix: "a", database: database)

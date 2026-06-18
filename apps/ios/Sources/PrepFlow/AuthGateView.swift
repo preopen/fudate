@@ -1,11 +1,11 @@
 // 正本: design/p0-wireframe-onboarding-liquidglass.png
 // 正本: design/p1-wireframe-settings-home-liquidglass.png
 import DesignTokens
+import PrepFlowData
 import SwiftUI
 
 struct AuthenticatedRootView: View {
     @StateObject private var authStore: AuthStore
-    @State private var screen: AuthenticatedScreen = .board
 
     init(authStore: AuthStore = AuthStore()) {
         _authStore = StateObject(wrappedValue: authStore)
@@ -13,27 +13,11 @@ struct AuthenticatedRootView: View {
 
     var body: some View {
         if let session = authStore.session {
-            switch screen {
-            case .board:
-                PrepFlowBoardView(
-                    initialMode: .now,
-                    store: BoardStore(database: authStore.database, tenantID: session.tenantID),
-                    openSettings: {
-                        screen = .settings
-                    }
-                )
-            case .settings:
-                SettingsHomeView(
-                    session: session,
-                    backToBoard: {
-                        screen = .board
-                    },
-                    signOut: {
-                        authStore.signOut()
-                        screen = .board
-                    }
-                )
-            }
+            AuthenticatedSessionView(
+                session: session,
+                database: authStore.database,
+                signOut: authStore.signOut
+            )
         } else {
             AuthGateView(store: authStore)
         }
@@ -41,8 +25,91 @@ struct AuthenticatedRootView: View {
 }
 
 private enum AuthenticatedScreen {
+    case activation
+    case serviceSetup
     case board
+    case catalog
+    case simulation
     case settings
+}
+
+// 正本: design/flow-vertical-slice.png
+private struct AuthenticatedSessionView: View {
+    let session: AuthSession
+    let signOut: () -> Void
+
+    @StateObject private var store: BoardStore
+    @State private var screen: AuthenticatedScreen = .activation
+
+    init(session: AuthSession, database: PrepFlowDatabase?, signOut: @escaping () -> Void) {
+        self.session = session
+        self.signOut = signOut
+        _store = StateObject(wrappedValue: BoardStore(database: database, tenantID: session.tenantID))
+    }
+
+    var body: some View {
+        switch screen {
+        case .activation:
+            ActivationSummaryView(
+                store: store,
+                adjustNumbers: {
+                    screen = .simulation
+                },
+                startFirstBoard: {
+                    screen = .serviceSetup
+                }
+            )
+        case .serviceSetup:
+            ServiceSetupView(
+                store: store,
+                generateBoard: {
+                    screen = .board
+                }
+            )
+        case .board:
+            PrepFlowBoardView(
+                initialMode: .now,
+                store: store,
+                openSettings: {
+                    screen = .settings
+                }
+            )
+        case .catalog:
+            CatalogEditorView(
+                store: store,
+                previewBoard: {
+                    screen = .board
+                }
+            )
+        case .simulation:
+            SimulationView(
+                store: store,
+                openBoard: {
+                    screen = .board
+                },
+                adjustNumbers: {
+                    store.applySimulationAdjustment()
+                }
+            )
+        case .settings:
+            SettingsHomeView(
+                session: session,
+                backToBoard: {
+                    screen = .board
+                },
+                signOut: signOut,
+                openServiceSetup: {
+                    screen = .serviceSetup
+                },
+                openCatalog: {
+                    screen = .catalog
+                },
+                openSimulation: {
+                    screen = .simulation
+                }
+            )
+        }
+    }
 }
 
 // 正本: design/p0-wireframe-onboarding-liquidglass.png

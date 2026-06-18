@@ -37,24 +37,32 @@ public final class PrepFlowDatabase: @unchecked Sendable {
     }
 
     public func create(_ table: P0Table, values: [String: String?]) throws {
+        try create(named: table.rawValue, values: values)
+    }
+
+    public func create(named tableName: String, values: [String: String?]) throws {
         try dbQueue.write { db in
             let keys = values.keys.sorted()
             let placeholders = Array(repeating: "?", count: keys.count).joined(separator: ", ")
             let columns = keys.joined(separator: ", ")
             let arguments = StatementArguments(keys.map { values[$0] ?? nil })
             try db.execute(
-                sql: "insert into \(table.rawValue) (\(columns)) values (\(placeholders))",
+                sql: "insert into \(tableName) (\(columns)) values (\(placeholders))",
                 arguments: arguments
             )
         }
     }
 
     public func update(_ table: P0Table, id: String, tenantID: String, values: [String: String?]) throws {
+        try update(named: table.rawValue, id: id, tenantID: tenantID, values: values)
+    }
+
+    public func update(named tableName: String, id: String, tenantID: String, values: [String: String?]) throws {
         try dbQueue.write { db in
             let keys = values.keys.sorted()
             let assignments = keys.map { "\($0) = ?" }.joined(separator: ", ")
             try db.execute(
-                sql: "update \(table.rawValue) set \(assignments), updated_at = ? where id = ? and tenant_id = ?",
+                sql: "update \(tableName) set \(assignments), updated_at = ? where id = ? and tenant_id = ?",
                 arguments: StatementArguments(keys.map { values[$0] ?? nil } + [Self.now, id, tenantID])
             )
         }
@@ -70,11 +78,15 @@ public final class PrepFlowDatabase: @unchecked Sendable {
     }
 
     public func rows(_ table: P0Table, tenantID: String, includeDeleted: Bool = false) throws -> [DataRow] {
+        try rows(named: table.rawValue, tenantID: tenantID, includeDeleted: includeDeleted)
+    }
+
+    public func rows(named tableName: String, tenantID: String, includeDeleted: Bool = false) throws -> [DataRow] {
         try dbQueue.read { db in
             let deletedClause = includeDeleted ? "" : " and deleted_at is null"
             let rows = try Row.fetchAll(
                 db,
-                sql: "select * from \(table.rawValue) where tenant_id = ?\(deletedClause) order by id",
+                sql: "select * from \(tableName) where tenant_id = ?\(deletedClause) order by id",
                 arguments: [tenantID]
             )
             return rows.map(Self.dataRow)
@@ -82,8 +94,12 @@ public final class PrepFlowDatabase: @unchecked Sendable {
     }
 
     public func tableColumns(_ table: P0Table) throws -> Set<String> {
+        try tableColumns(named: table.rawValue)
+    }
+
+    public func tableColumns(named tableName: String) throws -> Set<String> {
         try dbQueue.read { db in
-            let rows = try Row.fetchAll(db, sql: "pragma table_info(\(table.rawValue))")
+            let rows = try Row.fetchAll(db, sql: "pragma table_info(\(tableName))")
             return Set(rows.map { row in row["name"] as String })
         }
     }
@@ -91,6 +107,9 @@ public final class PrepFlowDatabase: @unchecked Sendable {
     private func migrate() throws {
         var migrator = DatabaseMigrator()
         migrator.registerMigration("ws3-p0-schema") { db in
+            try Self.createSchema(db)
+        }
+        migrator.registerMigration("forward-slice-schema-refresh") { db in
             try Self.createSchema(db)
         }
         try migrator.migrate(dbQueue)

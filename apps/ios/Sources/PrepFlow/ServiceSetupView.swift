@@ -5,9 +5,11 @@ import SwiftUI
 
 struct ServiceSetupView: View {
     @StateObject private var store: BoardStore
+    private let generateBoard: (() -> Void)?
 
-    init(store: BoardStore = BoardStore()) {
+    init(store: BoardStore = BoardStore(), generateBoard: (() -> Void)? = nil) {
         _store = StateObject(wrappedValue: store)
+        self.generateBoard = generateBoard
     }
 
     var body: some View {
@@ -15,9 +17,12 @@ struct ServiceSetupView: View {
             PrepFlowColor.g5.ignoresSafeArea()
 
             HStack(spacing: PrepFlowSpacing.none) {
-                ReservationList(service: store.service)
-                ServiceCoversPanel(store: store)
-                    .frame(width: PrepFlowMetric.railWidth)
+                ReservationList(store: store)
+                ServiceCoversPanel(store: store) {
+                    store.generateBoardFromService()
+                    generateBoard?()
+                }
+                .frame(width: PrepFlowMetric.railWidth)
             }
             .padding(.top, PrepFlowMetric.topInset + PrepFlowMetric.topBarHeight)
 
@@ -199,7 +204,7 @@ private struct MethodChip: View {
 
 // 正本: design/p0-wireframe-service-setup-liquidglass.png
 private struct ReservationList: View {
-    let service: ServiceDaySettings
+    @ObservedObject var store: BoardStore
 
     var body: some View {
         ScrollView {
@@ -210,12 +215,16 @@ private struct ReservationList: View {
                     .font(PrepFlowFont.railMeta)
                     .foregroundStyle(PrepFlowColor.g2)
 
-                ForEach(service.reservations) { reservation in
-                    ReservationRow(reservation: reservation)
+                ForEach(store.service.reservations) { reservation in
+                    ReservationRow(reservation: reservation) {
+                        store.editReservation(reservation.id)
+                    }
                 }
 
-                Button("＋ 予約を手入力で追加") {}
-                    .buttonStyle(ServiceDashedButtonStyle())
+                Button("＋ 予約を手入力で追加") {
+                    store.addManualReservation()
+                }
+                .buttonStyle(ServiceDashedButtonStyle())
 
                 HStack(spacing: PrepFlowSpacing.sm) {
                     Image(systemName: "envelope")
@@ -241,6 +250,7 @@ private struct ReservationList: View {
 // 正本: design/p0-wireframe-service-setup-liquidglass.png
 private struct ReservationRow: View {
     let reservation: ManualReservation
+    let edit: () -> Void
 
     var body: some View {
         HStack(spacing: PrepFlowSpacing.md) {
@@ -259,7 +269,7 @@ private struct ReservationRow: View {
             Text("\(reservation.covers)名")
                 .font(PrepFlowFont.chip)
                 .monospacedDigit()
-            Button("編集") {}
+            Button("編集", action: edit)
                 .buttonStyle(ServiceSmallButtonStyle())
         }
         .padding(PrepFlowSpacing.md)
@@ -275,6 +285,7 @@ private struct ReservationRow: View {
 // 正本: design/p0-wireframe-service-setup-liquidglass.png
 private struct ServiceCoversPanel: View {
     @ObservedObject var store: BoardStore
+    let generateBoard: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: PrepFlowSpacing.md) {
@@ -311,7 +322,7 @@ private struct ServiceCoversPanel: View {
 
             Spacer()
 
-            Button("この内容で当日ボードを生成") {}
+            Button("この内容で当日ボードを生成", action: generateBoard)
                 .buttonStyle(ServicePrimaryButtonStyle())
 
             Text("確定人数＋開店時刻から 数量算出・逆算（FR-03/06）を反映")

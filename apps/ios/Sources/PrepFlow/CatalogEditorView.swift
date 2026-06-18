@@ -6,9 +6,11 @@ import SwiftUI
 
 struct CatalogEditorView: View {
     @StateObject private var store: BoardStore
+    private let previewBoard: (() -> Void)?
 
-    init(store: BoardStore = BoardStore()) {
+    init(store: BoardStore = BoardStore(), previewBoard: (() -> Void)? = nil) {
         _store = StateObject(wrappedValue: store)
+        self.previewBoard = previewBoard
     }
 
     var body: some View {
@@ -23,8 +25,17 @@ struct CatalogEditorView: View {
             }
             .padding(.top, PrepFlowMetric.topInset)
 
-            CatalogTopBar(courseName: store.catalog.courseName)
-                .padding(PrepFlowSpacing.md)
+            CatalogTopBar(
+                courseName: store.catalog.courseName,
+                previewBoard: {
+                    store.saveCatalogForBoard()
+                    previewBoard?()
+                },
+                save: {
+                    store.saveCatalogForBoard()
+                }
+            )
+            .padding(PrepFlowSpacing.md)
         }
         .foregroundStyle(PrepFlowColor.ink)
     }
@@ -33,6 +44,8 @@ struct CatalogEditorView: View {
 // 正本: design/p1-wireframe-template-editor-liquidglass.png
 private struct CatalogTopBar: View {
     let courseName: String
+    let previewBoard: () -> Void
+    let save: () -> Void
 
     var body: some View {
         GlassEffectContainer {
@@ -43,9 +56,9 @@ private struct CatalogTopBar: View {
                 Text(courseName)
                     .font(PrepFlowFont.topTitle)
                 Spacer()
-                Button("当日ボードでプレビュー") {}
+                Button("当日ボードでプレビュー", action: previewBoard)
                     .buttonStyle(GlassButtonStyle())
-                Button("保存") {}
+                Button("保存", action: save)
                     .buttonStyle(PrimaryButtonStyle())
             }
             .padding(.horizontal, PrepFlowSpacing.lg)

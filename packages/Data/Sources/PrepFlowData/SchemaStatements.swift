@@ -248,6 +248,260 @@ extension PrepFlowDatabase {
           deleted_at text
         )
         """,
+        """
+        create table if not exists service_period (
+          id text primary key,
+          tenant_id text not null,
+          restaurant_id text not null references restaurant(id),
+          label text not null,
+          service_period text not null check (service_period in ('lunch', 'dinner', 'part1', 'part2')),
+          open_time text not null,
+          sort integer not null default 0,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists carryover (
+          id text primary key,
+          tenant_id text not null,
+          from_service_day_id text not null references service_day(id),
+          to_service_day_id text references service_day(id),
+          prep_task_id text not null references prep_task(id),
+          qty real not null,
+          unit text not null,
+          expire_at text,
+          status text not null check (status in ('available', 'used', 'wasted', 'expired')),
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists temp_log (
+          id text primary key,
+          tenant_id text not null,
+          storage_unit_id text,
+          kind text not null check (kind in ('fridge', 'heating')),
+          value real not null,
+          logged_at text not null,
+          by_account_id text,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists label (
+          id text primary key,
+          tenant_id text not null,
+          task_instance_id text not null references task_instance(id),
+          printed_at text,
+          made_qty real not null,
+          expire_at text,
+          qr_token text not null,
+          status text not null check (status in ('active', 'remaining', 'used', 'wasted')),
+          remaining_qty real,
+          storage_unit_id text,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists larder_item (
+          id text primary key,
+          tenant_id text not null,
+          label_id text references label(id),
+          prep_task_id text not null references prep_task(id),
+          qty real not null,
+          unit text not null,
+          expire_at text,
+          status text not null check (status in ('available', 'used', 'wasted', 'expired')),
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists connector_account (
+          id text primary key,
+          tenant_id text not null,
+          provider text not null check (provider in ('tablecheck', 'toreta', 'pos', 'kds')),
+          status text not null check (status in ('mock', 'pending', 'connected', 'disabled')),
+          external_account_id text,
+          last_sync_at text,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists source_event (
+          id text primary key,
+          tenant_id text not null,
+          connector_account_id text references connector_account(id),
+          source text not null,
+          external_id text,
+          type text not null,
+          payload text not null default '{}',
+          occurred_at text not null,
+          processed_at text,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists direct_booking (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text references service_day(id),
+          status text not null check (status in ('request', 'confirmed', 'cancelled', 'noshow')),
+          visit_time text not null,
+          covers integer not null,
+          course_text text,
+          guest_note text,
+          stripe_checkout_id text,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists waitlist_entry (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text references service_day(id),
+          direct_booking_id text references direct_booking(id),
+          visit_time text not null,
+          covers integer not null,
+          guest_name text not null,
+          status text not null check (status in ('waiting', 'offered', 'confirmed', 'expired')),
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists special_prep (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text not null references service_day(id),
+          reservation_id text,
+          title text not null,
+          note text,
+          status text not null check (status in ('not_started', 'in_progress', 'done')),
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists allergen_label (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text not null references service_day(id),
+          reservation_id text,
+          seat_ref text not null,
+          display_text text not null,
+          language text not null default 'ja',
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists guest_message (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text not null references service_day(id),
+          reservation_id text,
+          channel text not null,
+          language text not null default 'ja',
+          body text not null,
+          status text not null check (status in ('draft', 'queued', 'sent', 'failed')),
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists pass_seat_flag (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text not null references service_day(id),
+          reservation_id text,
+          seat_ref text not null,
+          kind text not null check (kind in ('allergy', 'vip', 'special')),
+          display_text text not null,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists service_event (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text not null references service_day(id),
+          type text not null,
+          payload text not null default '{}',
+          occurred_at text not null,
+          source text not null check (source in ('prepflow', 'pos', 'kds', 'manual')),
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists dayrail_item (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text not null references service_day(id),
+          kind text not null check (kind in ('prep', 'service', 'close')),
+          ref_id text not null,
+          title text not null,
+          prep_day_offset integer not null default 0,
+          start_at text not null,
+          finish_at text not null,
+          status text not null check (status in ('not_started', 'in_progress', 'done')),
+          sort integer not null default 0,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists subrecipe_aggregate (
+          id text primary key,
+          tenant_id text not null,
+          service_day_id text not null references service_day(id),
+          prep_task_id text not null references prep_task(id),
+          total_covers integer not null,
+          total_qty real not null,
+          unit text not null,
+          sources text not null default '[]',
+          status text not null check (status in ('not_started', 'in_progress', 'done')),
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists subrecipe_reference (
+          id text primary key,
+          tenant_id text not null,
+          aggregate_id text not null references subrecipe_aggregate(id),
+          course_key text not null,
+          covers integer not null,
+          rollup_status text not null check (rollup_status in ('not_started', 'in_progress', 'done')),
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
         "create index if not exists restaurant_tenant_idx on restaurant(tenant_id)",
         "create index if not exists owner_account_tenant_idx on owner_account(tenant_id)",
         "create index if not exists section_tenant_idx on section(tenant_id)",
@@ -269,5 +523,23 @@ extension PrepFlowDatabase {
         "create index if not exists event_log_tenant_idx on event_log(tenant_id)",
         "create index if not exists reservation_tenant_idx on reservation(tenant_id)",
         "create index if not exists reservation_service_visit_idx on reservation(service_day_id, visit_time)",
+        "create index if not exists service_period_tenant_idx on service_period(tenant_id)",
+        "create index if not exists carryover_tenant_idx on carryover(tenant_id)",
+        "create index if not exists temp_log_tenant_idx on temp_log(tenant_id)",
+        "create index if not exists label_tenant_idx on label(tenant_id)",
+        "create index if not exists larder_item_tenant_idx on larder_item(tenant_id)",
+        "create index if not exists connector_account_tenant_idx on connector_account(tenant_id)",
+        "create index if not exists source_event_tenant_idx on source_event(tenant_id)",
+        "create index if not exists direct_booking_tenant_idx on direct_booking(tenant_id)",
+        "create index if not exists waitlist_entry_tenant_idx on waitlist_entry(tenant_id)",
+        "create index if not exists special_prep_tenant_idx on special_prep(tenant_id)",
+        "create index if not exists allergen_label_tenant_idx on allergen_label(tenant_id)",
+        "create index if not exists guest_message_tenant_idx on guest_message(tenant_id)",
+        "create index if not exists pass_seat_flag_tenant_idx on pass_seat_flag(tenant_id)",
+        "create index if not exists service_event_tenant_idx on service_event(tenant_id)",
+        "create index if not exists dayrail_item_tenant_idx on dayrail_item(tenant_id)",
+        "create index if not exists dayrail_item_service_sort_idx on dayrail_item(service_day_id, sort)",
+        "create index if not exists subrecipe_aggregate_tenant_idx on subrecipe_aggregate(tenant_id)",
+        "create index if not exists subrecipe_reference_tenant_idx on subrecipe_reference(tenant_id)",
     ]
 }
