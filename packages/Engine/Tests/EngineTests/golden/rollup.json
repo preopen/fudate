@@ -1,0 +1,29 @@
+{
+  "function": "rollup",
+  "fr": ["FR-05"],
+  "semantics": "子（サブ仕込み）が全完了 → 構成要素が完了 → 皿が完了、と上位へ伝播。1つでも未完なら親は in_progress（着手済の子があるとき）または not_started。",
+  "cases": [
+    {
+      "name": "all_children_done_parent_done",
+      "input": {
+        "tree": { "id": "dish_omakase", "children": [
+          { "id": "shari", "children": [ { "id": "rice", "status": "done" } ] },
+          { "id": "nikiri", "children": [ { "id": "nikiri_make", "status": "done" } ] },
+          { "id": "neta", "children": [ { "id": "neta_prep", "status": "done" } ] }
+        ] }
+      },
+      "expect": { "dish_omakase": "done", "shari": "done", "nikiri": "done", "neta": "done" }
+    },
+    {
+      "name": "partial_in_progress",
+      "input": {
+        "tree": { "id": "dish_omakase", "children": [
+          { "id": "shari", "children": [ { "id": "rice", "status": "done" } ] },
+          { "id": "nikiri", "children": [ { "id": "nikiri_make", "status": "in_progress" } ] },
+          { "id": "neta", "children": [ { "id": "neta_prep", "status": "not_started" } ] }
+        ] }
+      },
+      "expect": { "dish_omakase": "in_progress", "shari": "done", "nikiri": "in_progress", "neta": "not_started" }
+    }
+  ]
+}

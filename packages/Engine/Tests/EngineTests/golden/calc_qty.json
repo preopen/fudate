@@ -1,0 +1,49 @@
+{
+  "function": "calcQty",
+  "fr": ["FR-03", "FR-37"],
+  "semantics": "per_cover: total = round_nearest(covers * coeff_per_cover / yield, round_step). per_portion: total = covers * coeff_per_portion (no rounding). fixed_batch: batches = ceil(covers / covers_per_batch); total = batches * batch_size.",
+  "rounding": "round_nearest(x, step) rounds to the nearest multiple of step; exact .5 ties round up.",
+  "cases": [
+    {
+      "name": "nikiri_per_cover_14",
+      "note": "煮切り 14名 → 200ml（boardの表示と一致）",
+      "input": { "scale_mode": "per_cover", "coeff_per_cover": 14.0, "yield": 1.0, "round_step": 10, "unit": "ml", "covers": 14 },
+      "expect": { "raw": 196.0, "total": 200, "unit": "ml" }
+    },
+    {
+      "name": "nikiri_per_cover_24",
+      "input": { "scale_mode": "per_cover", "coeff_per_cover": 14.0, "yield": 1.0, "round_step": 10, "unit": "ml", "covers": 24 },
+      "expect": { "raw": 336.0, "total": 340, "unit": "ml" }
+    },
+    {
+      "name": "yield_path_generic",
+      "note": "歩留りを効かせる経路の検証",
+      "input": { "scale_mode": "per_cover", "coeff_per_cover": 10.0, "yield": 0.8, "round_step": 5, "unit": "ml", "covers": 10 },
+      "expect": { "raw": 125.0, "total": 125, "unit": "ml" }
+    },
+    {
+      "name": "shari_fixed_batch_14",
+      "note": "シャリ 14名 → 2.0升（1.0升で7名分・端数切上げ）",
+      "input": { "scale_mode": "fixed_batch", "covers_per_batch": 7, "batch_size": 1.0, "unit": "升", "covers": 14 },
+      "expect": { "batches": 2, "total": 2.0, "unit": "升" }
+    },
+    {
+      "name": "neta_per_portion_14",
+      "note": "ネタ 14名 → 14貫（1貫/人・丸めなし）",
+      "input": { "scale_mode": "per_portion", "coeff_per_portion": 1.0, "unit": "貫", "covers": 14 },
+      "expect": { "total": 14, "unit": "貫" }
+    },
+    {
+      "name": "dashi_fixed_batch_14",
+      "note": "一番だし 14名 → 5.0L（2.5Lで7名分）",
+      "input": { "scale_mode": "fixed_batch", "covers_per_batch": 7, "batch_size": 2.5, "unit": "L", "covers": 14 },
+      "expect": { "batches": 2, "total": 5.0, "unit": "L" }
+    },
+    {
+      "name": "dashi_fixed_batch_15_ceil_boundary",
+      "note": "端数切上げ境界：15名 → 3バッチ → 7.5L",
+      "input": { "scale_mode": "fixed_batch", "covers_per_batch": 7, "batch_size": 2.5, "unit": "L", "covers": 15 },
+      "expect": { "batches": 3, "total": 7.5, "unit": "L" }
+    }
+  ]
+}

@@ -133,7 +133,7 @@ ModeLabel・ModeHACCP・ConnectorTableCheck・Direct・ServiceSync
 |---|---|---|
 | D1 | プラットフォーム/デザイン | ✅ **確定：iOS専用ネイティブ＋Apple Liquid Glass**（iPad中心）。規律は§A-12 |
 | D1a | 実装方式 | ✅ **確定：SwiftUIネイティブ**（iPadのプラットフォーム機能＝Pencil/Stage Manager/トラックパッドhover/⌘/D&D と最高忠実度のLiquid Glassを設計の前提にするため）。`Engine`はSwift、Web版ロジックは別（goldenベクタで整合検証） |
-| D2 | 同期エンジン（**唯一のGOゲート・WS2**） | スパイク順：① **PowerSync（Swift SDK）＋Supabase Postgres** → ② **GRDB＋自作同期** → ③ SwiftData実験。**合格基準**：2台のチェックオフ相互反映＜2秒／機内モード30分→復帰で無損失マージ／完了は冪等・数値はLWW＋履歴保持／2世代前のiPadで体感即時（NFR-03）。ネイティブSQLiteなのでブラウザ退避リスクは無し＝焦点は競合解決と性能 |
+| D2 | 同期エンジン（**WS2 GOゲート合格**） | **採用：GRDB＋自作同期（P0）**。PowerSync Swift SDK＋Supabaseは技術適合（Swift SDKはネイティブ実装・ローカルSQLite・Supabase連携）だが、実検証にSupabase/PowerSyncプロジェクト・Sync Streams・資格情報が必要なためP0 GO判定では保留。`packages/SyncSpike`でGRDB自作同期を検証し、2端末相当チェックオフ反映＜2秒／30分offline復帰でoutbox無損失／完了は冪等／数値はLWW＋履歴保持／offline中の当日ボード操作はlocal SQLite即時、をgreen確認。WS3以降はこの方式で進め、資格情報が揃った時点でPowerSync再評価は可能。 |
 
 > 残る決定はゼロ。**WS0/WS1 即着手可。GOゲートは WS2（D2スパイク）のみ。**
 
