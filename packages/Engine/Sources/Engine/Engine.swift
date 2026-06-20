@@ -49,6 +49,38 @@ public func diffPlan(task: PrepTask, currentCovers: Int?, madeTotal: Double?, ch
     }
 }
 
+public func reservationImpactPlan(
+    task: PrepTask,
+    previousCovers: Int,
+    madeTotal: Double?,
+    diff: ReservationDiffSummary
+) -> PlanDiff {
+    var added: [AddItem] = []
+    var reduced: [ReduceItem] = []
+
+    if diff.addedCovers > 0 {
+        let increase = diffPlan(
+            task: task,
+            currentCovers: previousCovers,
+            madeTotal: madeTotal,
+            change: .reservationAdded(deltaCovers: diff.addedCovers, course: "")
+        )
+        added.append(contentsOf: increase.added)
+    }
+
+    if diff.cancelledCovers > 0 {
+        let cancellation = diffPlan(
+            task: task,
+            currentCovers: previousCovers,
+            madeTotal: madeTotal,
+            change: .reservationCancelled(deltaCovers: -diff.cancelledCovers, course: "")
+        )
+        reduced.append(contentsOf: cancellation.reduced)
+    }
+
+    return PlanDiff(added: added, reduced: reduced)
+}
+
 public func schedule(task: PrepTask, serviceDate: String, t0: String, closedDates: Set<String>) -> Scheduled {
     let t0Minutes = minutes(fromHHMM: t0)
     var absoluteStart = t0Minutes - task.leadMinBeforeOpen
@@ -222,6 +254,18 @@ public func closeLoop(records: [CloseTaskRecord], nextDayPlan: [(task: String, b
         NextDayAdjustment(task: base.task, base: base.base, adjusted: adjusted.adjusted, unit: adjusted.unit)
     }
     return CloseLoopSummary(records: records, carryovers: carryovers, nextDayAdjustments: adjustments)
+}
+
+public func learningWasteRecords(records: [CloseTaskRecord], serviceDate: String, covers: Int) -> [WasteRecord] {
+    records.map {
+        WasteRecord(
+            serviceDate: serviceDate,
+            covers: covers,
+            made: $0.madeQty,
+            leftover: $0.leftoverQty,
+            exclude: $0.wasteReason != .overmade
+        )
+    }
 }
 
 public func issuePrepLabel(
@@ -424,6 +468,39 @@ public func evaluateDirectBooking(_ booking: DirectBooking, allotment: DirectAll
     )
 }
 
+public func promoteDirectWaitlist(_ booking: DirectBooking, allotment: DirectAllotment) -> DirectWaitlistPromotion {
+    let requested = max(0, booking.covers)
+    let remaining = max(0, allotment.allottedCovers - allotment.bookedCovers)
+    guard requested > 0 else {
+        return DirectWaitlistPromotion(
+            id: "promotion-\(booking.id)",
+            directBookingID: booking.id,
+            status: .request,
+            promotedCovers: 0,
+            remainingAllotment: remaining,
+            reason: "empty_request"
+        )
+    }
+    guard requested <= remaining else {
+        return DirectWaitlistPromotion(
+            id: "promotion-\(booking.id)",
+            directBookingID: booking.id,
+            status: .request,
+            promotedCovers: 0,
+            remainingAllotment: remaining,
+            reason: "insufficient_allotment"
+        )
+    }
+    return DirectWaitlistPromotion(
+        id: "promotion-\(booking.id)",
+        directBookingID: booking.id,
+        status: .confirmed,
+        promotedCovers: requested,
+        remainingAllotment: remaining - requested,
+        reason: "promoted"
+    )
+}
+
 public func recordDirectNoShow(_ booking: DirectBooking, forfeitsDeposit: Bool) -> DirectNoShowSettlement {
     DirectNoShowSettlement(
         id: "noshow-\(booking.id)",
@@ -431,6 +508,55 @@ public func recordDirectNoShow(_ booking: DirectBooking, forfeitsDeposit: Bool) 
         status: .noshow,
         forfeitsDeposit: forfeitsDeposit,
         prepImpactCovers: max(0, booking.covers)
+    )
+}
+
+public func fifoLarder(_ items: [PrepLarderItem], nowDate: String, alertWithinDays: Int = 1) -> [LarderAlert] {
+    items
+        .filter { $0.status == .available && $0.qty > 0 }
+        .sorted {
+            if $0.expireAt != $1.expireAt {
+                return $0.expireAt < $1.expireAt
+            }
+            return $0.id < $1.id
+        }
+        .map { item in
+            let level = larderAlertLevel(expireAt: item.expireAt, nowDate: nowDate, alertWithinDays: alertWithinDays)
+            return LarderAlert(
+                id: "larder-alert-\(item.id)",
+                labelID: item.labelID,
+                prepTaskID: item.prepTaskID,
+                qty: item.qty,
+                unit: item.unit,
+                expireAt: item.expireAt,
+                level: level
+            )
+        }
+}
+
+public func planLarderConsumption(_ items: [PrepLarderItem], requiredQty: Double, unit: String, nowDate: String) -> LarderConsumptionPlan {
+    var remaining = max(0, requiredQty)
+    var uses: [LarderUse] = []
+
+    for item in consumableLarderItems(items, nowDate: nowDate) where remaining > 0 {
+        let used = min(item.qty, remaining)
+        uses.append(LarderUse(
+            id: "larder-use-\(item.id)",
+            labelID: item.labelID,
+            prepTaskID: item.prepTaskID,
+            qty: used,
+            unit: item.unit,
+            expireAt: item.expireAt
+        ))
+        remaining -= used
+    }
+
+    return LarderConsumptionPlan(
+        uses: uses,
+        requestedQty: max(0, requiredQty),
+        plannedQty: max(0, requiredQty) - remaining,
+        shortfallQty: remaining,
+        unit: unit
     )
 }
 
@@ -531,6 +657,37 @@ public func serviceSyncState(
     )
 }
 
+public func replayServiceEvents(
+    plannedCovers: Int,
+    events: [ServiceSyncEvent],
+    elapsedMinutes: Int,
+    serviceMinutes: Int
+) -> ServiceReplaySummary {
+    var seen: Set<String> = []
+    var accepted: [ServiceSyncEvent] = []
+    var duplicates: [String] = []
+
+    for event in events {
+        if seen.contains(event.id) {
+            duplicates.append(event.id)
+        } else {
+            seen.insert(event.id)
+            accepted.append(event)
+        }
+    }
+
+    return ServiceReplaySummary(
+        state: serviceSyncState(
+            plannedCovers: plannedCovers,
+            events: accepted,
+            elapsedMinutes: elapsedMinutes,
+            serviceMinutes: serviceMinutes
+        ),
+        acceptedEventIDs: accepted.map(\.id),
+        ignoredDuplicateEventIDs: duplicates
+    )
+}
+
 public func servicePassState(syncState: ServiceSyncState, seatFlags: [PassSeatFlag]) -> ServicePassState {
     ServicePassState(
         firedCovers: syncState.firedCovers,
@@ -552,6 +709,24 @@ public func storeServiceSummary(
         serviceDate: serviceDate,
         remainingCovers: syncState.remainingCovers,
         recommendation: syncState.pacing.recommendation
+    )
+}
+
+public func multistoreServiceSummary(_ summaries: [StoreServiceSummary]) -> StoreServiceSummary {
+    let remaining = summaries.reduce(0) { $0 + $1.remainingCovers }
+    let recommendation = if summaries.contains(where: { $0.recommendation == "fire" }) {
+        "fire"
+    } else if summaries.contains(where: { $0.recommendation == "hold" }) {
+        "hold"
+    } else {
+        "keep"
+    }
+    return StoreServiceSummary(
+        id: "store-summary-all",
+        restaurantName: "全店舗",
+        serviceDate: summaries.map(\.serviceDate).sorted().first ?? "",
+        remainingCovers: remaining,
+        recommendation: recommendation
     )
 }
 
@@ -612,6 +787,33 @@ func mod(_ lhs: Int, _ rhs: Int) -> Int {
 
 func containsCaseInsensitive(_ value: String, _ token: String) -> Bool {
     value.lowercased().contains(token.lowercased())
+}
+
+func larderAlertLevel(expireAt: String, nowDate: String, alertWithinDays: Int) -> String {
+    let expireDate = String(expireAt.prefix(10))
+    if expireDate < nowDate {
+        return "expired"
+    }
+    let warningDate = addDays(to: nowDate, days: max(0, alertWithinDays))
+    if expireDate <= warningDate {
+        return "due"
+    }
+    return "ok"
+}
+
+func consumableLarderItems(_ items: [PrepLarderItem], nowDate: String) -> [PrepLarderItem] {
+    items
+        .filter {
+            $0.status == .available &&
+                $0.qty > 0 &&
+                String($0.expireAt.prefix(10)) >= nowDate
+        }
+        .sorted {
+            if $0.expireAt != $1.expireAt {
+                return $0.expireAt < $1.expireAt
+            }
+            return $0.id < $1.id
+        }
 }
 
 func addDays(to isoDate: String, days: Int) -> String {

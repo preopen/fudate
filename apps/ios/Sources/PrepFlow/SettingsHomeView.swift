@@ -4,11 +4,35 @@ import SwiftUI
 
 struct SettingsHomeView: View {
     let session: AuthSession
+    let authEnvironment: AuthEnvironment
+    @ObservedObject var store: BoardStore
     let backToBoard: () -> Void
     let signOut: () -> Void
     var openServiceSetup: (() -> Void)?
     var openCatalog: (() -> Void)?
     var openSimulation: (() -> Void)?
+
+    @State private var toastMessage = "保存しました（追い仕込み閾値 25%）"
+
+    init(
+        session: AuthSession,
+        authEnvironment: AuthEnvironment = .current,
+        store: BoardStore = BoardStore(database: nil),
+        backToBoard: @escaping () -> Void,
+        signOut: @escaping () -> Void,
+        openServiceSetup: (() -> Void)? = nil,
+        openCatalog: (() -> Void)? = nil,
+        openSimulation: (() -> Void)? = nil
+    ) {
+        self.session = session
+        self.authEnvironment = authEnvironment
+        self.store = store
+        self.backToBoard = backToBoard
+        self.signOut = signOut
+        self.openServiceSetup = openServiceSetup
+        self.openCatalog = openCatalog
+        self.openSimulation = openSimulation
+    }
 
     var body: some View {
         ZStack {
@@ -44,8 +68,8 @@ struct SettingsHomeView: View {
 
                     SettingsCard(title: "プラン・データ", rows: [
                         SettingsRowModel(title: "プラン", value: "P0 Pilot", action: .catalog),
-                        SettingsRowModel(title: "データのエクスポート", value: "CSV / JSON", action: .simulation),
-                        SettingsRowModel(title: "ローカル縮退", value: "SQLite 起動可"),
+                        SettingsRowModel(title: "データのエクスポート", value: store.latestExportSummary, action: .exportData),
+                        SettingsRowModel(title: "ローカル縮退", value: authEnvironment.settingsReadinessLabel),
                     ], perform: perform)
                 }
                 .padding(.horizontal, PrepFlowSpacing.xxl)
@@ -54,9 +78,17 @@ struct SettingsHomeView: View {
             }
 
             VStack(spacing: PrepFlowSpacing.md) {
-                SettingsTopBar(backToBoard: backToBoard, signOut: signOut)
+                SettingsTopBar(
+                    lockLabel: store.settingsLocked ? "設定ロック ON ・ オーナー解除中" : "設定ロック OFF ・ オーナー解除中",
+                    backToBoard: backToBoard,
+                    toggleLock: {
+                        store.toggleSettingsLock()
+                        toastMessage = store.settingsLocked ? "保存しました（設定ロック ON）" : "保存しました（設定ロック OFF）"
+                    },
+                    signOut: signOut
+                )
                 Spacer()
-                SettingsToast()
+                SettingsToast(message: toastMessage)
             }
             .padding(PrepFlowSpacing.md)
         }
@@ -71,6 +103,9 @@ struct SettingsHomeView: View {
             openCatalog?()
         case .simulation:
             openSimulation?()
+        case .exportData:
+            let export = store.exportSnapshotJSON(authReadinessLabel: authEnvironment.settingsReadinessLabel)
+            toastMessage = "JSON出力済み（\(export.count) bytes）"
         case nil:
             break
         }
@@ -81,6 +116,7 @@ private enum SettingsAction: Equatable {
     case serviceSetup
     case catalog
     case simulation
+    case exportData
 }
 
 private struct SettingsRowModel: Equatable {
@@ -92,7 +128,9 @@ private struct SettingsRowModel: Equatable {
 
 // 正本: design/p1-wireframe-settings-home-liquidglass.png
 private struct SettingsTopBar: View {
+    let lockLabel: String
     let backToBoard: () -> Void
+    let toggleLock: () -> Void
     let signOut: () -> Void
 
     var body: some View {
@@ -114,13 +152,14 @@ private struct SettingsTopBar: View {
 
                 Spacer()
 
-                Text("設定ロック ON ・ オーナー解除中")
+                Button(lockLabel, action: toggleLock)
                     .font(PrepFlowFont.countdownLabel)
                     .foregroundStyle(PrepFlowColor.ok)
                     .padding(.horizontal, PrepFlowSpacing.sm)
                     .padding(.vertical, PrepFlowSpacing.xs)
                     .background(PrepFlowColor.ok.opacity(PrepFlowOpacity.selection))
                     .clipShape(Capsule(style: .continuous))
+                    .buttonStyle(.plain)
 
                 Button("サインアウト", action: signOut)
                     .buttonStyle(SettingsGhostButtonStyle())
@@ -170,6 +209,7 @@ private struct SettingsCard: View {
     }
 }
 
+// 正本: design/p1-wireframe-settings-home-liquidglass.png
 private struct SettingsRow: View {
     let row: SettingsRowModel
     let action: () -> Void
@@ -203,13 +243,15 @@ private struct SettingsRow: View {
 
 // 正本: design/p1-wireframe-settings-home-liquidglass.png
 private struct SettingsToast: View {
+    let message: String
+
     var body: some View {
         GlassEffectContainer {
             HStack(spacing: PrepFlowSpacing.sm) {
                 Text("✓")
                     .font(PrepFlowFont.smallBold)
                     .foregroundStyle(PrepFlowColor.ink)
-                Text("保存しました（追い仕込み閾値 25%）")
+                Text(message)
                     .font(PrepFlowFont.smallBold)
                 Text("元に戻す")
                     .font(PrepFlowFont.smallBold)

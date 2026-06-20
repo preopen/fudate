@@ -47,6 +47,14 @@ public enum PrepFlowAngle {
     public static let countdownStart = Angle.degrees(-90)
 }
 
+public enum PrepFlowRatio {
+    public static let square: CGFloat = 1
+}
+
+public enum PrepFlowLayout {
+    public static let impactPreviewLimit = 2
+}
+
 public enum PrepFlowFont {
     public static func satoshi(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         .custom("Satoshi", size: size).weight(weight)
@@ -92,14 +100,19 @@ public enum PrepFlowMetric {
     public static let catalogTreeWidth: CGFloat = 312
     public static let catalogPreviewWidth: CGFloat = 300
     public static let catalogFieldHeight: CGFloat = 46
+    public static let smallControlHeight: CGFloat = 28
     public static let catalogMediaThumbWidth: CGFloat = 90
     public static let catalogMediaThumbHeight: CGFloat = 66
+    public static let boardWorkButtonWidth: CGFloat = 76
+    public static let guidanceBatchButtonWidth: CGFloat = 150
     public static let lineWidth: CGFloat = 1
     public static let heavyLineWidth: CGFloat = 2.5
     public static let textMinimumScale: CGFloat = 0.72
 }
 
 public enum PrepFlowOpacity {
+    public static let solid = 1.00
+    public static let pressed = 0.72
     public static let glass = 0.46
     public static let contentHeader = 0.72
     public static let glassStroke = 0.60

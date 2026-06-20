@@ -1,3 +1,4 @@
+@preconcurrency import GRDB
 @testable import PrepFlowData
 import XCTest
 
@@ -44,6 +45,109 @@ final class PrepFlowDataTests: XCTestCase {
         }
     }
 
+    func testMigrationAddsReservationNoteToExistingLocalDatabase() throws {
+        let path = FileManager.default.temporaryDirectory
+            .appendingPathComponent("prepflow-old-reservation-\(UUID().uuidString).sqlite")
+            .path
+        defer {
+            try? FileManager.default.removeItem(atPath: path)
+        }
+
+        let oldQueue = try DatabaseQueue(path: path)
+        try oldQueue.write { db in
+            try db.execute(sql: """
+            create table reservation (
+              id text primary key,
+              tenant_id text not null,
+              service_day_id text not null,
+              source text not null,
+              visit_time text not null,
+              covers integer not null,
+              course_template_id text,
+              course_text text,
+              party_name text,
+              structured integer not null default 0,
+              dup_group text,
+              created_at text not null default current_timestamp,
+              updated_at text not null default current_timestamp,
+              deleted_at text
+            )
+            """)
+            try db.execute(sql: """
+            insert into reservation (
+              id, tenant_id, service_day_id, source, visit_time, covers, structured
+            ) values (
+              'reservation-old-note', 'tenant-a', 'service-old', 'manual', '18:00', 2, 1
+            )
+            """)
+        }
+
+        let database = try PrepFlowDatabase(path: path)
+
+        XCTAssertTrue(try database.tableColumns(.reservation).contains("note"))
+        try database.update(.reservation, id: "reservation-old-note", tenantID: tenantA, values: ["note": "席札確認"])
+        let reservation = try XCTUnwrap(try database.rows(.reservation, tenantID: tenantA).first)
+        XCTAssertEqual(reservation.values["note"], "席札確認")
+
+        let reopened = try PrepFlowDatabase(path: path)
+        XCTAssertTrue(try reopened.tableColumns(.reservation).contains("note"))
+    }
+
+    func testMigrationAddsPrepTaskInstructionToExistingLocalDatabase() throws {
+        let path = FileManager.default.temporaryDirectory
+            .appendingPathComponent("prepflow-old-prep-task-\(UUID().uuidString).sqlite")
+            .path
+        defer {
+            try? FileManager.default.removeItem(atPath: path)
+        }
+
+        let oldQueue = try DatabaseQueue(path: path)
+        try oldQueue.write { db in
+            try db.execute(sql: """
+            create table prep_task (
+              id text primary key,
+              tenant_id text not null,
+              component_id text not null,
+              name text not null,
+              scale_mode text not null,
+              coeff_per_cover real,
+              coeff_per_portion real,
+              yield real not null default 1.0,
+              round_step real,
+              covers_per_batch integer,
+              batch_size real,
+              unit text not null,
+              duration_min integer not null default 0,
+              lead_min_before_open integer not null default 0,
+              shelf_life_days integer,
+              section_id text,
+              default_storage_zone text,
+              sort integer not null default 0,
+              created_at text not null default current_timestamp,
+              updated_at text not null default current_timestamp,
+              deleted_at text
+            )
+            """)
+            try db.execute(sql: """
+            insert into prep_task (
+              id, tenant_id, component_id, name, scale_mode, coeff_per_cover, unit
+            ) values (
+              'prep-old-instruction', 'tenant-a', 'component-old', 'Nikiri', 'per_cover', 14, 'ml'
+            )
+            """)
+        }
+
+        let database = try PrepFlowDatabase(path: path)
+
+        XCTAssertTrue(try database.tableColumns(.prepTask).contains("instruction"))
+        try database.update(.prepTask, id: "prep-old-instruction", tenantID: tenantA, values: ["instruction": "弱火で詰める"])
+        let prepTask = try XCTUnwrap(try database.rows(.prepTask, tenantID: tenantA).first)
+        XCTAssertEqual(prepTask.values["instruction"], "弱火で詰める")
+
+        let reopened = try PrepFlowDatabase(path: path)
+        XCTAssertTrue(try reopened.tableColumns(.prepTask).contains("instruction"))
+    }
+
     func testCrudAndTenantScopedReadsForP0Graph() throws {
         let database = try PrepFlowDatabase()
         try seedGraph(tenantID: tenantA, suffix: "a", database: database)
@@ -76,6 +180,10 @@ final class PrepFlowDataTests: XCTestCase {
         XCTAssertTrue(sql.contains("alter table public.%I enable row level security"))
         XCTAssertTrue(sql.contains("tenant_id = public.current_tenant_id()"))
         XCTAssertTrue(sql.contains("auth.jwt() ->> 'tenant_id'"))
+        XCTAssertTrue(sql.contains("party_name text,\n  note text,"), "reservation note column missing from create table")
+        XCTAssertTrue(sql.contains("alter table public.reservation add column if not exists note text"))
+        XCTAssertTrue(sql.contains("default_storage_zone text,\n  instruction text,"), "prep_task instruction column missing from create table")
+        XCTAssertTrue(sql.contains("alter table public.prep_task add column if not exists instruction text"))
 
         for deferredTable in ["label", "printer", "storage_unit", "temp_log", "store_membership"] {
             XCTAssertFalse(sql.contains("create table if not exists public.\(deferredTable)"))
@@ -133,7 +241,7 @@ final class PrepFlowDataTests: XCTestCase {
         [
             "component_id": "component-\(suffix)", "name": "Nikiri", "scale_mode": "per_cover",
             "coeff_per_cover": "14", "yield": "1", "unit": "ml", "duration_min": "20",
-            "lead_min_before_open": "180", "section_id": "section-\(suffix)", "sort": "1",
+            "lead_min_before_open": "180", "section_id": "section-\(suffix)", "instruction": "Simmer", "sort": "1",
         ]
     }
 

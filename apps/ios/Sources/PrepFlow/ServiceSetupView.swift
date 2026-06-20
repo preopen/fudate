@@ -3,8 +3,10 @@ import DesignTokens
 import Engine
 import SwiftUI
 
+// 正本: design/p0-wireframe-service-setup-liquidglass.png
 struct ServiceSetupView: View {
     @StateObject private var store: BoardStore
+    @State private var editingReservationID: String?
     private let generateBoard: (() -> Void)?
 
     init(store: BoardStore = BoardStore(), generateBoard: (() -> Void)? = nil) {
@@ -17,7 +19,9 @@ struct ServiceSetupView: View {
             PrepFlowColor.g5.ignoresSafeArea()
 
             HStack(spacing: PrepFlowSpacing.none) {
-                ReservationList(store: store)
+                ReservationList(store: store) { reservationID in
+                    editingReservationID = reservationID
+                }
                 ServiceCoversPanel(store: store) {
                     store.generateBoardFromService()
                     generateBoard?()
@@ -33,6 +37,32 @@ struct ServiceSetupView: View {
             .padding(PrepFlowSpacing.md)
         }
         .foregroundStyle(PrepFlowColor.ink)
+        .sheet(item: editingReservation) { reservation in
+            ReservationEditSheet(
+                reservation: reservation,
+                update: { covers, note in
+                    store.updateReservation(reservation.id, covers: covers, note: note)
+                },
+                delete: {
+                    store.deleteReservation(reservation.id)
+                    editingReservationID = nil
+                }
+            )
+        }
+    }
+
+    private var editingReservation: Binding<ManualReservation?> {
+        Binding(
+            get: {
+                guard let editingReservationID else {
+                    return nil
+                }
+                return store.service.reservations.first { $0.id == editingReservationID }
+            },
+            set: { nextValue in
+                editingReservationID = nextValue?.id
+            }
+        )
     }
 }
 
@@ -205,6 +235,7 @@ private struct MethodChip: View {
 // 正本: design/p0-wireframe-service-setup-liquidglass.png
 private struct ReservationList: View {
     @ObservedObject var store: BoardStore
+    let edit: (String) -> Void
 
     var body: some View {
         ScrollView {
@@ -217,7 +248,7 @@ private struct ReservationList: View {
 
                 ForEach(store.service.reservations) { reservation in
                     ReservationRow(reservation: reservation) {
-                        store.editReservation(reservation.id)
+                        edit(reservation.id)
                     }
                 }
 
@@ -320,6 +351,14 @@ private struct ServiceCoversPanel: View {
                     .foregroundStyle(PrepFlowColor.time) // time-use: service peak time
             }
 
+            if let summary = store.serviceBoardPreviewSummary {
+                ServiceGeneratedStatus(
+                    count: store.serviceBoardGenerateCount,
+                    summary: summary,
+                    generatedAt: store.serviceBoardGeneratedAt
+                )
+            }
+
             Spacer()
 
             Button("この内容で当日ボードを生成", action: generateBoard)
@@ -380,6 +419,108 @@ private struct CoversStepper: View {
     }
 }
 
+// 正本: design/p0-wireframe-service-setup-liquidglass.png
+private struct ServiceGeneratedStatus: View {
+    let count: Int
+    let summary: String
+    let generatedAt: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: PrepFlowSpacing.xs) {
+            HStack {
+                Text("生成済み")
+                    .font(PrepFlowFont.smallBold)
+                Spacer()
+                Text("\(count)回")
+                    .font(PrepFlowFont.railMeta)
+                    .foregroundStyle(PrepFlowColor.g2)
+                    .monospacedDigit()
+            }
+            Text(summary)
+                .font(PrepFlowFont.railMeta)
+                .foregroundStyle(PrepFlowColor.g2)
+            Text(generatedAt ?? "ローカル保存済み")
+                .font(PrepFlowFont.railMeta)
+                .foregroundStyle(PrepFlowColor.g2)
+        }
+        .padding(PrepFlowSpacing.sm)
+        .background(PrepFlowColor.g5)
+        .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous))
+    }
+}
+
+// 正本: design/p0-wireframe-service-setup-liquidglass.png
+private struct ReservationEditSheet: View {
+    let reservation: ManualReservation
+    let update: (Int, String) -> Void
+    let delete: () -> Void
+    @State private var covers: Int
+    @State private var note: String
+
+    init(
+        reservation: ManualReservation,
+        update: @escaping (Int, String) -> Void,
+        delete: @escaping () -> Void
+    ) {
+        self.reservation = reservation
+        self.update = update
+        self.delete = delete
+        _covers = State(initialValue: reservation.covers)
+        _note = State(initialValue: reservation.note)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: PrepFlowSpacing.lg) {
+            Capsule(style: .continuous)
+                .fill(PrepFlowColor.g4)
+                .frame(width: PrepFlowMetric.actionButtonHeight, height: PrepFlowMetric.lineWidth)
+                .frame(maxWidth: .infinity)
+
+            VStack(alignment: .leading, spacing: PrepFlowSpacing.xs) {
+                Text(reservation.partyName)
+                    .font(PrepFlowFont.focusTitle)
+                Text("\(reservation.visitTime) / \(covers)名")
+                    .font(PrepFlowFont.body)
+                    .foregroundStyle(PrepFlowColor.g2)
+            }
+
+            CoversStepper(title: "人数", value: covers) {
+                covers = max(1, $0)
+                update(covers, note)
+            }
+
+            VStack(alignment: .leading, spacing: PrepFlowSpacing.xs) {
+                Text("メモ")
+                    .font(PrepFlowFont.sectionTitle)
+                TextField("予約メモ", text: Binding(
+                    get: { note },
+                    set: { nextValue in
+                        note = nextValue
+                        update(covers, nextValue)
+                    }
+                ))
+                .font(PrepFlowFont.body)
+                .padding(PrepFlowSpacing.sm)
+                .background(PrepFlowColor.white)
+                .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous)
+                        .stroke(PrepFlowColor.g4, lineWidth: PrepFlowMetric.lineWidth)
+                }
+            }
+
+            Spacer()
+
+            Button("予約を削除", action: delete)
+                .buttonStyle(ServiceDeleteButtonStyle())
+        }
+        .padding(PrepFlowSpacing.xl)
+        .background(PrepFlowColor.g5)
+        .foregroundStyle(PrepFlowColor.ink)
+        .presentationDetents([.medium])
+    }
+}
+
 private struct ServiceSmallButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -392,6 +533,23 @@ private struct ServiceSmallButtonStyle: ButtonStyle {
             .overlay {
                 RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous)
                     .stroke(PrepFlowColor.g4, lineWidth: PrepFlowMetric.lineWidth)
+            }
+            .opacity(configuration.isPressed ? PrepFlowOpacity.contentHeader : 1)
+    }
+}
+
+private struct ServiceDeleteButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(PrepFlowFont.action)
+            .foregroundStyle(PrepFlowColor.time) // time-use: destructive reservation removal
+            .frame(maxWidth: .infinity)
+            .frame(height: PrepFlowMetric.actionButtonHeight)
+            .background(PrepFlowColor.white)
+            .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous)
+                    .stroke(PrepFlowColor.time.opacity(PrepFlowOpacity.timeStroke), lineWidth: PrepFlowMetric.lineWidth) // time-use: destructive reservation removal border
             }
             .opacity(configuration.isPressed ? PrepFlowOpacity.contentHeader : 1)
     }

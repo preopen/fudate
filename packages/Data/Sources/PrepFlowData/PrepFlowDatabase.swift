@@ -112,6 +112,12 @@ public final class PrepFlowDatabase: @unchecked Sendable {
         migrator.registerMigration("forward-slice-schema-refresh") { db in
             try Self.createSchema(db)
         }
+        migrator.registerMigration("reservation-note-column") { db in
+            try Self.ensureColumn(db, table: "reservation", column: "note", definition: "text")
+        }
+        migrator.registerMigration("prep-task-instruction-column") { db in
+            try Self.ensureColumn(db, table: "prep_task", column: "instruction", definition: "text")
+        }
         try migrator.migrate(dbQueue)
     }
 
@@ -120,6 +126,15 @@ public final class PrepFlowDatabase: @unchecked Sendable {
         for statement in schemaStatements {
             try db.execute(sql: statement)
         }
+    }
+
+    private static func ensureColumn(_ db: Database, table: String, column: String, definition: String) throws {
+        let rows = try Row.fetchAll(db, sql: "pragma table_info(\(table))")
+        let columns = Set(rows.map { row in row["name"] as String })
+        guard !columns.contains(column) else {
+            return
+        }
+        try db.execute(sql: "alter table \(table) add column \(column) \(definition)")
     }
 
     private static func dataRow(_ row: Row) -> DataRow {

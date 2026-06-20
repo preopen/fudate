@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "DesignTokens",
-    platforms: [.iOS("26.0")],
+    platforms: [.iOS("26.0"), .macOS(.v14)],
     products: [
         .library(name: "DesignTokens", targets: ["DesignTokens"]),
     ],

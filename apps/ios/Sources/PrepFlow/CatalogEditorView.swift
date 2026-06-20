@@ -4,6 +4,7 @@ import DesignTokens
 import Engine
 import SwiftUI
 
+// 正本: design/p1-wireframe-template-editor-liquidglass.png
 struct CatalogEditorView: View {
     @StateObject private var store: BoardStore
     private let previewBoard: (() -> Void)?
@@ -28,7 +29,7 @@ struct CatalogEditorView: View {
             CatalogTopBar(
                 courseName: store.catalog.courseName,
                 previewBoard: {
-                    store.saveCatalogForBoard()
+                    store.previewCatalogOnBoard()
                     previewBoard?()
                 },
                 save: {
@@ -252,8 +253,14 @@ private struct CatalogDetail: View {
                 .padding(.vertical, PrepFlowSpacing.md)
             }
 
-            CatalogPreview(task: task, quantity: quantity)
-                .frame(width: PrepFlowMetric.catalogPreviewWidth)
+            CatalogPreview(
+                task: task,
+                quantity: quantity,
+                saveCount: store.catalogSaveCount,
+                summary: store.catalogBoardPreviewSummary,
+                savedAt: store.catalogLastSavedAt
+            )
+            .frame(width: PrepFlowMetric.catalogPreviewWidth)
         }
         .background(PrepFlowColor.g5)
     }
@@ -490,6 +497,9 @@ private struct CatalogMediaThumb: View {
 private struct CatalogPreview: View {
     let task: CatalogPrepTask
     let quantity: Quantity
+    let saveCount: Int
+    let summary: String?
+    let savedAt: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: PrepFlowSpacing.md) {
@@ -522,6 +532,10 @@ private struct CatalogPreview: View {
                     .stroke(PrepFlowColor.g4, lineWidth: PrepFlowMetric.lineWidth)
             }
 
+            if let summary {
+                CatalogSavedStatus(saveCount: saveCount, summary: summary, savedAt: savedAt)
+            }
+
             Spacer()
         }
         .padding(PrepFlowSpacing.md)
@@ -531,6 +545,36 @@ private struct CatalogPreview: View {
                 .fill(PrepFlowColor.g4)
                 .frame(width: PrepFlowMetric.lineWidth)
         }
+    }
+}
+
+// 正本: design/p1-wireframe-template-editor-liquidglass.png
+private struct CatalogSavedStatus: View {
+    let saveCount: Int
+    let summary: String
+    let savedAt: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: PrepFlowSpacing.xs) {
+            HStack {
+                Text("保存済み")
+                    .font(PrepFlowFont.smallBold)
+                Spacer()
+                Text("\(saveCount)回")
+                    .font(PrepFlowFont.railMeta)
+                    .foregroundStyle(PrepFlowColor.g2)
+                    .monospacedDigit()
+            }
+            Text(summary)
+                .font(PrepFlowFont.railMeta)
+                .foregroundStyle(PrepFlowColor.g2)
+            Text(savedAt ?? "ローカル保存済み")
+                .font(PrepFlowFont.railMeta)
+                .foregroundStyle(PrepFlowColor.g2)
+        }
+        .padding(PrepFlowSpacing.sm)
+        .background(PrepFlowColor.g5)
+        .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous))
     }
 }
 

@@ -1,10 +1,18 @@
 // 正本: design/p0-wireframe-simulation-liquidglass.png
 // 正本: design/p0-wireframe-activation-liquidglass.png
 import DesignTokens
+import Engine
 import SwiftUI
 
+// 正本: design/p0-wireframe-simulation-liquidglass.png
 struct SimulationView: View {
     @StateObject private var store: BoardStore
+    @State private var isCloseLoopPresented = false
+    @State private var isReservationHubPresented = false
+    @State private var closeMadeQty = 240
+    @State private var closeLeftoverQty = 40
+    @State private var closeReason = WasteReason.overmade
+    @State private var closeCarriesOver = true
     private let openBoard: (() -> Void)?
     private let adjustNumbers: (() -> Void)?
 
@@ -19,14 +27,24 @@ struct SimulationView: View {
             PrepFlowColor.g5.ignoresSafeArea()
 
             VStack(spacing: PrepFlowSpacing.md) {
-                SimulationKPIGrid(summary: store.simulation)
+                SimulationKPIGrid(summary: store.simulation, periodDays: store.simulationPeriodDays)
 
                 HStack(spacing: PrepFlowSpacing.none) {
-                    SimulationItemList(summary: store.simulation)
-                    SimulationResultPanel(summary: store.simulation) {
+                    SimulationItemList(summary: store.simulation, periodDays: store.simulationPeriodDays)
+                    SimulationResultPanel(
+                        summary: store.simulation,
+                        periodDays: store.simulationPeriodDays,
+                        adjustmentSummary: store.simulationLastAdjustmentSummary,
+                        appliedCount: store.simulationAppliedCount,
+                        appliedAt: store.simulationAppliedAt,
+                        boardImpactSummary: store.simulationBoardImpactSummary
+                    ) {
+                        store.applySimulationAdjustment()
+                        adjustNumbers?()
+                    } apply: {
                         store.applySimulationCoefficients()
                         store.recordNikiriWaste()
-                        openBoard?()
+                        isCloseLoopPresented = true
                     }
                     .frame(width: PrepFlowMetric.railWidth)
                 }
@@ -34,19 +52,69 @@ struct SimulationView: View {
             .padding(.top, PrepFlowMetric.topInset)
 
             SimulationTopBar(
+                periodDays: store.simulationPeriodDays,
+                dateRange: store.simulationDateRange,
                 changePeriod: {
                     store.changeSimulationPeriod()
-                    adjustNumbers?()
                 },
                 apply: {
                     store.applySimulationCoefficients()
                     store.recordNikiriWaste()
-                    openBoard?()
+                    isCloseLoopPresented = true
                 }
             )
             .padding(PrepFlowSpacing.md)
         }
         .foregroundStyle(PrepFlowColor.ink)
+        .sheet(isPresented: $isCloseLoopPresented) {
+            CloseLoopSheet(
+                madeQty: $closeMadeQty,
+                leftoverQty: $closeLeftoverQty,
+                reason: $closeReason,
+                carriesOver: $closeCarriesOver,
+                batchRecords: store.closeGateRecords,
+                learningRecords: store.latestLearningWasteRecords,
+                summary: store.closeLoopSummary,
+                commitCount: store.closeLoopCommitCount,
+                canCommit: store.canCommitCloseLoop(
+                    madeQty: Double(closeMadeQty),
+                    leftoverQty: Double(closeLeftoverQty)
+                ),
+                nextDayReservations: store.closeNextDayPrepReservations,
+                gateCompletedAt: store.closeGateCompletedAt,
+                commit: {
+                    store.recordCloseLoop(
+                        madeQty: Double(closeMadeQty),
+                        leftoverQty: Double(closeLeftoverQty),
+                        wasteReason: closeReason,
+                        carryoverToNext: closeCarriesOver
+                    )
+                },
+                commitBatch: {
+                    store.recordDefaultCloseGateBatch()
+                },
+                toggleNextDayReservation: { id in
+                    store.toggleCloseNextDayPrepReservation(id)
+                },
+                completeGate: {
+                    store.completeCloseGate()
+                },
+                openBoard: {
+                    isCloseLoopPresented = false
+                    openBoard?()
+                },
+                openReservationHub: {
+                    isCloseLoopPresented = false
+                    isReservationHubPresented = true
+                }
+            )
+        }
+        .sheet(isPresented: $isReservationHubPresented) {
+            ReservationHubSheet(store: store) {
+                isReservationHubPresented = false
+                openBoard?()
+            }
+        }
     }
 }
 
@@ -120,13 +188,15 @@ struct ActivationSummaryView: View {
 
 // 正本: design/p0-wireframe-simulation-liquidglass.png
 private struct SimulationTopBar: View {
+    let periodDays: Int
+    let dateRange: String
     let changePeriod: () -> Void
     let apply: () -> Void
 
     var body: some View {
         GlassEffectContainer {
             HStack(spacing: PrepFlowSpacing.md) {
-                Text("SIMULATION ・ 14日間")
+                Text("SIMULATION ・ \(periodDays)日間")
                     .font(PrepFlowFont.countdownLabel)
                     .foregroundStyle(PrepFlowColor.g2)
                     .padding(.horizontal, PrepFlowSpacing.sm)
@@ -137,7 +207,7 @@ private struct SimulationTopBar: View {
                 VStack(alignment: .leading, spacing: PrepFlowSpacing.xxs) {
                     Text("実績 vs 推奨")
                         .font(PrepFlowFont.topTitle)
-                    Text("鮨 はやし ・ 6/1〜6/14（過去予約14日分で試算）")
+                    Text("鮨 はやし ・ \(dateRange)（過去予約\(periodDays)日分で試算）")
                         .font(PrepFlowFont.topSubtitle)
                         .foregroundStyle(PrepFlowColor.g2)
                 }
@@ -166,11 +236,12 @@ private struct SimulationTopBar: View {
 // 正本: design/p0-wireframe-simulation-liquidglass.png
 private struct SimulationKPIGrid: View {
     let summary: SimulationSummary
+    let periodDays: Int
 
     var body: some View {
         HStack(spacing: PrepFlowSpacing.md) {
             KPIBox(title: "推奨で減らせた食材量", value: summary.reductionText, detail: "過剰仕込みの平均", state: .ok)
-            KPIBox(title: "推定の食材ロス削減", value: summary.lossSavingText, detail: "14日換算", state: .ok)
+            KPIBox(title: "推定の食材ロス削減", value: summary.lossSavingText, detail: "\(periodDays)日換算", state: .ok)
             KPIBox(title: "品切れリスク", value: "\(summary.stockoutRisks)件", detail: "要・安全係数の上乗せ", state: .time)
             KPIBox(title: "推奨の的中率", value: "\(summary.hitRatePercent)%", detail: "±10%以内", state: .neutral)
         }
@@ -235,11 +306,12 @@ private struct KPIBox: View {
 // 正本: design/p0-wireframe-simulation-liquidglass.png
 private struct SimulationItemList: View {
     let summary: SimulationSummary
+    let periodDays: Int
 
     var body: some View {
         VStack(alignment: .leading, spacing: PrepFlowSpacing.sm) {
             HStack {
-                Text("仕込みアイテム別（14日平均・1営業あたり）")
+                Text("仕込みアイテム別（\(periodDays)日平均・1営業あたり）")
                     .font(PrepFlowFont.sectionTitle)
                 Spacer()
                 Text("実績")
@@ -345,13 +417,19 @@ private struct SimulationBar: View {
 // 正本: design/p0-wireframe-simulation-liquidglass.png
 private struct SimulationResultPanel: View {
     let summary: SimulationSummary
+    let periodDays: Int
+    let adjustmentSummary: String?
+    let appliedCount: Int
+    let appliedAt: String?
+    let boardImpactSummary: String?
+    let adjust: () -> Void
     let apply: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: PrepFlowSpacing.md) {
             Text("結果サマリー")
                 .font(PrepFlowFont.sectionTitle)
-            Text("14日間の予約実績に対して、推奨量を当てたときの差。")
+            Text("\(periodDays)日間の予約実績に対して、推奨量を当てたときの差。")
                 .font(PrepFlowFont.railMeta)
                 .foregroundStyle(PrepFlowColor.g2)
 
@@ -379,12 +457,32 @@ private struct SimulationResultPanel: View {
             SummaryMiniRow(title: "作りすぎを削減", value: "11品")
             SummaryMiniRow(title: "品切れリスク", value: "\(summary.stockoutRisks)品")
 
-            Text("品切れリスクの2品は安全係数を+10%して本適用。各係数はこの14日で初期化されます。")
+            Text("品切れリスクの2品は安全係数を+10%して本適用。各係数はこの\(periodDays)日で初期化されます。")
                 .font(PrepFlowFont.railMeta)
                 .foregroundStyle(PrepFlowColor.g2)
 
+            if let adjustmentSummary {
+                SimulationStatusBox(
+                    title: "調整履歴",
+                    bodyText: adjustmentSummary,
+                    detail: "数字を調整すると推奨量とリスク件数を即時更新します。"
+                )
+            }
+
+            if let boardImpactSummary {
+                SimulationStatusBox(
+                    title: "本適用済み",
+                    bodyText: boardImpactSummary,
+                    detail: "適用 \(appliedCount)回\(appliedAt.map { " ・ \($0)" } ?? "")"
+                )
+            }
+
             Spacer()
 
+            if adjustmentSummary != nil {
+                Button("数字を再調整", action: adjust)
+                    .buttonStyle(SimulationSecondaryWideButtonStyle())
+            }
             Button("この係数で本適用する", action: apply)
                 .buttonStyle(SimulationPrimaryWideButtonStyle())
             Text("本適用後も実績から自動補正が続きます（FR-09）")
@@ -402,6 +500,36 @@ private struct SimulationResultPanel: View {
     }
 }
 
+// 正本: design/p0-wireframe-simulation-liquidglass.png
+private struct SimulationStatusBox: View {
+    let title: String
+    let bodyText: String
+    let detail: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: PrepFlowSpacing.xs) {
+            Text(title)
+                .font(PrepFlowFont.railMeta)
+                .foregroundStyle(PrepFlowColor.g2)
+            Text(bodyText)
+                .font(PrepFlowFont.smallBold)
+                .foregroundStyle(PrepFlowColor.ink)
+            Text(detail)
+                .font(PrepFlowFont.railMeta)
+                .foregroundStyle(PrepFlowColor.g2)
+        }
+        .padding(PrepFlowSpacing.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(PrepFlowColor.white)
+        .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous)
+                .stroke(PrepFlowColor.g4, lineWidth: PrepFlowMetric.lineWidth)
+        }
+    }
+}
+
+// 正本: design/p0-wireframe-simulation-liquidglass.png
 private struct SummaryMiniRow: View {
     let title: String
     let value: String
@@ -460,6 +588,7 @@ private enum ActivationStepState {
     case pending
 }
 
+// 正本: design/p0-wireframe-activation-liquidglass.png
 private struct ActivationStep: View {
     let title: String
     let mark: String
@@ -506,6 +635,7 @@ private struct ActivationStep: View {
     }
 }
 
+// 正本: design/p0-wireframe-activation-liquidglass.png
 private struct ActivationStepSeparator: View {
     var body: some View {
         Rectangle()
@@ -528,6 +658,7 @@ private struct ActivationNumbers: View {
     }
 }
 
+// 正本: design/p0-wireframe-activation-liquidglass.png
 private struct ActivationNumber: View {
     let title: String
     let value: String
@@ -672,6 +803,22 @@ private struct SimulationPrimaryWideButtonStyle: ButtonStyle {
             .background(PrepFlowColor.ink)
             .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous))
             .shadow(color: PrepFlowColor.ink.opacity(PrepFlowOpacity.glassShadow), radius: PrepFlowSpacing.md, y: PrepFlowSpacing.xs)
+            .opacity(configuration.isPressed ? PrepFlowOpacity.contentHeader : 1)
+    }
+}
+
+private struct SimulationSecondaryWideButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(PrepFlowFont.smallBold)
+            .foregroundStyle(PrepFlowColor.ink)
+            .frame(maxWidth: .infinity, minHeight: PrepFlowMetric.catalogFieldHeight)
+            .background(PrepFlowColor.white)
+            .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous)
+                    .stroke(PrepFlowColor.g4, lineWidth: PrepFlowMetric.lineWidth)
+            }
             .opacity(configuration.isPressed ? PrepFlowOpacity.contentHeader : 1)
     }
 }

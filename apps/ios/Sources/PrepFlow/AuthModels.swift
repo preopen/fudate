@@ -57,6 +57,20 @@ struct AuthEnvironment: Equatable {
         supabaseURL.isEmpty || supabaseAnonKey.isEmpty || supabaseURL.contains("YOUR-PROJECT")
     }
 
+    var isReadyForStagingAuth: Bool {
+        missingSecrets.isEmpty
+    }
+
+    var settingsReadinessLabel: String {
+        if isReadyForStagingAuth {
+            return "Staging 認証OK"
+        }
+        if usesLocalSQLiteFallback {
+            return "SQLite 起動可"
+        }
+        return "不足: \(missingSecrets.joined(separator: " / "))"
+    }
+
     var missingSecrets: [String] {
         var missing: [String] = []
         if supabaseURL.isEmpty || supabaseURL.contains("YOUR-PROJECT") {
@@ -90,6 +104,10 @@ struct LocalInviteRegistry {
             throw AuthError.providerNotAllowed
         }
         return invite
+    }
+
+    var restoreCandidates: [LocalInvite] {
+        invites.values.sorted { $0.email < $1.email }
     }
 }
 
@@ -125,10 +143,15 @@ final class AuthStore: ObservableObject {
         self.environment = environment
         self.registry = registry
         email = initialEmail
+        session = restoreSession()
     }
 
     var usesLocalSQLiteFallback: Bool {
         environment.usesLocalSQLiteFallback
+    }
+
+    var isReadyForStagingAuth: Bool {
+        environment.isReadyForStagingAuth
     }
 
     var missingSecretsText: String {
@@ -154,6 +177,9 @@ final class AuthStore: ObservableObject {
     }
 
     func signOut() {
+        if let session {
+            try? database?.softDelete(.ownerAccount, id: session.ownerID, tenantID: session.tenantID)
+        }
         session = nil
         magicLinkSentTo = nil
     }
@@ -188,14 +214,52 @@ final class AuthStore: ObservableObject {
             "auth_provider": session.provider.rawValue,
             "display_name": session.displayName,
             "role": session.role,
+            "deleted_at": nil,
         ]
 
-        let ownerExists = (try? database?.rows(.ownerAccount, tenantID: session.tenantID).contains { $0.id == session.ownerID }) == true
+        let ownerExists = (try? database?.rows(
+            .ownerAccount,
+            tenantID: session.tenantID,
+            includeDeleted: true
+        ).contains { $0.id == session.ownerID }) == true
         if ownerExists {
             try? database?.update(.ownerAccount, id: session.ownerID, tenantID: session.tenantID, values: values)
         } else {
             try? database?.create(.ownerAccount, values: values)
         }
+    }
+
+    private func restoreSession() -> AuthSession? {
+        for invite in registry.restoreCandidates {
+            guard let row = try? database?.rows(.ownerAccount, tenantID: invite.tenantID)
+                .first(where: { $0.id == invite.ownerID }),
+                let session = restoredSession(from: row)
+            else {
+                continue
+            }
+            email = session.email
+            return session
+        }
+        return nil
+    }
+
+    private func restoredSession(from row: DataRow) -> AuthSession? {
+        guard let email = row.values["email"],
+              let providerValue = row.values["auth_provider"],
+              let provider = AuthProvider(rawValue: providerValue),
+              let displayName = row.values["display_name"],
+              let role = row.values["role"]
+        else {
+            return nil
+        }
+        return AuthSession(
+            ownerID: row.id,
+            tenantID: row.tenantID,
+            email: email,
+            provider: provider,
+            displayName: displayName,
+            role: role
+        )
     }
 
     private func handle(_ error: Error) {

@@ -4,6 +4,7 @@ import DesignTokens
 import PrepFlowData
 import SwiftUI
 
+// 正本: design/flow-vertical-slice.png
 struct AuthenticatedRootView: View {
     @StateObject private var authStore: AuthStore
 
@@ -16,6 +17,7 @@ struct AuthenticatedRootView: View {
             AuthenticatedSessionView(
                 session: session,
                 database: authStore.database,
+                authEnvironment: authStore.environment,
                 signOut: authStore.signOut
             )
         } else {
@@ -24,27 +26,47 @@ struct AuthenticatedRootView: View {
     }
 }
 
-private enum AuthenticatedScreen {
+enum AuthenticatedScreen: Equatable {
     case activation
     case serviceSetup
     case board
     case catalog
     case simulation
     case settings
+
+    @MainActor
+    static func restoredInitialScreen(for store: BoardStore) -> AuthenticatedScreen {
+        if store.serviceBoardGenerateCount > 0 {
+            return .board
+        }
+        if store.simulationAdjustmentCount > 0 {
+            return .simulation
+        }
+        return .activation
+    }
 }
 
 // 正本: design/flow-vertical-slice.png
 private struct AuthenticatedSessionView: View {
     let session: AuthSession
+    let authEnvironment: AuthEnvironment
     let signOut: () -> Void
 
     @StateObject private var store: BoardStore
     @State private var screen: AuthenticatedScreen = .activation
 
-    init(session: AuthSession, database: PrepFlowDatabase?, signOut: @escaping () -> Void) {
+    init(
+        session: AuthSession,
+        database: PrepFlowDatabase?,
+        authEnvironment: AuthEnvironment = .current,
+        signOut: @escaping () -> Void
+    ) {
         self.session = session
+        self.authEnvironment = authEnvironment
         self.signOut = signOut
-        _store = StateObject(wrappedValue: BoardStore(database: database, tenantID: session.tenantID))
+        let restoredStore = BoardStore(database: database, tenantID: session.tenantID)
+        _store = StateObject(wrappedValue: restoredStore)
+        _screen = State(initialValue: AuthenticatedScreen.restoredInitialScreen(for: restoredStore))
     }
 
     var body: some View {
@@ -53,6 +75,7 @@ private struct AuthenticatedSessionView: View {
             ActivationSummaryView(
                 store: store,
                 adjustNumbers: {
+                    store.applySimulationAdjustment()
                     screen = .simulation
                 },
                 startFirstBoard: {
@@ -94,6 +117,8 @@ private struct AuthenticatedSessionView: View {
         case .settings:
             SettingsHomeView(
                 session: session,
+                authEnvironment: authEnvironment,
+                store: store,
                 backToBoard: {
                     screen = .board
                 },
@@ -181,6 +206,7 @@ private struct AuthTopBar: View {
     }
 }
 
+// 正本: design/p0-wireframe-onboarding-liquidglass.png
 private struct AuthStepSeparator: View {
     var body: some View {
         Rectangle()
@@ -189,6 +215,7 @@ private struct AuthStepSeparator: View {
     }
 }
 
+// 正本: design/p0-wireframe-onboarding-liquidglass.png
 private struct AuthStep: View {
     let index: String
     let title: String
@@ -339,6 +366,7 @@ private struct AuthTenantPanel: View {
     }
 }
 
+// 正本: design/p0-wireframe-onboarding-liquidglass.png
 private struct AuthStatusRow: View {
     let title: String
     let value: String

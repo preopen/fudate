@@ -96,6 +96,7 @@ extension PrepFlowDatabase {
           shelf_life_days integer,
           section_id text references section(id),
           default_storage_zone text,
+          instruction text,
           sort integer not null default 0,
           created_at text not null default current_timestamp,
           updated_at text not null default current_timestamp,
@@ -241,6 +242,7 @@ extension PrepFlowDatabase {
           course_template_id text references course_template(id),
           course_text text,
           party_name text,
+          note text,
           structured integer not null default 0,
           dup_group text,
           created_at text not null default current_timestamp,
@@ -287,6 +289,37 @@ extension PrepFlowDatabase {
           value real not null,
           logged_at text not null,
           by_account_id text,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists storage_unit (
+          id text primary key,
+          tenant_id text not null,
+          restaurant_id text not null references restaurant(id),
+          name text not null,
+          kind text not null check (kind in ('fridge', 'freezer', 'chiller', 'room')),
+          temp_min real,
+          temp_max real,
+          qr_token text not null,
+          created_at text not null default current_timestamp,
+          updated_at text not null default current_timestamp,
+          deleted_at text
+        )
+        """,
+        """
+        create table if not exists printer (
+          id text primary key,
+          tenant_id text not null,
+          restaurant_id text not null references restaurant(id),
+          name text not null,
+          connection text not null check (connection in ('network', 'bluetooth', 'usb', 'pdf')),
+          paper_size text not null,
+          status text not null check (status in ('connected', 'offline', 'pdf')),
+          is_default integer not null default 0,
+          last_tested_at text,
           created_at text not null default current_timestamp,
           updated_at text not null default current_timestamp,
           deleted_at text

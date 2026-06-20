@@ -96,6 +96,7 @@ create table if not exists public.prep_task (
   shelf_life_days integer,
   section_id text references public.section(id),
   default_storage_zone text,
+  instruction text,
   sort integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -231,12 +232,16 @@ create table if not exists public.reservation (
   course_template_id text references public.course_template(id),
   course_text text,
   party_name text,
+  note text,
   structured boolean not null default false,
   dup_group text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   deleted_at timestamptz
 );
+
+alter table public.reservation add column if not exists note text;
+alter table public.prep_task add column if not exists instruction text;
 
 create index if not exists restaurant_tenant_idx on public.restaurant(tenant_id);
 create index if not exists owner_account_tenant_idx on public.owner_account(tenant_id);

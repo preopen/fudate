@@ -11,11 +11,14 @@
 		0EA78D4A1636D179F473B162 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 4148D17EBFB395CB2B006372 /* SnapshotTesting */; };
 		115F5CC9BAEA624D0F83220B /* PrepFlowBoardSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FB619D263BE69F92375958 /* PrepFlowBoardSnapshotTests.swift */; };
 		1C221DC5AB261095D63D2248 /* Satoshi-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1E8024E8CB189E23F4982511 /* Satoshi-Bold.otf */; };
+		20DEBE1B88CAB58F030C8BD0 /* CloseLoopSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2108AE0A6612AA641F856513 /* CloseLoopSheet.swift */; };
 		24C2A1AB159FCA1A9B8EF01B /* PrepFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B82BFD34B2D5E12CB1D3F85 /* PrepFlowApp.swift */; };
+		3DD26DC9835B19A82E342D67 /* ReservationHubSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B85CF350A619B64CDF74E3 /* ReservationHubSheet.swift */; };
 		44AE6862E4A347D4358F4DBC /* testBoardNowMatchesSourceWire.p0-wireframe-board-liquidglass.png in Resources */ = {isa = PBXBuildFile; fileRef = C2D401BFA3A05A805D2B8082 /* testBoardNowMatchesSourceWire.p0-wireframe-board-liquidglass.png */; };
 		44ED5034C58B252DAE1A2961 /* PrepFlowData in Frameworks */ = {isa = PBXBuildFile; productRef = 475D07E15555007BBAEB0322 /* PrepFlowData */; };
 		4DD818536F930138D05EEB4F /* CatalogModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A4C654FDBB9C10305B86A2 /* CatalogModels.swift */; };
 		4E70A62AADB66AD858A52BFB /* testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png in Resources */ = {isa = PBXBuildFile; fileRef = BA4DADAD9C37E8A9D0C7648F /* testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png */; };
+		4EF69473EC4F244B9235B4AB /* DirectServiceOpsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744362A502355067202F41DB /* DirectServiceOpsSheet.swift */; };
 		5457F18F13DE5E64A1617C22 /* BoardChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFEF01BB3C11B19998854F9 /* BoardChrome.swift */; };
 		58109CF317BBC81A0786534E /* testSimulationMatchesSourceWire.p0-wireframe-simulation-liquidglass.png in Resources */ = {isa = PBXBuildFile; fileRef = D5B23AA2FA68F4777FA801A8 /* testSimulationMatchesSourceWire.p0-wireframe-simulation-liquidglass.png */; };
 		62004F4353B493326DF16A9B /* Engine in Frameworks */ = {isa = PBXBuildFile; productRef = 8A23825344FB0224673C2952 /* Engine */; };
@@ -24,12 +27,15 @@
 		6A3C5C961876C0572C6C7186 /* AuthGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8780922CD2E347241C741311 /* AuthGateView.swift */; };
 		73477B350D4FCD321744A2BF /* CatalogEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5465D8F87788C6C0613324CC /* CatalogEditorView.swift */; };
 		75C85E360C79723E73497EF2 /* Engine in Frameworks */ = {isa = PBXBuildFile; productRef = 6043540F4C5A1B1E89EE6563 /* Engine */; };
+		77094BCE7BA2FC91F6E883AA /* NowGuidanceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D2FADCDEAD4FAF3EC8D00D /* NowGuidanceSheet.swift */; };
 		7C8A763AFD30F5D825D87E81 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 4B5BE6B6F56F2F54D5ACF099 /* GRDB */; };
 		7F4E0F5B97E84441176D6D33 /* SimulationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F780AC7A73B5DFE2E8F20871 /* SimulationModels.swift */; };
 		872FE0E484B12D748605FC06 /* DesignTokens in Frameworks */ = {isa = PBXBuildFile; productRef = EBCEF50B54D8E7617B365016 /* DesignTokens */; };
 		921A121D9EA57588A2360CD5 /* testActivationMatchesSourceWire.p0-wireframe-activation-liquidglass.png in Resources */ = {isa = PBXBuildFile; fileRef = F144098AFB80D6C627433D5E /* testActivationMatchesSourceWire.p0-wireframe-activation-liquidglass.png */; };
 		9D784EE7760D64512B3F6F06 /* Satoshi-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 03CE1CF2034F35830A9F3A4F /* Satoshi-Black.otf */; };
 		A48C354FA5CDD05BEB8456E6 /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3327FF738A048B2C80FAF156 /* AuthModels.swift */; };
+		A778C0360F2C9502D622DE9F /* ReservationOmotenashiPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1915E7E39B0694FE553AE12 /* ReservationOmotenashiPanel.swift */; };
+		C09EF20749A42A9D11E08C3D /* LabelOpsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576D57F497A9C0450B84E29F /* LabelOpsSheet.swift */; };
 		C3CDC9E06760AEA822A5C947 /* ServiceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158C785A883E7211F12E5F61 /* ServiceModels.swift */; };
 		CA80FEA766F767E4C624958C /* testAuthGateMatchesSourceWire.p0-wireframe-onboarding-liquidglass.png in Resources */ = {isa = PBXBuildFile; fileRef = 966B299E28E3D1F5BE3C43A6 /* testAuthGateMatchesSourceWire.p0-wireframe-onboarding-liquidglass.png */; };
 		D684E7F45CDB92D058F53D2D /* AppDatabaseFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F82B4A43BA7BBFA011948A55 /* AppDatabaseFactory.swift */; };
@@ -55,6 +61,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00B85CF350A619B64CDF74E3 /* ReservationHubSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationHubSheet.swift; sourceTree = "<group>"; };
 		03CE1CF2034F35830A9F3A4F /* Satoshi-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Black.otf"; sourceTree = "<group>"; };
 		080558E37E7B2666546EC2EE /* DesignTokens */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DesignTokens; path = ../../packages/DesignTokens; sourceTree = SOURCE_ROOT; };
 		082E594F1023B0F9BE0A0504 /* PrepFlow.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PrepFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,13 +70,16 @@
 		1CFEF01BB3C11B19998854F9 /* BoardChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardChrome.swift; sourceTree = "<group>"; };
 		1E8024E8CB189E23F4982511 /* Satoshi-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Bold.otf"; sourceTree = "<group>"; };
 		20FB619D263BE69F92375958 /* PrepFlowBoardSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrepFlowBoardSnapshotTests.swift; sourceTree = "<group>"; };
+		2108AE0A6612AA641F856513 /* CloseLoopSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseLoopSheet.swift; sourceTree = "<group>"; };
 		3327FF738A048B2C80FAF156 /* AuthModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModels.swift; sourceTree = "<group>"; };
 		375C2C31DB9266918E76EC7A /* SimulationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulationViews.swift; sourceTree = "<group>"; };
 		42255E5C40BB5F7EDF94AC33 /* testBoardStaffMatchesSourceWire.p1-wireframe-view-staff-liquidglass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "testBoardStaffMatchesSourceWire.p1-wireframe-view-staff-liquidglass.png"; sourceTree = "<group>"; };
 		5465D8F87788C6C0613324CC /* CatalogEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogEditorView.swift; sourceTree = "<group>"; };
 		5528DF21BB6FDC5799A98B13 /* Engine */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Engine; path = ../../packages/Engine; sourceTree = SOURCE_ROOT; };
+		576D57F497A9C0450B84E29F /* LabelOpsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelOpsSheet.swift; sourceTree = "<group>"; };
 		5E4D97785FC434739FB783F4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6C0BD61D51C6F729BED11418 /* PrepFlowSnapshotTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PrepFlowSnapshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		744362A502355067202F41DB /* DirectServiceOpsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectServiceOpsSheet.swift; sourceTree = "<group>"; };
 		7B82BFD34B2D5E12CB1D3F85 /* PrepFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrepFlowApp.swift; sourceTree = "<group>"; };
 		7BA69CF4CB9B225FEE698F58 /* BoardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardStore.swift; sourceTree = "<group>"; };
 		8525C1B79B16EE3835FF73CD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -80,8 +90,10 @@
 		B0A4C654FDBB9C10305B86A2 /* CatalogModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogModels.swift; sourceTree = "<group>"; };
 		B93D69111C39D44B54F1F1AC /* Data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Data; path = ../../packages/Data; sourceTree = SOURCE_ROOT; };
 		BA4DADAD9C37E8A9D0C7648F /* testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "testSettingsHomeMatchesSourceWire.p1-wireframe-settings-home-liquidglass.png"; sourceTree = "<group>"; };
+		C1915E7E39B0694FE553AE12 /* ReservationOmotenashiPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationOmotenashiPanel.swift; sourceTree = "<group>"; };
 		C2D401BFA3A05A805D2B8082 /* testBoardNowMatchesSourceWire.p0-wireframe-board-liquidglass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "testBoardNowMatchesSourceWire.p0-wireframe-board-liquidglass.png"; sourceTree = "<group>"; };
 		C3540741D5AF32E9BAC03591 /* ServiceSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceSetupView.swift; sourceTree = "<group>"; };
+		C6D2FADCDEAD4FAF3EC8D00D /* NowGuidanceSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowGuidanceSheet.swift; sourceTree = "<group>"; };
 		CC115886C18221CAA1D153E1 /* Satoshi-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Satoshi-Regular.otf"; sourceTree = "<group>"; };
 		D5B23AA2FA68F4777FA801A8 /* testSimulationMatchesSourceWire.p0-wireframe-simulation-liquidglass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "testSimulationMatchesSourceWire.p0-wireframe-simulation-liquidglass.png"; sourceTree = "<group>"; };
 		EB92148BA1CF0220C904BFE9 /* testBoardDishesMatchesSourceWire.p1-wireframe-view-dishes-liquidglass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "testBoardDishesMatchesSourceWire.p1-wireframe-view-dishes-liquidglass.png"; sourceTree = "<group>"; };
@@ -184,9 +196,15 @@
 				7BA69CF4CB9B225FEE698F58 /* BoardStore.swift */,
 				5465D8F87788C6C0613324CC /* CatalogEditorView.swift */,
 				B0A4C654FDBB9C10305B86A2 /* CatalogModels.swift */,
+				2108AE0A6612AA641F856513 /* CloseLoopSheet.swift */,
 				8525C1B79B16EE3835FF73CD /* ContentView.swift */,
+				744362A502355067202F41DB /* DirectServiceOpsSheet.swift */,
 				5E4D97785FC434739FB783F4 /* Info.plist */,
+				576D57F497A9C0450B84E29F /* LabelOpsSheet.swift */,
+				C6D2FADCDEAD4FAF3EC8D00D /* NowGuidanceSheet.swift */,
 				7B82BFD34B2D5E12CB1D3F85 /* PrepFlowApp.swift */,
+				00B85CF350A619B64CDF74E3 /* ReservationHubSheet.swift */,
+				C1915E7E39B0694FE553AE12 /* ReservationOmotenashiPanel.swift */,
 				158C785A883E7211F12E5F61 /* ServiceModels.swift */,
 				C3540741D5AF32E9BAC03591 /* ServiceSetupView.swift */,
 				9525A3E214A2D16B8F90177E /* SettingsHomeView.swift */,
@@ -358,8 +376,14 @@
 				0A385EEA3E173986303CC22D /* BoardStore.swift in Sources */,
 				73477B350D4FCD321744A2BF /* CatalogEditorView.swift in Sources */,
 				4DD818536F930138D05EEB4F /* CatalogModels.swift in Sources */,
+				20DEBE1B88CAB58F030C8BD0 /* CloseLoopSheet.swift in Sources */,
 				E789FD6DF8500E40EFE8EAEC /* ContentView.swift in Sources */,
+				4EF69473EC4F244B9235B4AB /* DirectServiceOpsSheet.swift in Sources */,
+				C09EF20749A42A9D11E08C3D /* LabelOpsSheet.swift in Sources */,
+				77094BCE7BA2FC91F6E883AA /* NowGuidanceSheet.swift in Sources */,
 				24C2A1AB159FCA1A9B8EF01B /* PrepFlowApp.swift in Sources */,
+				3DD26DC9835B19A82E342D67 /* ReservationHubSheet.swift in Sources */,
+				A778C0360F2C9502D622DE9F /* ReservationOmotenashiPanel.swift in Sources */,
 				C3CDC9E06760AEA822A5C947 /* ServiceModels.swift in Sources */,
 				66F86B248AD3BC76AD7643C7 /* ServiceSetupView.swift in Sources */,
 				E096E5FCDAC792FE17B0D439 /* SettingsHomeView.swift in Sources */,

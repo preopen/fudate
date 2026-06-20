@@ -13,6 +13,94 @@ jobs:
       - run: swift test --package-path packages/SyncSpike
       - run: swift test --package-path packages/Data
 
+  quality:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install quality tools
+        run: |
+          brew list swiftformat >/dev/null 2>&1 || brew install swiftformat
+          brew list swiftlint >/dev/null 2>&1 || brew install swiftlint
+      - run: swiftformat --lint .
+      - run: swiftlint --strict
+      - name: Enforce UI token guardrails
+        shell: bash
+        run: |
+          set -euo pipefail
+          pattern='#[0-9A-Fa-f]{6}|Color\(red:|\.font\(\.system'
+          if command -v rg >/dev/null 2>&1; then
+            matches="$(rg -n "${pattern}" apps/ios/Sources packages --glob '*.swift' --glob '!packages/DesignTokens/Sources/DesignTokens/DesignTokens.swift' || true)"
+          else
+            matches="$(grep -REn "${pattern}" apps/ios/Sources packages --include='*.swift' | grep -v 'packages/DesignTokens/Sources/DesignTokens/DesignTokens.swift' || true)"
+          fi
+          if [ -n "${matches}" ]; then
+            echo "${matches}"
+            exit 1
+          fi
+      - name: Enforce PrepFlowColor.time usage annotations
+        shell: bash
+        run: |
+          set -euo pipefail
+          if command -v rg >/dev/null 2>&1; then
+            matches="$(rg -n 'PrepFlowColor\.time' apps/ios/Sources --glob '*.swift' | grep -v 'time-use:' || true)"
+          else
+            matches="$(grep -REn 'PrepFlowColor\.time' apps/ios/Sources --include='*.swift' | grep -v 'time-use:' || true)"
+          fi
+          if [ -n "${matches}" ]; then
+            echo "PrepFlowColor.time must be annotated with // time-use: explaining time/NOW/delay/urgent usage."
+            echo "${matches}"
+            exit 1
+          fi
+      - name: Enforce canonical wire references
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruby <<'RUBY'
+          failures = []
+
+          Dir.glob("apps/ios/Sources/**/*.swift").sort.each do |file|
+            lines = File.readlines(file, chomp: true)
+
+            lines.each_with_index do |line, index|
+              next unless line =~ %r{^// 正本: (design/[^ ]+)}
+
+              wire = Regexp.last_match(1)
+              failures << "#{file}:#{index + 1}: missing canonical wire #{wire}" unless File.file?(wire)
+            end
+
+            lines.each_with_index do |line, index|
+              next unless line =~ /^\s*(?:private\s+)?struct\s+\w+(?:<[^>]+>)?.*:\s*View\b/
+
+              start = [0, index - 4].max
+              window = lines[start...index]
+              next if window.any? { |candidate| candidate.start_with?("// 正本: design/") }
+
+              failures << "#{file}:#{index + 1}: missing // 正本: design/<file> immediately above #{line.strip}"
+            end
+          end
+
+          if failures.any?
+            warn "SwiftUI View declarations must be preceded by existing // 正本: design/<file> references."
+            failures.each { |failure| warn failure }
+            exit 1
+          end
+          RUBY
+      - name: Enforce no committed secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          tracked_secret_files="$(git ls-files | grep -E '(^|/)\.env$|(^|/)\.env\.(local|development|staging|production)$|AuthKey_[A-Z0-9]+\.p8$|\.mobileprovision$|\.p12$|\.cer$' || true)"
+          service_role_values="$(git grep -nE 'SUPABASE_SERVICE_ROLE_KEY[[:space:]]*=[[:space:]]*[^#[:space:]]' -- . ':!.env.example' || true)"
+          private_key_values="$(git grep -nE -- '-----BEGIN (RSA |EC |OPENSSH |PRIVATE )?PRIVATE KEY-----' -- . ':!.env.example' || true)"
+
+          if [ -n "${tracked_secret_files}${service_role_values}${private_key_values}" ]; then
+            echo "Secret-bearing files or values must not be committed."
+            [ -z "${tracked_secret_files}" ] || printf "Tracked secret files:\n%s\n" "${tracked_secret_files}"
+            [ -z "${service_role_values}" ] || printf "Service-role key values:\n%s\n" "${service_role_values}"
+            [ -z "${private_key_values}" ] || printf "Private key material:\n%s\n" "${private_key_values}"
+            exit 1
+          fi
+
   app:
     runs-on: macos-15
     steps:
