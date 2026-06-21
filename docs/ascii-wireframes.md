@@ -1,32 +1,32 @@
-# PrepFlow ASCII Wireframes for Implementation Edits
+# PrepFlow ASCII ワイヤーフレーム実装修正マップ
 
-Purpose: make the current SwiftUI implementation easier to inspect and edit.
+目的: 現在の SwiftUI 実装を、修正時に追いやすい ASCII ワイヤーフレームとして整理する。
 
-This file is not the UI source of truth. The source of truth remains:
+このファイルは UI の正本ではない。正本は常に次のファイル群とする。
 
 - `docs/ui-fidelity-contract.md`
 - `design/*.png`
 - `design/*.html`
-- snapshot tests and `docs/ui-comparisons/*.comparison.png`
+- snapshot test（スナップショットテスト）
+- `docs/ui-comparisons/*.comparison.png`
 
-Use this file as a code navigation map only. If a layout change is desired, update
-the matching `design/` wire first, then update SwiftUI to follow it.
+このファイルはコードを読むための補助地図である。レイアウトを変更したい場合は、先に対応する `design/` の正本ワイヤーを更新し、その後に SwiftUI 実装を追従させる。
 
-## Legend
+## 凡例
 
 ```text
-+-----+     opaque content layer
++-----+     不透明なコンテンツ層
 |     |
 +-----+
 
-[glass]     Liquid Glass functional layer only
-(time)      time / NOW / delay / deadline use; may use PrepFlowColor.time
-[ink]       selection / progress / normal emphasis; must not use time red
-<sheet>     modal sheet
-{store}     BoardStore or AuthStore state/action
+[glass]     Liquid Glass を使う機能層
+(time)      時間 / NOW / 遅延 / 期限。PrepFlowColor.time 使用可
+[ink]       選択 / 進捗 / 通常強調。朱を使わない
+<sheet>     モーダルシート
+{store}     BoardStore または AuthStore の状態/操作
 ```
 
-## Route Map
+## 画面遷移マップ
 
 ```text
 PrepFlowApp
@@ -37,198 +37,198 @@ ContentView
   v
 AuthenticatedRootView
   |
-  +-- no session -------------------------------------------+
+  +-- セッションなし ----------------------------------------+
   |                                                        |
   |  AuthGateView                                          |
-  |   -> invite / Apple / magic link / local fallback       |
+  |   -> 招待 / Apple / マジックリンク / SQLite 縮退         |
   |                                                        |
-  +-- session ----------------------------------------------+
+  +-- セッションあり ----------------------------------------+
                                                            |
      AuthenticatedSessionView                              |
        |                                                   |
-       +-- activation -> ActivationSummaryView             |
-       +-- simulation -> SimulationView                    |
-       +-- service    -> ServiceSetupView                  |
-       +-- board      -> PrepFlowBoardView                 |
-       +-- catalog    -> CatalogEditorView                 |
-       +-- settings   -> SettingsHomeView                  |
+       +-- 活性化     -> ActivationSummaryView             |
+       +-- 試算       -> SimulationView                    |
+       +-- 営業設定   -> ServiceSetupView                  |
+       +-- ボード     -> PrepFlowBoardView                 |
+       +-- カタログ   -> CatalogEditorView                 |
+       +-- 設定       -> SettingsHomeView                  |
 ```
 
-## Auth Gate
+## オンボーディング / 認証
 
-Source file: `apps/ios/Sources/PrepFlow/AuthGateView.swift`
-Canonical wire: `design/p0-wireframe-onboarding-liquidglass.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/AuthGateView.swift`
+正本ワイヤー: `design/p0-wireframe-onboarding-liquidglass.png`
 
 ```text
 +--------------------------------------------------------------------------------+
 | [glass] AuthTopBar                                                              |
-|         step 1 -- step 2 -- step 3                                               |
+|         手順 1 -- 手順 2 -- 手順 3                                               |
 +--------------------------------------------------------------------------------+
 |                                                                                |
 | +--------------------------------+  +-----------------------------------------+ |
 | | AuthHero                       |  | AuthInvitePanel                         | |
-| | - product signal               |  | - email field                           | |
-| | - onboarding message           |  | - magic link action                     | |
-| | - readiness / local fallback   |  | - Apple sign-in action                  | |
+| | - プロダクト信号               |  | - email 入力                            | |
+| | - 初期導入メッセージ           |  | - マジックリンク操作                    | |
+| | - 準備状態 / SQLite 縮退       |  | - Apple サインイン操作                  | |
 | +--------------------------------+  +-----------------------------------------+ |
 |                                                                                |
 | +--------------------------------+  +-----------------------------------------+ |
 | | AuthTenantPanel                |  | AuthStatusRows                         | |
-| | - tenant / role                |  | - Supabase readiness                    | |
-| | - local invite                 |  | - Apple readiness                       | |
+| | - tenant / role                |  | - Supabase 準備状態                     | |
+| | - ローカル招待                 |  | - Apple 準備状態                        | |
 | +--------------------------------+  +-----------------------------------------+ |
 |                                                                                |
 +--------------------------------------------------------------------------------+
 | [glass] AuthBottomBar                                                           |
-|         primary auth action / fallback status                                   |
+|         主操作 / 縮退状態                                                       |
 +--------------------------------------------------------------------------------+
 ```
 
-Edit anchors:
+修正アンカー:
 
 ```text
-AuthGateView          -> screen shell
-AuthTopBar            -> functional glass layer
-AuthHero              -> left content block
-AuthInvitePanel       -> auth input/actions
-AuthTenantPanel       -> tenant status
-AuthStatusRow         -> readiness rows
-AuthStore/AuthModels  -> session, invite, env fallback
+AuthGateView          -> 画面全体
+AuthTopBar            -> 上部 glass 機能層
+AuthHero              -> 左側の導入ブロック
+AuthInvitePanel       -> 認証入力と操作
+AuthTenantPanel       -> tenant 状態
+AuthStatusRow         -> 準備状態の行
+AuthStore/AuthModels  -> session / invite / env 縮退
 ```
 
-## Activation Summary
+## 活性化サマリー
 
-Source file: `apps/ios/Sources/PrepFlow/SimulationViews.swift`
-Canonical wire: `design/p0-wireframe-activation-liquidglass.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/SimulationViews.swift`
+正本ワイヤー: `design/p0-wireframe-activation-liquidglass.png`
 
 ```text
 +--------------------------------------------------------------------------------+
 | [glass] ActivationTopBar                                                        |
-|         setup steps: business done -> savings current -> first board pending    |
+|         業態 完了 -> 削減 現在 -> 初回ボード 待機                              |
 +--------------------------------------------------------------------------------+
 |                                                                                |
 | +------------------------------------------------------------------------------+|
 | | ActivationNumbers                                                            ||
 | | +--------------------+  +--------------------+  +--------------------+       ||
-| | | reduction hero     |  | loss saving        |  | hit rate           |       ||
+| | | 削減の主指標       |  | ロス削減           |  | 的中率             |       ||
 | | +--------------------+  +--------------------+  +--------------------+       ||
 | +------------------------------------------------------------------------------+|
 |                                                                                |
 | +------------------------------------------------------------------------------+|
 | | ActivationBars                                                               ||
-| | - before recommendation                                                       ||
-| | - after recommendation                                                        ||
-| | - expected reduction                                                          ||
+| | - 推奨前                                                                        ||
+| | - 推奨後                                                                        ||
+| | - 削減見込み                                                                    ||
 | +------------------------------------------------------------------------------+|
 |                                                                                |
 +--------------------------------------------------------------------------------+
-| [glass] ActivationBottomBar -> continue to simulation / board                   |
+| [glass] ActivationBottomBar -> シミュレーション / ボードへ進む                  |
 +--------------------------------------------------------------------------------+
 ```
 
-Edit anchors:
+修正アンカー:
 
 ```text
-ActivationSummaryView -> screen shell
-ActivationTopBar      -> glass progress header
-ActivationNumbers     -> KPI cards
-ActivationBars        -> comparison bars
-ActivationBottomBar   -> navigation action
-BoardStore            -> simulation summary and routing progress
+ActivationSummaryView -> 画面全体
+ActivationTopBar      -> glass の進行ヘッダー
+ActivationNumbers     -> KPI カード
+ActivationBars        -> 比較バー
+ActivationBottomBar   -> 遷移アクション
+BoardStore            -> シミュレーション概要と遷移進捗
 ```
 
-## Simulation
+## シミュレーション
 
-Source file: `apps/ios/Sources/PrepFlow/SimulationViews.swift`
-Canonical wire: `design/p0-wireframe-simulation-liquidglass.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/SimulationViews.swift`
+正本ワイヤー: `design/p0-wireframe-simulation-liquidglass.png`
 
 ```text
 +--------------------------------------------------------------------------------+
 | [glass] SimulationTopBar                                                        |
-|         period / route actions / reservation hub / close loop                   |
+|         期間 / 動線操作 / 予約ハブ / 締めループ                                 |
 +--------------------------------------------------------------------------------+
 |                                                                                |
 | +--------------------------------+  +-----------------------------------------+ |
 | | SimulationKPIGrid              |  | SimulationResultPanel                   | |
-| | + KPIBox + KPIBox + KPIBox     |  | - waste log / correction result        | |
-| | - recommended vs actual        |  | - board impact summary                 | |
+| | + KPIBox + KPIBox + KPIBox     |  | - 廃棄ログ / 補正結果                  | |
+| | - 推奨 vs 実績                 |  | - ボード影響の概要                     | |
 | +--------------------------------+  +-----------------------------------------+ |
 |                                                                                |
 | +------------------------------------------------------------------------------+|
 | | SimulationItemList                                                           ||
 | | - SimulationItemRow                                                          ||
-| | - SimulationBar: recommended / actual / gap                                  ||
+| | - SimulationBar: 推奨 / 実績 / 差分                                          ||
 | +------------------------------------------------------------------------------+|
 |                                                                                |
 | +------------------------------------------------------------------------------+|
 | | SimulationStatusBox                                                          ||
-| | - local save status                                                          ||
-| | - applied coefficient status                                                 ||
+| | - ローカル保存状態                                                         ||
+| | - 係数適用状態                                                               ||
 | +------------------------------------------------------------------------------+|
 +--------------------------------------------------------------------------------+
 ```
 
-Edit anchors:
+修正アンカー:
 
 ```text
-SimulationView        -> screen shell and sheets
-SimulationTopBar      -> glass function layer
-SimulationKPIGrid     -> KPI summary
-SimulationItemList    -> rows
-SimulationResultPanel -> apply/adjust summary
-CloseLoopSheet        -> close flow sheet
-ReservationHubSheet   -> reservation diff sheet
+SimulationView        -> 画面全体と sheet 起動
+SimulationTopBar      -> glass 機能層
+SimulationKPIGrid     -> KPI 概要
+SimulationItemList    -> 行リスト
+SimulationResultPanel -> 適用/調整の概要
+CloseLoopSheet        -> 締めフロー sheet
+ReservationHubSheet   -> 予約差分 sheet
 ```
 
-## Service Setup
+## 本日のサービス設定
 
-Source file: `apps/ios/Sources/PrepFlow/ServiceSetupView.swift`
-Canonical wire: `design/p0-wireframe-service-setup-liquidglass.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/ServiceSetupView.swift`
+正本ワイヤー: `design/p0-wireframe-service-setup-liquidglass.png`
 
 ```text
 +--------------------------------------------------------------------------------+
 | [glass] ServiceTopBar                                                           |
-|         date / service period / open time                                       |
+|         日付 / 営業帯 / 開店時刻                                                |
 +--------------------------------------------------------------------------------+
 |                                                                                |
 | +------------------------------------------+ +-------------------------------+ |
 | | ReservationList                          | | ServiceCoversPanel            | |
-| | + ServiceControlStrip                    | | - main covers stepper         | |
-| | | - period toggle                        | | - other covers stepper        | |
-| | | - open time control (time)             | | - generated board status      | |
-| | +--------------------------------------+ | | - generate board action       | |
+| | + ServiceControlStrip                    | | - メイン人数 stepper          | |
+| | | - 営業帯切替                           | | - その他人数 stepper          | |
+| | | - 開店時刻入力 (time)                  | | - ボード生成済み状態          | |
+| | +--------------------------------------+ | | - ボード生成操作             | |
 | | | ReservationRow                         | +-------------------------------+ |
 | | | ReservationRow                         |                                   |
-| | | add manual reservation                 |                                   |
+| | | 手入力予約を追加                       |                                   |
 | | +--------------------------------------+ |                                   |
 | +------------------------------------------+                                   |
 |                                                                                |
 | <sheet> ReservationEditSheet                                                    |
-|         covers stepper / note field / delete action                             |
+|         人数 stepper / メモ入力 / 削除操作                                      |
 +--------------------------------------------------------------------------------+
 ```
 
-Edit anchors:
+修正アンカー:
 
 ```text
-ServiceSetupView        -> screen shell
-ServiceTopBar           -> top glass layer
-ServiceControlStrip     -> period/open-time controls
-ReservationList         -> manual reservation list
-ReservationRow          -> row action into edit sheet
-ServiceCoversPanel      -> cover totals and board generation
-ReservationEditSheet    -> edit/delete sheet
-BoardStore              -> service, reservations, board preview
+ServiceSetupView        -> 画面全体
+ServiceTopBar           -> 上部 glass 層
+ServiceControlStrip     -> 営業帯 / 開店時刻の操作
+ReservationList         -> 手入力予約リスト
+ReservationRow          -> 編集 sheet 起動行
+ServiceCoversPanel      -> 人数合計と board 生成
+ReservationEditSheet    -> 編集 / 削除 sheet
+BoardStore              -> service / reservations / board preview
 ```
 
-## Board: Shared Shell
+## 仕込みボード: 共通シェル
 
-Source files:
+実装ファイル:
 
 - `apps/ios/Sources/PrepFlow/ContentView.swift`
 - `apps/ios/Sources/PrepFlow/BoardChrome.swift`
 
-Canonical wires:
+正本ワイヤー:
 
 - `design/p0-wireframe-board-liquidglass.png`
 - `design/p1-wireframe-board-eta-liquidglass.png`
@@ -238,72 +238,72 @@ Canonical wires:
 ```text
 +--------------------------------------------------------------------------------+
 | [glass] BoardTopBar                                                             |
-|  title + day/covers             [ now | dishes | staff ]     (T-minus island)   |
-|  impact badge / settings                                                         |
+|  タイトル + 日付/人数        [ 今これ | 皿ごと | 担当 ]     (T-minus 島)          |
+|  影響バッジ / 設定                                                            |
 +--------------------------------------------------------------------------------+
 |                                                                                |
-|                         selected BoardMode                                      |
+|                         選択中の BoardMode                                      |
 |                                                                                |
-|      now view                 dishes view                  staff view            |
+|      今これ view              皿ごと view                 担当 view             |
 |         |                         |                          |                  |
 |         v                         v                          v                  |
 |   NowBoardContent          DishBoardContent            StaffBoardContent         |
 |                                                                                |
 +--------------------------------------------------------------------------------+
-| [glass] BoardBottomBar or LineGateBar                                           |
-|  - line gate status                                                             |
-|  - guidance action                                                              |
-|  - label progression / unresolved check                                         |
+| [glass] BoardBottomBar または LineGateBar                                      |
+|  - ライン開始ゲート状態                                                        |
+|  - 手順ガイド操作                                                              |
+|  - ラベル進捗 / 未解決チェック                                                |
 +--------------------------------------------------------------------------------+
 | <sheet> NowGuidanceSheet                                                        |
 | <sheet> LabelOpsSheet                                                           |
 +--------------------------------------------------------------------------------+
 ```
 
-Rules to preserve:
+維持する規則:
 
 ```text
-1. Board navigation is top bar + segmented control.
-2. Do not replace now/dishes/staff with a sidebar.
-3. Progress bars use ink, not time red.
-4. Time red is only for T-minus, NOW, delay, deadline, urgent.
-5. Glass is only top bar, segment, countdown island, bottom bar, sheets.
+1. ボードナビは上部バー + segmented control。
+2. now/dishes/staff を sidebar に置き換えない。
+3. progress bar は ink。time red を使わない。
+4. time red は T-minus / NOW / 遅延 / 期限 / 緊急のみ。
+5. glass は top bar / segment / countdown island / bottom bar / sheet のみ。
 ```
 
-## Board: Now View
+## 仕込みボード: 今これ
 
-Source file: `apps/ios/Sources/PrepFlow/ContentView.swift`
-Main view: `NowBoardContent`
+実装ファイル: `apps/ios/Sources/PrepFlow/ContentView.swift`
+主 View: `NowBoardContent`
 
 ```text
 +--------------------------------------------------------------------------------+
 | +--------------------------------------+ +------------------------------------+ |
-| | Focus area                           | | TimelineRail                       | |
-| | - current task title                 | | - T-minus sequence                 | |
-| | - quantity / assignee                | | - RailItem rows                    | |
-| | - FocusTaskRow list                  | | - status per step                  | |
-| | - CheckCircle state                  | |                                    | |
+| | フォーカス領域                      | | TimelineRail                       | |
+| | - 現在タスク名                      | | - T-minus 順序                    | |
+| | - 数量 / 担当                       | | - RailItem 行                      | |
+| | - FocusTaskRow リスト               | | - 手順ごとの状態                  | |
+| | - CheckCircle 状態                  | |                                    | |
 | +--------------------------------------+ +------------------------------------+ |
 |                                                                                |
 | +--------------------------------------+ +------------------------------------+ |
 | | BoardWorkStatePanel                  | | BoardLandingForecastCard           | |
-| | - started/hold/readiness             | | - ETACompact                       | |
-| | - start/pause/resume/check/complete  | | - delay/shortfall state (time)     | |
-| | - assist proposal action             | | - assist apply                     | |
+| | - 開始/保留/準備状態                | | - ETACompact                       | |
+| | - 開始/一時停止/再開/確認/完了      | | - 遅延/不足状態 (time)            | |
+| | - 応援提案操作                      | | - 応援適用                        | |
 | +--------------------------------------+ +------------------------------------+ |
 |                                                                                |
 | +------------------------------------------------------------------------------+|
 | | BoardImpactRailCard                                                          ||
-| | - queued reservation/service/guest/remaining impacts                         ||
-| | - apply or dismiss impact                                                    ||
+| | - 待機中の予約/営業/ゲスト/残数影響                                      ||
+| | - 影響の適用または却下                                                    ||
 | +------------------------------------------------------------------------------+|
 +--------------------------------------------------------------------------------+
 ```
 
-## Board: Dishes View
+## 仕込みボード: 皿ごと
 
-Source file: `apps/ios/Sources/PrepFlow/ContentView.swift`
-Main view: `DishBoardContent`
+実装ファイル: `apps/ios/Sources/PrepFlow/ContentView.swift`
+主 View: `DishBoardContent`
 
 ```text
 +--------------------------------------------------------------------------------+
@@ -311,7 +311,7 @@ Main view: `DishBoardContent`
 |                                                                                |
 | +----------------------+ +----------------------+ +----------------------+     |
 | | DishCard             | | DishCard             | | DishCard             |     |
-| | - dish title         | | - dish title         | | - dish title         |     |
+| | - 料理名            | | - 料理名            | | - 料理名            |     |
 | | - [ink] ProgressBar  | | - [ink] ProgressBar  | | - [ink] ProgressBar  |     |
 | | - DishTaskRow        | | - DishTaskRow        | | - DishTaskRow        |     |
 | | - DishImpactRow      | | - DishImpactRow      | | - DishImpactRow      |     |
@@ -319,10 +319,10 @@ Main view: `DishBoardContent`
 +--------------------------------------------------------------------------------+
 ```
 
-## Board: Staff View
+## 仕込みボード: 担当
 
-Source file: `apps/ios/Sources/PrepFlow/ContentView.swift`
-Main view: `StaffBoardContent`
+実装ファイル: `apps/ios/Sources/PrepFlow/ContentView.swift`
+主 View: `StaffBoardContent`
 
 ```text
 +--------------------------------------------------------------------------------+
@@ -330,17 +330,17 @@ Main view: `StaffBoardContent`
 |                                                                                |
 | +---------------------------+ +---------------------------+ +----------------+ |
 | | StaffColumn               | | StaffColumn               | | StaffColumn    | |
-| | - operator / workload     | | - operator / workload     | | - operator    | |
-| | - StaffTaskCard           | | - StaffTaskCard           | | - task cards  | |
-| | - StaffImpactCard         | | - StaffImpactCard         | | - impacts     | |
+| | - 担当者 / 負荷           | | - 担当者 / 負荷           | | - 担当者      | |
+| | - StaffTaskCard           | | - StaffTaskCard           | | - タスク群    | |
+| | - StaffImpactCard         | | - StaffImpactCard         | | - 影響        | |
 | +---------------------------+ +---------------------------+ +----------------+ |
 +--------------------------------------------------------------------------------+
 ```
 
-## Now Guidance Sheet
+## 今これ手順 Sheet
 
-Source file: `apps/ios/Sources/PrepFlow/NowGuidanceSheet.swift`
-Canonical wire: `design/p0-wireframe-board-liquidglass.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/NowGuidanceSheet.swift`
+正本ワイヤー: `design/p0-wireframe-board-liquidglass.png`
 
 ```text
 +--------------------------------------------------------------------------------+
@@ -348,27 +348,27 @@ Canonical wire: `design/p0-wireframe-board-liquidglass.png`
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | GuidanceWorkStatePanel            | | TodayPrepImpactPanel                  | |
-| | - active operator                 | | - impact rows                         | |
-| | - start/pause/resume              | | - apply/dismiss                       | |
-| | - actual minute adjustment        | |                                       | |
+| | - 現在の担当者                   | | - 影響行                              | |
+| | - 開始/一時停止/再開             | | - 適用/却下                           | |
+| | - 実績分数の調整                 | |                                       | |
 | +-----------------------------------+ +---------------------------------------+ |
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | GuidanceReadinessGate             | | AssistProposalCard                    | |
-| | - GuidanceCheckRow                | | - late/shortfall proposal             | |
-| | - completed check state           | | - apply assist                        | |
+| | - GuidanceCheckRow                | | - 遅延/不足提案                       | |
+| | - 完了チェック状態               | | - 応援適用                            | |
 | +-----------------------------------+ +---------------------------------------+ |
 |                                                                                |
 | +------------------------------------------------------------------------------+|
-| | GuidanceStepRow list / undo / complete next                                  ||
+| | GuidanceStepRow リスト / 取り消し / 次を完了                                 ||
 | +------------------------------------------------------------------------------+|
 +--------------------------------------------------------------------------------+
 ```
 
-## Catalog Editor
+## Catalog Editor（カタログ編集）
 
-Source file: `apps/ios/Sources/PrepFlow/CatalogEditorView.swift`
-Canonical wires:
+実装ファイル: `apps/ios/Sources/PrepFlow/CatalogEditorView.swift`
+正本ワイヤー:
 
 - `design/p1-wireframe-template-editor-liquidglass.png`
 - `design/p1-wireframe-prepitem-editor.png`
@@ -380,31 +380,31 @@ Canonical wires:
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | CatalogTree                       | | CatalogDetail                         | |
-| | - dish rows                       | | - task fields                         | |
-| | - component rows                  | | - scale mode                          | |
-| | - task rows                       | | - yield / lead / duration             | |
-| | - add buttons                     | | - instructions / media placeholder    | |
+| | - 料理行                          | | - タスク項目                          | |
+| | - コンポーネント行                | | - スケール方式                        | |
+| | - タスク行                        | | - 収量 / リード / 所要時間            | |
+| | - 追加ボタン                      | | - 手順 / メディア枠                   | |
 | +-----------------------------------+ | - CatalogPreview                      | |
 |                                       | - CatalogSavedStatus                  | |
 |                                       +---------------------------------------+ |
 +--------------------------------------------------------------------------------+
 ```
 
-## Settings Home
+## Settings Home（設定ホーム）
 
-Source file: `apps/ios/Sources/PrepFlow/SettingsHomeView.swift`
-Canonical wire: `design/p1-wireframe-settings-home-liquidglass.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/SettingsHomeView.swift`
+正本ワイヤー: `design/p1-wireframe-settings-home-liquidglass.png`
 
 ```text
 +--------------------------------------------------------------------------------+
 | [glass] SettingsTopBar                                                          |
-|         back to board / session / sign out                                      |
+|         board へ戻る / session / サインアウト                                  |
 +--------------------------------------------------------------------------------+
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | SettingsCard: Account             | | SettingsCard: Store / service         | |
-| | - auth provider                   | | - service time (time)                 | |
-| | - tenant readiness                | | - theme / lock / export               | |
+| | - 認証プロバイダ                  | | - 営業時刻 (time)                     | |
+| | - tenant 準備状態                 | | - テーマ / ロック / 書き出し          | |
 | +-----------------------------------+ +---------------------------------------+ |
 |                                                                                |
 | +------------------------------------------------------------------------------+|
@@ -413,10 +413,10 @@ Canonical wire: `design/p1-wireframe-settings-home-liquidglass.png`
 +--------------------------------------------------------------------------------+
 ```
 
-## Close Loop Sheet
+## 締め -> 翌日 Sheet
 
-Source file: `apps/ios/Sources/PrepFlow/CloseLoopSheet.swift`
-Canonical wires:
+実装ファイル: `apps/ios/Sources/PrepFlow/CloseLoopSheet.swift`
+正本ワイヤー:
 
 - `design/p2-wireframe-close-flow-liquidglass.png`
 - `design/p2-wireframe-close-nextday-liquidglass.png`
@@ -427,8 +427,8 @@ Canonical wires:
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | CloseLoopQtyStepper               | | CloseLoopPreview                      | |
-| | - made quantity                   | | - waste / carryover summary          | |
-| | - leftover quantity               | | - next-day effect                    | |
+| | - 仕込み済み数量                  | | - 廃棄 / 持越し概要                 | |
+| | - 残数量                          | | - 翌日への影響                      | |
 | +-----------------------------------+ +---------------------------------------+ |
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
@@ -438,42 +438,42 @@ Canonical wires:
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | CloseLoopLearningFeed             | | CloseLoopNextDayPanel                 | |
-| | - learning waste records          | | - CloseLoopNextDayRow                | |
+| | - 学習用の廃棄記録                | | - CloseLoopNextDayRow                | |
 | +-----------------------------------+ +---------------------------------------+ |
 +--------------------------------------------------------------------------------+
 ```
 
-## Reservation Hub Sheet
+## 予約ハブ Sheet
 
-Source file: `apps/ios/Sources/PrepFlow/ReservationHubSheet.swift`
-Canonical wire: `design/p2-wireframe-reservation-hub-liquidglass.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/ReservationHubSheet.swift`
+正本ワイヤー: `design/p2-wireframe-reservation-hub-liquidglass.png`
 
 ```text
 +--------------------------------------------------------------------------------+
 | <sheet> ReservationHubSheet                                                     |
 |                                                                                |
 | [glass] ReservationHubTopBar                                                    |
-|         source chips / resync / apply                                           |
+|         取得元 chips / 再同期 / 適用                                            |
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | ReservationHubList                | | ReservationHubApplyPanel              | |
-| | - ReservationHubRow               | | - apply gate status                   | |
-| | - duplicate alert                 | | - panel rows                          | |
-| | - source status                   | | - applied status                      | |
+| | - ReservationHubRow               | | - 適用ゲート状態                      | |
+| | - 重複アラート                    | | - パネル行                            | |
+| | - 取得元状態                      | | - 適用済み状態                        | |
 | +-----------------------------------+ +---------------------------------------+ |
 |                                                                                |
 | +------------------------------------------------------------------------------+|
 | | ReservationConnectorReviewPanel                                             ||
-| | - connector diff review rows                                                ||
-| | - accept/reject                                                              ||
+| | - connector 差分レビュー行                                                 ||
+| | - 承認/却下                                                                  ||
 | +------------------------------------------------------------------------------+|
 +--------------------------------------------------------------------------------+
 ```
 
-## Reservation Omotenashi Panel
+## 予約おもてなし Panel
 
-Source file: `apps/ios/Sources/PrepFlow/ReservationOmotenashiPanel.swift`
-Canonical wires:
+実装ファイル: `apps/ios/Sources/PrepFlow/ReservationOmotenashiPanel.swift`
+正本ワイヤー:
 
 - `design/p2-wireframe-special-prep.png`
 - `design/p3-wireframe-allergy-message.png`
@@ -485,22 +485,22 @@ Canonical wires:
 |                                                                                |
 | +------------------------------+ +-------------------------------------------+ |
 | | ReservationSpecialPrepRow    | | ReservationGuestReplyRecheckRow           | |
-| | - special prep task          | | - changed guest reply                     | |
-| | - assignment/status          | | - recheck impact                          | |
+| | - 特別仕込みタスク          | | - 変更されたゲスト回答                   | |
+| | - 割当/状態                 | | - 再確認の影響                           | |
 | +------------------------------+ +-------------------------------------------+ |
 |                                                                                |
 | +------------------------------------------------------------------------------+|
 | | ReservationAllergenPreview                                                  ||
-| | - allergen label preview                                                     ||
-| | - print/reprint status                                                       ||
+| | - アレルゲンラベルのプレビュー                                             ||
+| | - 印刷/再印刷状態                                                           ||
 | +------------------------------------------------------------------------------+|
 +--------------------------------------------------------------------------------+
 ```
 
-## Label / Larder / QR Sheet
+## ラベル / ラーダー / QR Sheet
 
-Source file: `apps/ios/Sources/PrepFlow/LabelOpsSheet.swift`
-Canonical wires:
+実装ファイル: `apps/ios/Sources/PrepFlow/LabelOpsSheet.swift`
+正本ワイヤー:
 
 - `design/p2-wireframe-label-flow.png`
 - `design/p2-wireframe-prep-larder.png`
@@ -515,19 +515,19 @@ Canonical wires:
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | LabelFlowColumn                   | | PrepLarderPanel                       | |
-| | - step 1 completed task preview   | | - larder KPI                          | |
-| | - step 2 label preview            | | - printer settings                    | |
-| | - step 3 QR remaining/waste       | | - fridge lens                         | |
-| | - step 4 carryover preview        | | - larder items                        | |
-| +-----------------------------------+ | - FIFO footer                         | |
+| | - 手順1 完了タスクプレビュー      | | - ラーダーKPI                         | |
+| | - 手順2 ラベルプレビュー          | | - プリンタ設定                        | |
+| | - 手順3 QR 残量/廃棄              | | - 冷蔵庫レンズ                        | |
+| | - 手順4 持越しプレビュー          | | - ラーダー品目                        | |
+| +-----------------------------------+ | - FIFO フッター                       | |
 |                                       +---------------------------------------+ |
 +--------------------------------------------------------------------------------+
 ```
 
-## Direct Booking Sheet
+## Direct Booking Sheet（Direct予約）
 
-Source file: `apps/ios/Sources/PrepFlow/DirectServiceOpsSheet.swift`
-Canonical wire: `design/p3-wireframe-direct-booking.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/DirectServiceOpsSheet.swift`
+正本ワイヤー: `design/p3-wireframe-direct-booking.png`
 
 ```text
 +--------------------------------------------------------------------------------+
@@ -535,40 +535,40 @@ Canonical wire: `design/p3-wireframe-direct-booking.png`
 |                                                                                |
 | +------------------------------+ +-------------------------------------------+ |
 | | DirectBrandPanel             | | DirectStepCard stack                      | |
-| | - booking source             | | - party card                              | |
-| | - allotment / remaining      | | - course card                             | |
-| +------------------------------+ | - note card                               | |
-|                                  | - payment card                            | |
+| | - 予約元                     | | - 人数カード                            | |
+| | - 枠 / 残数                  | | - コースカード                          | |
+| +------------------------------+ | - メモカード                            | |
+|                                  | - 決済カード                            | |
 |                                  +-------------------------------------------+ |
 |                                                                                |
 | +------------------------------------------------------------------------------+|
 | | DirectOpsStatus                                                             ||
-| | - checkout / no-show / waitlist / prep impact                               ||
+| | - checkout / no-show / waitlist / 仕込み影響                                ||
 | +------------------------------------------------------------------------------+|
 +--------------------------------------------------------------------------------+
 ```
 
-## Service Pass Sheet
+## Service Pass Sheet（サービス進行）
 
-Source file: `apps/ios/Sources/PrepFlow/DirectServiceOpsSheet.swift`
-Canonical wire: `design/p4-wireframe-passview.png`
+実装ファイル: `apps/ios/Sources/PrepFlow/DirectServiceOpsSheet.swift`
+正本ワイヤー: `design/p4-wireframe-passview.png`
 
 ```text
 +--------------------------------------------------------------------------------+
 | <sheet> ServicePassOpsSheet                                                     |
 |                                                                                |
 | [glass] ServicePassTopBar                                                       |
-|         segmented mode / sync actions                                           |
+|         segmented mode / 同期操作                                               |
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | ServicePassMatrix                 | | ServiceRemainingBoard                 | |
-| | - ServicePassCell grid            | | - remaining count                     | |
-| | - fire / hold / served state      | | - pacing proposal                     | |
+| | - ServicePassCell グリッド        | | - 残数                                | |
+| | - fire / hold / 提供済み状態      | | - ペース提案                          | |
 | +-----------------------------------+ +---------------------------------------+ |
 |                                                                                |
 | +-----------------------------------+ +---------------------------------------+ |
 | | ServiceFireBanner                 | | ServiceSyncPanel                      | |
-| | - urgent fire/hold state          | | - offline flush                       | |
+| | - 緊急 fire/hold 状態             | | - オフライン送信                      | |
 | +-----------------------------------+ | - POS/KDS event replay                | |
 |                                       +---------------------------------------+ |
 |                                                                                |
@@ -578,16 +578,16 @@ Canonical wire: `design/p4-wireframe-passview.png`
 +--------------------------------------------------------------------------------+
 ```
 
-## Store / Engine / Data Wiring
+## Store / Engine / Data の接続
 
 ```text
 SwiftUI View
   |
-  | user action
+  | ユーザー操作
   v
-BoardStore or AuthStore
+BoardStore または AuthStore
   |
-  +-- pure calculation --------------------------------------+
+  +-- 純粋計算 ---------------------------------------------+
   |                                                         |
   |  Engine                                                 |
   |   - calcQty                                             |
@@ -599,39 +599,39 @@ BoardStore or AuthStore
   |   - label / larder                                      |
   |   - direct / service sync                               |
   |                                                         |
-  +-- local persistence ------------------------------------+
+  +-- ローカル永続化 --------------------------------------+
                                                             |
      PrepFlowDatabase (GRDB SQLite)
-      - tenant scoped rows
+      - tenant スコープ行
       - event log
-      - settings payloads
-      - local fallback
-      - restore state on relaunch
+      - settings payload
+      - ローカル縮退
+      - 再起動時の状態復元
 ```
 
-## Edit Workflow
+## 修正手順
 
 ```text
-1. Pick the screen or sheet in this document.
-2. Open the listed canonical design file in design/.
-3. Open the listed Swift source file.
-4. Keep the same macro layout:
-   - top glass layer
-   - opaque content layer
-   - bottom/sheet glass layer
-5. Use only DesignTokens for color/font/radius/spacing/motion.
-6. Use PrepFlowColor.time only for time/NOW/delay/deadline/urgent.
-7. Add or keep // time-use: on every PrepFlowColor.time usage.
-8. Keep // canonical design comments near every SwiftUI View.
-9. Run:
+1. この文書で対象画面または sheet を選ぶ。
+2. 記載されている正本デザインファイルを design/ で開く。
+3. 記載されている Swift ソースファイルを開く。
+4. 大枠の構造を維持する。
+   - 上部 glass layer
+   - 不透明 content layer
+   - 下部/sheet glass layer
+5. 色 / font / radius / spacing / motion は DesignTokens のみ使う。
+6. PrepFlowColor.time は time / NOW / 遅延 / 期限 / 緊急のみに使う。
+7. PrepFlowColor.time の使用箇所には必ず // time-use: を付ける。
+8. すべての SwiftUI View 近くに // 正本: design/... を維持する。
+9. 最低限、次を走らせる。
    swiftformat --lint .
    swiftlint --strict
    xcodebuild test ... -only-testing:PrepFlowSnapshotTests
-10. If the visual structure intentionally changed:
-   update design/ first, render the PNG, then update snapshots/comparisons.
+10. 見た目の構造を意図的に変える場合:
+   先に design/ を更新し、PNG を render してから snapshot/comparison を更新する。
 ```
 
-## Snapshot Comparison Files
+## Snapshot 比較ファイル
 
 ```text
 docs/ui-comparisons/testAuthGateMatchesSourceWire.p0-wireframe-onboarding-liquidglass.comparison.png
