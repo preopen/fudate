@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepFlow High Fidelity User Flow</title>
+<style>
+  :root{
+    --ink:#15171a;--g2:#70757b;--g3:#b9bec4;--g4:#e6e8eb;--g5:#f6f7f8;
+    --white:#fff;--time:#c2410c;--time-soft:#fff1e8;--ok:#177245;
+    --font:Satoshi,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#dfe2e5;color:var(--ink);font-family:var(--font);padding:28px}
+  .cover{width:1180px;margin:0 auto 26px}
+  .cover h1{font-size:28px;margin:0 0 8px;font-weight:900}
+  .cover p{margin:0;color:var(--g2);font-size:14px}
+  .frame{width:1180px;margin:0 auto 34px}
+  .label{display:flex;justify-content:space-between;align-items:flex-end;margin:0 0 10px}
+  .label b{font-size:18px}.label span{font-size:12px;color:var(--g2)}
+  .ipad{width:1180px;height:812px;background:#0c0d0e;border-radius:40px;padding:14px;box-shadow:0 30px 70px rgba(0,0,0,.28)}
+  .screen{position:relative;height:784px;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#f8f9fa,#eef1f3)}
+  .screen:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.58),rgba(255,255,255,0) 34%,rgba(0,0,0,.03));pointer-events:none}
+  .content{position:absolute;inset:94px 22px 102px;display:flex;gap:16px}
+  .content.no-bottom{bottom:22px}.content.no-top{top:22px}.content.sheet-space{inset:72px 28px 28px}
+  .glass{background:rgba(255,255,255,.54);backdrop-filter:blur(24px) saturate(170%);-webkit-backdrop-filter:blur(24px) saturate(170%);
+    border:1px solid rgba(255,255,255,.82);box-shadow:0 13px 32px rgba(20,23,26,.13),inset 0 1px 0 rgba(255,255,255,.94)}
+  .topbar{position:absolute;z-index:4;top:14px;left:14px;right:14px;height:68px;border-radius:22px;display:flex;align-items:center;gap:18px;padding:0 20px}
+  .topbar h2{font-size:18px;margin:0;font-weight:900}.topbar small{display:block;color:var(--g2);font-weight:700;margin-top:2px}
+  .spacer{flex:1}.seg{display:flex;gap:3px;padding:4px;border-radius:999px;background:rgba(20,23,26,.07)}
+  .seg span{padding:8px 19px;border-radius:999px;font-size:13px;font-weight:900;color:var(--g2)}
+  .seg .on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(20,23,26,.14)}
+  .island{display:flex;align-items:center;gap:10px;background:rgba(194,65,12,.13);border:1px solid rgba(194,65,12,.3);border-radius:16px;padding:7px 14px;color:var(--time)}
+  .island b{font-size:19px}.island small{font-size:10px;letter-spacing:.08em;color:var(--time)}
+  .bottom{position:absolute;z-index:4;left:14px;right:14px;bottom:14px;height:78px;border-radius:24px;display:flex;align-items:center;gap:12px;padding:12px 16px}
+  .panel{background:#fff;border:1px solid var(--g4);border-radius:18px;padding:18px;box-shadow:0 2px 8px rgba(20,23,26,.04)}
+  .panel h3{margin:0 0 10px;font-size:17px}.panel p{margin:0;color:var(--g2);font-size:13px;line-height:1.45}
+  .col{flex:1;display:flex;flex-direction:column;gap:14px}.rail{width:350px;display:flex;flex-direction:column;gap:14px}.wide{flex:1.45}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.kpi b{display:block;font-size:34px;font-weight:900}.kpi span{font-size:12px;color:var(--g2);font-weight:800}
+  .row{display:flex;align-items:center;gap:12px;border-top:1px solid var(--g4);padding:12px 0}.row:first-child{border-top:0}
+  .row b{font-size:14px}.row small{margin-left:auto;color:var(--g2);font-weight:800}
+  .check{width:28px;height:28px;border-radius:999px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900}
+  .empty{background:#fff;border:2px solid var(--g3);color:transparent}.time{color:var(--time)!important;font-weight:900!important}
+  .button{height:48px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;padding:0 18px;font-weight:900;background:var(--ink);color:#fff}
+  .button.secondary{background:#fff;color:var(--ink);border:1px solid var(--g4)}.button.timebtn{background:var(--time-soft);color:var(--time);border:1px solid rgba(194,65,12,.25)}
+  .bar{height:8px;border-radius:999px;background:var(--g4);overflow:hidden}.bar i{display:block;height:100%;background:var(--ink);border-radius:999px}
+  .timeline{position:relative;padding-left:18px}.timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--g4)}
+  .tick{position:relative;padding:8px 8px 8px 14px}.tick:before{content:"";position:absolute;left:-16px;top:15px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--g3)}
+  .tick.now{background:var(--time-soft);border-radius:12px}.tick.now:before{background:var(--time);border-color:var(--time)}
+  .sheet{position:absolute;left:34px;right:34px;bottom:24px;min-height:650px;border-radius:28px;background:#fff;border:1px solid var(--g4);box-shadow:0 30px 80px rgba(20,23,26,.18);padding:24px}
+  .sheet .handle{width:54px;height:5px;background:var(--g4);border-radius:99px;margin:0 auto 18px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .muted{color:var(--g2)}.tag{display:inline-flex;padding:7px 10px;border-radius:999px;background:var(--g5);font-size:12px;font-weight:900;color:var(--g2)}
+  .tag.time{background:var(--time-soft);color:var(--time)}.tag.ok{background:#eaf7ef;color:var(--ok)}
+  .table{width:100%;border-collapse:collapse;font-size:13px}.table td,.table th{padding:10px;border-bottom:1px solid var(--g4);text-align:left}.table th{color:var(--g2);font-size:11px;text-transform:uppercase}
+  .phone{width:270px;height:560px;border-radius:30px;background:#111;padding:10px}.phone .inner{height:100%;border-radius:22px;background:#f6f7f8;padding:18px}
+</style>
+</head>
+<body>
+<div class="cover">
+  <h1>PrepFlow High Fidelity User Flow</h1>
+  <p>ASCIIユーザーフローに沿った高精度画面集。既存の正本ワイヤーを置き換えず、実装・レビュー時の視覚確認用に使う。</p>
+</div>
+
+<section class="frame"><div class="label"><b>00. 全体動線</b><span>Auth -> Activation -> Daily Ops -> Close / Reservation / Service</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>PrepFlow 全体動線</h2><div class="spacer"></div><span class="tag ok">user flow</span></div>
+  <div class="content no-bottom">
+    <div class="col wide">
+      <div class="panel"><h3>初回体験</h3><div class="row"><b>AuthGateView</b><small>招待 / Apple / magic link</small></div><div class="row"><b>ActivationSummaryView</b><small>削減見込み</small></div><div class="row"><b>SimulationView</b><small>数字調整</small></div><div class="row"><b>ServiceSetupView</b><small>人数入力</small></div></div>
+      <div class="panel"><h3>日次ループ</h3><div class="grid3"><span class="button secondary">今これ</span><span class="button secondary">皿ごと</span><span class="button secondary">担当</span></div></div>
+    </div>
+    <div class="rail"><div class="panel"><h3>周辺運用</h3><div class="row"><b>CloseLoopSheet</b><small>締め</small></div><div class="row"><b>ReservationHubSheet</b><small>差分</small></div><div class="row"><b>DirectBookingOpsSheet</b><small>直販</small></div><div class="row"><b>ServicePassOpsSheet</b><small>サービス</small></div></div><div class="panel"><h3>設定/編集</h3><p>SettingsHomeView からサービス設定、カタログ、試算へ戻る。</p></div></div>
+  </div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>01. オンボーディング / 認証</b><span>p0-wireframe-onboarding-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>セットアップ</h2><small>招待確認 -> 認証 -> 初回ボード</small><div class="spacer"></div><span class="tag ok">LOCAL SQLite</span></div>
+  <div class="content">
+    <div class="col"><div class="panel" style="height:100%"><h3>招待済みアカウントで開始</h3><p>店舗ごとの tenant で分離。資格情報が未設定でもローカルSQLiteで起動継続。</p><div style="margin-top:24px" class="tag ok">RLS tenant_id claim</div></div></div>
+    <div class="rail" style="width:520px"><div class="panel"><h3>招待メール</h3><div class="panel" style="background:var(--g5);box-shadow:none">owner@prepflow.test</div><div style="display:flex;gap:10px;margin-top:14px"><span class="button">Appleで続ける</span><span class="button secondary">リンクを送信</span></div></div><div class="panel"><h3>tenant / RLS</h3><div class="row"><b>tenant</b><small>tenant-local</small></div><div class="row"><b>role</b><small>owner</small></div><div class="row"><b>不足</b><small>Supabase URL</small></div></div></div>
+  </div>
+  <div class="bottom glass"><b>認証状態</b><span class="muted">ローカル縮退で開始できます</span><div class="spacer"></div><span class="button">開始</span></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>02. 活性化サマリー</b><span>p0-wireframe-activation-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>活性化</h2><small>業態 完了 -> 削減 現在 -> 初回ボード 待機</small><div class="spacer"></div><span class="tag">STEP 2/3</span></div>
+  <div class="content"><div class="col"><div class="panel"><h3>PrepFlow なら、これだけ減らせます</h3><div class="kpis"><div class="panel kpi"><b>31%</b><span>削減の主指標</span></div><div class="panel kpi"><b>12.4L</b><span>ロス削減</span></div><div class="panel kpi"><b>87%</b><span>的中率</span></div></div></div><div class="panel"><h3>推奨前後の比較</h3><div class="row"><b>推奨前</b><div class="bar" style="width:68%"><i style="width:92%"></i></div></div><div class="row"><b>推奨後</b><div class="bar" style="width:68%"><i style="width:52%"></i></div></div><div class="row"><b>削減見込み</b><small>安全余白を維持</small></div></div></div></div>
+  <div class="bottom glass"><span class="button secondary">数字を調整して試算</span><div class="spacer"></div><span class="button">初回ボードへ</span></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>03. シミュレーション</b><span>p0-wireframe-simulation-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>シミュレーション</h2><small>期間 / 数字調整 / 予約ハブ / 締めループ</small><div class="spacer"></div><span class="button secondary">予約ハブ</span><span class="button secondary">締め</span></div>
+  <div class="content"><div class="col wide"><div class="kpis"><div class="panel kpi"><b>14名</b><span>人数</span></div><div class="panel kpi"><b>200ml</b><span>推奨</span></div><div class="panel kpi"><b>-18%</b><span>差分</span></div></div><div class="panel" style="flex:1"><h3>SimulationItemList</h3><table class="table"><tr><th>料理</th><th>推奨</th><th>実績</th><th>差分</th></tr><tr><td>煮切り</td><td>200ml</td><td>240ml</td><td>-40ml</td></tr><tr><td>シャリ</td><td>2.8kg</td><td>3.1kg</td><td>-0.3kg</td></tr><tr><td>吸地</td><td>1.4L</td><td>1.6L</td><td>-0.2L</td></tr></table></div></div><div class="rail"><div class="panel"><h3>補正結果</h3><p>廃棄ログと予約差分を反映し、当日ボードへの影響を確認。</p></div><div class="panel"><h3>保存状態</h3><span class="tag ok">local saved</span></div></div></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>04. 本日のサービス設定</b><span>p0-wireframe-service-setup-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>本日のサービス設定</h2><small>STEP 1/2 設定 -> 当日ボード生成</small><div class="spacer"></div><span class="tag time">開店 18:00</span></div>
+  <div class="content"><div class="col wide"><div class="panel"><h3>ServiceControlStrip</h3><div class="grid3"><span class="button secondary">6/11(木)</span><span class="button secondary">夜</span><span class="button timebtn">18:00</span></div></div><div class="panel" style="flex:1"><h3>ReservationList</h3><div class="row"><b>林様</b><small>18:00 / 2名</small></div><div class="row"><b>鈴木様</b><small>18:30 / 4名</small></div><div class="row"><b>手入力予約を追加</b><small>+</small></div></div></div><div class="rail"><div class="panel"><h3>ServiceCoversPanel</h3><div class="kpi"><b>14</b><span>合計人数</span></div><div class="row"><b>メイン</b><small>12</small></div><div class="row"><b>その他</b><small>2</small></div><span class="button" style="width:100%;margin-top:14px">ボード生成</span></div></div></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>05. 予約編集 Sheet</b><span>ReservationEditSheet</span></div><div class="ipad"><div class="screen">
+  <div class="sheet"><div class="handle"></div><h2>予約編集</h2><div class="grid2"><div class="panel"><h3>鈴木様 / 18:30</h3><div class="kpi"><b>4名</b><span>CoversStepper</span></div></div><div class="panel"><h3>メモ</h3><p>甲殻類NG / 記念日 / 入口近くを避ける</p></div></div><div style="position:absolute;left:24px;right:24px;bottom:24px;display:flex;gap:12px"><span class="button secondary">削除</span><div class="spacer"></div><span class="button">保存</span></div></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>06. 仕込みボード / 今これ</b><span>p0-wireframe-board-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>本日の仕込み</h2><small>鮨 はやし ・ 6/11(木) 夜 ・ 14名</small><div class="spacer"></div><div class="seg"><span class="on">今これ</span><span>皿ごと</span><span>担当</span></div><div class="island"><div><small>SERVICE 18:00</small><b>T-2:48</b></div></div></div>
+  <div class="content"><div class="col wide"><span class="tag time">NOW ・ 15:00 / T-3:00</span><div class="panel" style="flex:1"><h3 style="font-size:34px">煮切り仕込み</h3><p>200ml ・ 14名分 ・ 親方</p><div class="row"><span class="check">✓</span><b>酒・みりんを煮切る</b><small>10分</small></div><div class="row"><span class="check empty">.</span><b>たまり・濃口を合わせる</b><small>15分</small></div><div class="row"><span class="check empty">.</span><b>味見基準を確認</b><small>15分</small></div></div><div class="panel"><h3>BoardWorkStatePanel</h3><span class="button secondary">一時停止</span> <span class="button">次を完了</span></div></div><div class="rail"><div class="panel"><h3>TimelineRail</h3><div class="timeline"><div class="tick">ネタ仕込み</div><div class="tick">シャリ</div><div class="tick now">煮切り NOW</div><div class="tick">ソース</div><div class="tick">盛り付け</div></div></div><div class="panel"><h3>着地予測</h3><p><span class="time">18:12</span> 着地。応援提案あり。</p></div></div></div>
+  <div class="bottom glass"><b>ライン点検</b><span class="muted">全5皿そろって開店ゲート</span><div class="spacer"></div><span class="button secondary">手順ガイド</span><span class="button">すべて完了</span></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>07. 今これ手順 Sheet</b><span>NowGuidanceSheet</span></div><div class="ipad"><div class="screen">
+  <div class="sheet"><div class="handle"></div><h2>煮切り仕込み / 手順</h2><div class="grid2"><div class="panel"><h3>GuidanceWorkStatePanel</h3><div class="row"><b>担当者</b><small>親方</small></div><div class="row"><b>実績</b><small>+2分</small></div><span class="button secondary">一時停止</span></div><div class="panel"><h3>TodayPrepImpactPanel</h3><div class="row"><b>予約+2名</b><small>適用待ち</small></div><div class="row"><b>残数不足</b><small class="time">緊急</small></div></div><div class="panel"><h3>GuidanceReadinessGate</h3><div class="row"><span class="check">✓</span><b>味見基準</b></div><div class="row"><span class="check empty">.</span><b>冷却容器</b></div></div><div class="panel"><h3>AssistProposalCard</h3><p>15分遅延見込み。担当を1名追加すると 18:00 に復帰。</p></div></div><div class="bottom" style="left:24px;right:24px;bottom:24px"><span class="button secondary">取り消し</span><div class="spacer"></div><span class="button">次を完了</span></div></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>08. 仕込みボード / 皿ごと</b><span>p1-wireframe-view-dishes-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>本日の仕込み</h2><div class="spacer"></div><div class="seg"><span>今これ</span><span class="on">皿ごと</span><span>担当</span></div><div class="island"><small>SERVICE</small><b>T-2:34</b></div></div>
+  <div class="content"><div class="grid3" style="width:100%"><div class="panel"><h3>握り</h3><div class="bar"><i style="width:72%"></i></div><div class="row"><span class="check">✓</span><b>シャリ</b></div><div class="row"><span class="check empty">.</span><b>煮切り</b></div></div><div class="panel"><h3>椀物</h3><div class="bar"><i style="width:48%"></i></div><div class="row"><span class="check">✓</span><b>出汁</b></div><div class="row"><span class="check empty">.</span><b>吸地</b></div></div><div class="panel"><h3>デザート</h3><div class="bar"><i style="width:35%"></i></div><div class="row"><span class="check empty">.</span><b>仕上げ</b></div></div></div></div>
+  <div class="bottom glass"><b>LineGateBar</b><span class="muted">皿ごとの未完了を確認</span></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>09. 仕込みボード / 担当</b><span>p1-wireframe-view-staff-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>本日の仕込み</h2><div class="spacer"></div><div class="seg"><span>今これ</span><span>皿ごと</span><span class="on">担当</span></div><div class="island"><small>SERVICE</small><b>T-2:26</b></div></div>
+  <div class="content no-bottom"><div class="grid3" style="width:100%"><div class="panel"><h3>親方 <span class="tag">82%</span></h3><div class="row"><b>煮切り</b><small class="time">NOW</small></div><div class="row"><b>味見基準</b><small>15分</small></div></div><div class="panel"><h3>副料理長 <span class="tag">64%</span></h3><div class="row"><b>出汁</b><small>完了</small></div><div class="row"><b>吸地</b><small>20分</small></div></div><div class="panel"><h3>仕込み担当 <span class="tag">47%</span></h3><div class="row"><b>薬味</b><small>12分</small></div><div class="row"><b>盛り付け</b><small>待機</small></div></div></div></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>10. ラベル / ラーダー / QR Sheet</b><span>p2-wireframe-label-flow</span></div><div class="ipad"><div class="screen"><div class="sheet"><div class="handle"></div><h2>ラベル / ラーダー / QR</h2><div class="grid2"><div class="panel"><h3>LabelFlowColumn</h3><div class="row"><span class="check">✓</span><b>完了タスク</b></div><div class="row"><span class="check">✓</span><b>ラベルプレビュー</b></div><div class="row"><span class="check empty">.</span><b>QR 残量/廃棄</b></div><div class="row"><span class="check empty">.</span><b>持越し</b></div></div><div class="panel"><h3>PrepLarderPanel</h3><div class="kpis"><div class="panel kpi"><b>8</b><span>品目</span></div><div class="panel kpi"><b>2</b><span>期限近い</span></div><div class="panel kpi"><b>1</b><span>要印刷</span></div></div><div class="row"><b>冷蔵庫レンズ</b><small>QR scan</small></div></div></div></div></div></div></section>
+
+<section class="frame"><div class="label"><b>11. カタログ編集</b><span>p1-wireframe-template-editor-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>カタログ編集</h2><small>テンプレート / 仕込みアイテム</small><div class="spacer"></div><span class="tag ok">saved</span></div>
+  <div class="content no-bottom"><div class="rail"><div class="panel" style="height:100%"><h3>CatalogTree</h3><div class="row"><b>握り</b><small>3 task</small></div><div class="row"><b>椀物</b><small>4 task</small></div><div class="row"><b>煮切り</b><small>component</small></div><div class="row"><b>追加</b><small>+</small></div></div></div><div class="col wide"><div class="panel"><h3>CatalogDetail</h3><div class="grid3"><span class="tag">scale mode</span><span class="tag">yield 200ml</span><span class="tag">lead 180m</span></div><p style="margin-top:18px">手順、所要時間、メディア枠、自己補正の入力。</p></div><div class="panel" style="flex:1"><h3>CatalogPreview</h3><p>保存後の当日ボード表示を確認。</p></div></div></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>12. 設定ホーム</b><span>p1-wireframe-settings-home-liquidglass</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>設定</h2><small>session / store / service</small><div class="spacer"></div><span class="button secondary">boardへ戻る</span><span class="button secondary">サインアウト</span></div>
+  <div class="content no-bottom"><div class="grid2" style="width:100%"><div class="panel"><h3>Account</h3><div class="row"><b>認証</b><small>Apple / magic link</small></div><div class="row"><b>tenant</b><small>ready</small></div></div><div class="panel"><h3>Store / service</h3><div class="row"><b>営業時刻</b><small class="time">18:00</small></div><div class="row"><b>テーマ</b><small>Liquid Glass</small></div><div class="row"><b>書き出し</b><small>CSV</small></div></div><div class="panel"><h3>導線</h3><span class="button secondary">サービス設定</span> <span class="button secondary">カタログ</span> <span class="button secondary">試算</span></div><div class="panel"><h3>SettingsToast</h3><p>変更は即時保存されました。</p></div></div></div>
+</div></div></section>
+
+<section class="frame"><div class="label"><b>13. 締め -> 翌日 Sheet</b><span>p2-wireframe-close-flow-liquidglass</span></div><div class="ipad"><div class="screen"><div class="sheet"><div class="handle"></div><h2>締め -> 翌日</h2><div class="grid2"><div class="panel"><h3>作った / 余り</h3><div class="grid2"><div class="kpi"><b>240ml</b><span>作った</span></div><div class="kpi"><b>40ml</b><span>余り</span></div></div><div class="row"><b>持越し</b><small>ON</small></div><div class="row"><b>廃棄理由</b><small>酸化</small></div></div><div class="panel"><h3>翌日への影響</h3><p>予約人数と持越しを反映し、明日の推奨量を再計算。</p><div class="tag ok">締めゲート完了可能</div></div><div class="panel"><h3>CloseLoopBatchTable</h3><table class="table"><tr><td>煮切り</td><td>40ml</td></tr><tr><td>シャリ</td><td>0.2kg</td></tr></table></div><div class="panel"><h3>CloseLoopCommitStatus</h3><p>単品記録 / 締め表記録 / 予約差分へ</p></div></div></div></div></div></section>
+
+<section class="frame"><div class="label"><b>14. 予約ハブ Sheet</b><span>p2-wireframe-reservation-hub-liquidglass</span></div><div class="ipad"><div class="screen"><div class="sheet"><div class="handle"></div><h2>予約ハブ</h2><div class="grid4"><span class="tag">Direct 2</span><span class="tag">TableCheck 8</span><span class="tag">手入力 4</span><span class="tag time">差分 +2</span></div><div class="grid2" style="margin-top:14px"><div class="panel"><h3>ReservationHubList</h3><div class="row"><b>林様</b><small>18:00 / 2</small></div><div class="row"><b>鈴木様</b><small>重複候補</small></div><div class="row"><b>Direct Guest</b><small>VIP</small></div></div><div class="panel"><h3>ReservationHubApplyPanel</h3><p>コース未割当、重複、特別仕込み、アレルゲンを確認。</p><div class="panel" style="margin-top:12px;background:var(--g5);box-shadow:none"><b>ReservationOmotenashiPanel</b></div></div></div><div class="panel" style="margin-top:14px"><h3>ReservationConnectorReviewPanel</h3><p>connector 差分レビュー / 承認 / 却下</p></div></div></div></div></section>
+
+<section class="frame"><div class="label"><b>15. 予約おもてなし Panel</b><span>p2-wireframe-special-prep</span></div><div class="ipad"><div class="screen"><div class="content no-top no-bottom"><div class="col"><div class="panel"><h3>ReservationOmotenashiPanel</h3><div class="grid2"><div class="panel"><h3>特別仕込み</h3><div class="row"><b>記念日プレート</b><small>担当割当</small></div><div class="row"><b>甲殻類NG代替</b><small>確認中</small></div></div><div class="panel"><h3>ゲスト回答再確認</h3><p>変更されたゲスト回答を厨房側で再チェック。</p></div></div><div class="panel" style="margin-top:14px"><h3>Allergen Preview</h3><p>アレルゲンラベルのプレビュー / 印刷状態。</p></div></div></div></div></div></div></section>
+
+<section class="frame"><div class="label"><b>16. Direct予約 Sheet</b><span>p3-wireframe-direct-booking</span></div><div class="ipad"><div class="screen"><div class="sheet"><div class="handle"></div><h2>PrepFlow Direct</h2><p class="muted">直販予約 -> 枠判定 -> 仕込み差分</p><div class="grid2" style="margin-top:18px"><div class="panel"><h3>DirectBrandPanel</h3><div class="kpi"><b>1</b><span>残枠</span></div><p>公式予約 / デポジット / no-show</p></div><div class="panel"><h3>DirectStepCard stack</h3><div class="row"><b>日付・時間</b><small>18:00</small></div><div class="row"><b>人数</b><small>2名</small></div><div class="row"><b>コース</b><small>おまかせ</small></div><div class="row"><b>メモ</b><small>VIP</small></div></div></div><div class="panel" style="margin-top:14px"><h3>DirectOpsStatus</h3><p>checkout / no-show / waitlist / 仕込み影響</p></div></div></div></div></section>
+
+<section class="frame"><div class="label"><b>17. サービス進行 Sheet</b><span>p4-wireframe-passview</span></div><div class="ipad"><div class="screen"><div class="sheet"><div class="handle"></div><div style="display:flex;align-items:center;gap:14px"><h2>Service Pass</h2><div class="seg"><span>残数</span><span class="on">パス</span><span>担当</span></div></div><div class="grid2" style="margin-top:18px"><div class="panel"><h3>ServicePassMatrix</h3><table class="table"><tr><th>卓</th><th>先付</th><th>握り</th><th>椀</th></tr><tr><td>卓1</td><td>served</td><td class="time">fire</td><td>hold</td></tr><tr><td>卓2</td><td>served</td><td>served</td><td>wait</td></tr></table></div><div class="panel"><h3>ServiceSyncPanel</h3><div class="row"><b>offline flush</b><small>0</small></div><div class="row"><b>POS/KDS replay</b><small>ready</small></div></div></div><div class="panel" style="margin-top:14px"><h3>ServiceFireBanner</h3><p><span class="time">卓1 握り fire</span> / hold / pacing proposal</p></div></div></div></div></section>
+
+<section class="frame"><div class="label"><b>18. 戻りと分岐</b><span>navigation rules</span></div><div class="ipad"><div class="screen">
+  <div class="topbar glass"><h2>戻りと分岐</h2><small>AuthenticatedSessionView screen state</small></div>
+  <div class="content no-bottom"><div class="grid2" style="width:100%"><div class="panel"><h3>よく使う戻り</h3><div class="row"><b>SettingsHomeView</b><small>Board Now</small></div><div class="row"><b>CatalogEditorView</b><small>Board Now</small></div><div class="row"><b>SimulationView</b><small>Board Now</small></div><div class="row"><b>CloseLoopSheet</b><small>ReservationHub -> Board</small></div></div><div class="panel"><h3>分岐の扱い</h3><p>主要画面は screen state。ボード3ビューは上部バーの segmented control。sheetは完了後に親画面へ戻る。</p><div style="margin-top:18px" class="grid3"><span class="button secondary">今これ</span><span class="button secondary">皿ごと</span><span class="button secondary">担当</span></div></div></div></div>
+</div></div></section>
+
+</body>
+</html>
