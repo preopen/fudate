@@ -4,6 +4,8 @@
 
 このファイルは UI の正本ではない。正本は `docs/ui-fidelity-contract.md`、`design/`、snapshot、`docs/ui-comparisons/` とする。各画面の部品名と配置は `docs/ascii-wireframes.md` と揃える。
 
+この流れに沿ったハイフィディリティ確認用アートボードは `design/high-fidelity-user-flow.html` / `.png` に置く。
+
 ## 00. 全体動線
 
 ```text
