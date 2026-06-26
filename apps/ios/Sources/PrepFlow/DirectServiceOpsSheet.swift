@@ -8,13 +8,14 @@ import SwiftUI
 // 正本: design/p3-wireframe-direct-booking.png
 struct DirectBookingOpsSheet: View {
     @ObservedObject var store: BoardStore
+    let done: () -> Void
     @State private var covers = 2
     @State private var note = "甲殻類NG / VIP:gold / 記念日"
     @State private var allotment = 1
 
     var body: some View {
         VStack(alignment: .leading, spacing: PrepFlowSpacing.lg) {
-            DirectOpsHeader(title: "PrepFlow Direct", subtitle: "直販予約 → 枠判定 → 仕込み差分")
+            DirectOpsHeader(title: "PrepFlow Direct", subtitle: "直販予約 → 枠判定 → 仕込み差分", close: done)
 
             HStack(alignment: .top, spacing: PrepFlowSpacing.md) {
                 DirectBrandPanel()
@@ -86,11 +87,12 @@ struct DirectBookingOpsSheet: View {
 // 正本: design/p4-wireframe-passview.png
 struct ServicePassOpsSheet: View {
     @ObservedObject var store: BoardStore
+    let done: () -> Void
     @State private var mode: ServicePassMode = .pass
 
     var body: some View {
         VStack(spacing: PrepFlowSpacing.md) {
-            ServicePassTopBar(mode: $mode)
+            ServicePassTopBar(mode: $mode, close: done)
             ServiceFireBanner(
                 fire: {
                     store.acceptIncomingServiceFire()
@@ -134,6 +136,7 @@ private enum ServicePassMode: String, CaseIterable, Identifiable {
 private struct DirectOpsHeader: View {
     let title: String
     let subtitle: String
+    let close: () -> Void
 
     var body: some View {
         GlassEffectContainer {
@@ -146,6 +149,8 @@ private struct DirectOpsHeader: View {
                         .foregroundStyle(PrepFlowColor.g2)
                 }
                 Spacer()
+                Button("予約ハブへ", action: close)
+                    .buttonStyle(OpsHeaderButtonStyle())
                 Text("公式予約")
                     .font(PrepFlowFont.smallBold)
                     .foregroundStyle(PrepFlowColor.white)
@@ -358,6 +363,7 @@ private struct DirectOpsStatus: View {
 // 正本: design/p4-wireframe-passview.png
 private struct ServicePassTopBar: View {
     @Binding var mode: ServicePassMode
+    let close: () -> Void
 
     var body: some View {
         GlassEffectContainer {
@@ -393,6 +399,8 @@ private struct ServicePassTopBar: View {
                     .font(PrepFlowFont.countdownValue)
                     .foregroundStyle(PrepFlowColor.time) // time-use: service elapsed countdown
                     .monospacedDigit()
+                Button("予約ハブへ", action: close)
+                    .buttonStyle(OpsHeaderButtonStyle())
             }
             .padding(.horizontal, PrepFlowSpacing.lg)
             .frame(height: PrepFlowMetric.topBarHeight)
@@ -404,6 +412,19 @@ private struct ServicePassTopBar: View {
             }
             .glassEffect()
         }
+    }
+}
+
+private struct OpsHeaderButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(PrepFlowFont.smallBold)
+            .foregroundStyle(PrepFlowColor.ink)
+            .padding(.horizontal, PrepFlowSpacing.md)
+            .frame(height: PrepFlowMetric.catalogFieldHeight)
+            .background(PrepFlowColor.white.opacity(PrepFlowOpacity.glass))
+            .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous))
+            .opacity(configuration.isPressed ? PrepFlowOpacity.pressed : PrepFlowOpacity.solid)
     }
 }
 

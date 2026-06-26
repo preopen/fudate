@@ -85,6 +85,9 @@ private struct AuthenticatedSessionView: View {
         case .serviceSetup:
             ServiceSetupView(
                 store: store,
+                backToBoard: {
+                    screen = .board
+                },
                 generateBoard: {
                     screen = .board
                 }
@@ -100,6 +103,9 @@ private struct AuthenticatedSessionView: View {
         case .catalog:
             CatalogEditorView(
                 store: store,
+                backToBoard: {
+                    screen = .board
+                },
                 previewBoard: {
                     screen = .board
                 }

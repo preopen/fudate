@@ -7,10 +7,12 @@ import SwiftUI
 // 正本: design/p1-wireframe-template-editor-liquidglass.png
 struct CatalogEditorView: View {
     @StateObject private var store: BoardStore
+    private let backToBoard: (() -> Void)?
     private let previewBoard: (() -> Void)?
 
-    init(store: BoardStore = BoardStore(), previewBoard: (() -> Void)? = nil) {
+    init(store: BoardStore = BoardStore(), backToBoard: (() -> Void)? = nil, previewBoard: (() -> Void)? = nil) {
         _store = StateObject(wrappedValue: store)
+        self.backToBoard = backToBoard
         self.previewBoard = previewBoard
     }
 
@@ -28,6 +30,7 @@ struct CatalogEditorView: View {
 
             CatalogTopBar(
                 courseName: store.catalog.courseName,
+                backToBoard: backToBoard,
                 previewBoard: {
                     store.previewCatalogOnBoard()
                     previewBoard?()
@@ -45,12 +48,17 @@ struct CatalogEditorView: View {
 // 正本: design/p1-wireframe-template-editor-liquidglass.png
 private struct CatalogTopBar: View {
     let courseName: String
+    let backToBoard: (() -> Void)?
     let previewBoard: () -> Void
     let save: () -> Void
 
     var body: some View {
         GlassEffectContainer {
             HStack(spacing: PrepFlowSpacing.md) {
+                if let backToBoard {
+                    Button("← 今日へ", action: backToBoard)
+                        .buttonStyle(GlassButtonStyle())
+                }
                 Text("テンプレート /")
                     .font(PrepFlowFont.small)
                     .foregroundStyle(PrepFlowColor.g2)
