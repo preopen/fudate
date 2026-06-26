@@ -15,9 +15,12 @@ struct ReservationHubSheet: View {
             PrepFlowColor.g5.ignoresSafeArea()
 
             VStack(spacing: PrepFlowSpacing.md) {
-                ReservationHubTopBar {
-                    store.queueConnectorReservationDiffs()
-                }
+                ReservationHubTopBar(
+                    close: done,
+                    resync: {
+                        store.queueConnectorReservationDiffs()
+                    }
+                )
 
                 HStack(spacing: PrepFlowSpacing.sm) {
                     ReservationSourceChip(title: "PrepFlow Direct", value: sourceCovers(.direct), marker: "D", isDirect: true)
@@ -108,10 +111,14 @@ struct ReservationHubSheet: View {
         .foregroundStyle(PrepFlowColor.ink)
         .presentationDetents([.large])
         .sheet(isPresented: $isDirectBookingPresented) {
-            DirectBookingOpsSheet(store: store)
+            DirectBookingOpsSheet(store: store) {
+                isDirectBookingPresented = false
+            }
         }
         .sheet(isPresented: $isServicePassPresented) {
-            ServicePassOpsSheet(store: store)
+            ServicePassOpsSheet(store: store) {
+                isServicePassPresented = false
+            }
         }
     }
 
@@ -149,6 +156,7 @@ private enum ReservationSourceKind {
 
 // 正本: design/p2-wireframe-reservation-hub-liquidglass.png
 private struct ReservationHubTopBar: View {
+    let close: () -> Void
     let resync: () -> Void
 
     var body: some View {
@@ -164,6 +172,8 @@ private struct ReservationHubTopBar: View {
 
                 Spacer()
 
+                Button("閉じる", action: close)
+                    .buttonStyle(ReservationGlassButtonStyle())
                 Button("再同期", action: resync)
                     .buttonStyle(ReservationGlassButtonStyle())
 

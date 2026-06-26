@@ -54,11 +54,14 @@ struct PrepFlowBoardView: View {
                     assistAppliedSummary: store.todayPrepAssistAppliedSummary,
                     assistETAAfterApply: store.todayPrepAssistETAAfterApply,
                     impactItems: store.todayPrepImpactItems,
-                    impactLastAction: store.todayPrepImpactLastAction
+                    impactLastAction: store.todayPrepImpactLastAction,
+                    canUndo: store.lastTodayPrepUndo != nil
                 ) { id in
                     store.handleTodayPrepBoardStepTap(id)
                 } completedBy: { id in
                     store.todayPrepCompletionDisplay(for: id)
+                } undo: {
+                    store.undoLastTodayPrepAction()
                 } startNext: {
                     store.startNextTodayStep()
                 } pause: {
@@ -77,7 +80,12 @@ struct PrepFlowBoardView: View {
                     store.dismissTodayPrepImpact(id)
                 }
             case .dishes:
-                DishBoardContent(completed: store.completed, impactItems: store.todayPrepImpactItems) { id in
+                DishBoardContent(
+                    completed: store.completed,
+                    progress: store.todayPrepProgress,
+                    lineGateStatus: store.lineGateStatus,
+                    impactItems: store.todayPrepImpactItems
+                ) { id in
                     store.toggleDishBoardTask(id)
                 } applyImpact: { id in
                     store.applyTodayPrepImpact(id)
@@ -85,7 +93,12 @@ struct PrepFlowBoardView: View {
                     store.dismissTodayPrepImpact(id)
                 }
             case .staff:
-                StaffBoardContent(completed: store.completed, impactItems: store.todayPrepImpactItems) { id in
+                StaffBoardContent(
+                    completed: store.completed,
+                    progress: store.todayPrepProgress,
+                    lineGateStatus: store.lineGateStatus,
+                    impactItems: store.todayPrepImpactItems
+                ) { id in
                     store.toggleStaffBoardTask(id)
                 } applyImpact: { id in
                     store.applyTodayPrepImpact(id)
@@ -418,8 +431,10 @@ private struct NowBoardContent: View {
     let assistETAAfterApply: ETA?
     let impactItems: [TodayPrepImpactItem]
     let impactLastAction: String
+    let canUndo: Bool
     let onToggle: (String) -> Void
     let completedBy: (String) -> String?
+    let undo: () -> Void
     let startNext: () -> Void
     let pause: () -> Void
     let resume: () -> Void
@@ -453,20 +468,28 @@ private struct NowBoardContent: View {
                     FocusChip(text: "親方", isPrimary: false)
                 }
 
-                if showsBoardWorkStatePanel {
-                    BoardWorkStatePanel(
-                        progress: progress,
-                        activeStartedAt: activeStartedAt,
-                        readiness: readiness,
-                        activeHold: activeHold,
-                        blockReason: completionBlockReason,
-                        startNext: startNext,
-                        pause: pause,
-                        resume: resume,
-                        completeChecks: completeChecks,
-                        completeNext: completeNext
-                    )
-                }
+                BoardOperationStrip(
+                    progress: progress,
+                    activeStartedAt: activeStartedAt,
+                    readiness: readiness,
+                    activeHold: activeHold,
+                    impactCount: impactItems.count,
+                    canUndo: canUndo,
+                    undo: undo
+                )
+
+                BoardWorkStatePanel(
+                    progress: progress,
+                    activeStartedAt: activeStartedAt,
+                    readiness: readiness,
+                    activeHold: activeHold,
+                    blockReason: completionBlockReason,
+                    startNext: startNext,
+                    pause: pause,
+                    resume: resume,
+                    completeChecks: completeChecks,
+                    completeNext: completeNext
+                )
 
                 VStack(spacing: PrepFlowSpacing.sm) {
                     FocusTaskRow(
@@ -522,17 +545,132 @@ private struct NowBoardContent: View {
         40
     }
 
-    private var showsBoardWorkStatePanel: Bool {
-        activeStartedAt != nil
-            || activeHold != nil
-            || readiness.completedCount > 0
-            || completionBlockReason.hasPrefix("未完:")
-    }
-
     private func toggle(_ id: String) {
         withAnimation(.spring(response: PrepFlowMotion.response, dampingFraction: PrepFlowMotion.dampingFraction)) {
             onToggle(id)
         }
+    }
+}
+
+// 正本: design/p0-wireframe-board-liquidglass.png
+private struct BoardOperationStrip: View {
+    let progress: TodayPrepProgress
+    let activeStartedAt: String?
+    let readiness: TodayPrepReadiness
+    let activeHold: TodayPrepHold?
+    let impactCount: Int
+    let canUndo: Bool
+    let undo: () -> Void
+
+    var body: some View {
+        HStack(spacing: PrepFlowSpacing.sm) {
+            BoardOperationStep(
+                title: "着手",
+                value: activeStartedAt ?? "未着手",
+                state: activeStartedAt == nil ? .pending : .done
+            )
+            BoardOperationStep(
+                title: "確認",
+                value: "\(readiness.completedCount)/\(readiness.requiredCount)",
+                state: readiness.canComplete ? .done : .active
+            )
+            BoardOperationStep(
+                title: "完了",
+                value: progress.isComplete ? "点検へ" : "残り\(progress.remainingMinutes)分",
+                state: progress.isComplete ? .done : .pending
+            )
+            BoardOperationStep(
+                title: "外部変化",
+                value: impactCount == 0 ? "なし" : "\(impactCount)件",
+                state: impactCount == 0 ? .done : .active
+            )
+
+            if let activeHold {
+                Text(activeHold.reason)
+                    .font(PrepFlowFont.countdownLabel)
+                    .foregroundStyle(PrepFlowColor.time) // time-use: active hold needs immediate deadline recovery
+                    .padding(.horizontal, PrepFlowSpacing.sm)
+                    .frame(height: PrepFlowMetric.smallControlHeight)
+                    .background(PrepFlowColor.time.opacity(PrepFlowOpacity.timeNow)) // time-use: active hold badge tint
+                    .clipShape(Capsule(style: .continuous))
+            }
+
+            Button("取り消し", action: undo)
+                .buttonStyle(BoardUndoButtonStyle(isEnabled: canUndo))
+                .disabled(!canUndo)
+        }
+        .padding(PrepFlowSpacing.sm)
+        .background(PrepFlowColor.white)
+        .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous)
+                .stroke(PrepFlowColor.g4, lineWidth: PrepFlowMetric.lineWidth)
+        }
+    }
+}
+
+private enum BoardOperationState {
+    case pending
+    case active
+    case done
+}
+
+private struct BoardOperationStep: View {
+    let title: String
+    let value: String
+    let state: BoardOperationState
+
+    var body: some View {
+        HStack(spacing: PrepFlowSpacing.xs) {
+            Circle()
+                .fill(dotColor)
+                .frame(width: PrepFlowSpacing.sm, height: PrepFlowSpacing.sm)
+            VStack(alignment: .leading, spacing: PrepFlowSpacing.none) {
+                Text(title)
+                    .font(PrepFlowFont.countdownLabel)
+                    .foregroundStyle(PrepFlowColor.g2)
+                Text(value)
+                    .font(PrepFlowFont.smallBold)
+                    .foregroundStyle(PrepFlowColor.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(PrepFlowMetric.textMinimumScale)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, PrepFlowSpacing.xs)
+        .frame(height: PrepFlowMetric.catalogFieldHeight)
+        .background(state == .active ? PrepFlowColor.ink.opacity(PrepFlowOpacity.selection) : PrepFlowColor.g5)
+        .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous))
+    }
+
+    private var dotColor: Color {
+        switch state {
+        case .pending:
+            PrepFlowColor.g3
+        case .active:
+            PrepFlowColor.ink
+        case .done:
+            PrepFlowColor.ok
+        }
+    }
+}
+
+private struct BoardUndoButtonStyle: ButtonStyle {
+    let isEnabled: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(PrepFlowFont.countdownLabel)
+            .foregroundStyle(isEnabled ? PrepFlowColor.ink : PrepFlowColor.g3)
+            .frame(width: PrepFlowMetric.boardWorkButtonWidth)
+            .frame(height: PrepFlowMetric.catalogFieldHeight)
+            .background(isEnabled ? PrepFlowColor.white : PrepFlowColor.g4)
+            .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous)
+                    .stroke(isEnabled ? PrepFlowColor.ink : PrepFlowColor.g4, lineWidth: PrepFlowMetric.lineWidth)
+            }
+            .opacity(configuration.isPressed ? PrepFlowOpacity.pressed : PrepFlowOpacity.solid)
     }
 }
 
@@ -1066,6 +1204,8 @@ private struct RailItem: View {
 // 正本: design/p1-wireframe-view-dishes-liquidglass.png
 private struct DishBoardContent: View {
     let completed: Set<String>
+    let progress: TodayPrepProgress
+    let lineGateStatus: LineGateStatus
     let impactItems: [TodayPrepImpactItem]
     let toggle: (String) -> Void
     let applyImpact: (String) -> Void
@@ -1074,6 +1214,11 @@ private struct DishBoardContent: View {
     var body: some View {
         ScrollView {
             VStack(spacing: PrepFlowSpacing.md) {
+                BoardModeStatusHeader(
+                    title: "皿ごとの仕込み",
+                    progress: progress,
+                    lineGateStatus: lineGateStatus
+                )
                 DishCard(title: "先付け", window: "T−4:00 窓", done: 1, total: 1, rows: [
                     DishTask(id: "dish-sakizuke-kobachi", title: "小鉢の仕込み", quantity: "14客", time: "14:00 ・ T−4:00", isDone: true, isNow: false, section: "ガルド"),
                 ], impacts: [], toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
@@ -1106,6 +1251,72 @@ private struct DishBoardContent: View {
             .padding(.horizontal, PrepFlowSpacing.xl)
             .padding(.bottom, PrepFlowSpacing.lg)
         }
+    }
+}
+
+// 正本: design/p1-wireframe-view-dishes-liquidglass.png
+// 正本: design/p1-wireframe-view-staff-liquidglass.png
+private struct BoardModeStatusHeader: View {
+    let title: String
+    let progress: TodayPrepProgress
+    let lineGateStatus: LineGateStatus
+
+    var body: some View {
+        HStack(spacing: PrepFlowSpacing.md) {
+            VStack(alignment: .leading, spacing: PrepFlowSpacing.xxs) {
+                Text(title)
+                    .font(PrepFlowFont.sectionTitle)
+                    .foregroundStyle(PrepFlowColor.g2)
+                Text(primaryText)
+                    .font(PrepFlowFont.topTitle)
+                    .foregroundStyle(PrepFlowColor.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(PrepFlowMetric.textMinimumScale)
+            }
+
+            Spacer(minLength: PrepFlowSpacing.md)
+
+            BoardModeStatusPill(title: "完了", value: "\(progress.completedCount)/\(progress.totalCount)")
+            BoardModeStatusPill(title: "残り", value: "\(progress.remainingMinutes)分")
+            BoardModeStatusPill(title: "点検", value: lineGateStatus.canOpen ? "OK" : "\(lineGateStatus.blockingCount)件")
+        }
+        .padding(PrepFlowSpacing.md)
+        .background(PrepFlowColor.white)
+        .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: PrepFlowRadius.lg, style: .continuous)
+                .stroke(PrepFlowColor.g4, lineWidth: PrepFlowMetric.lineWidth)
+        }
+    }
+
+    private var primaryText: String {
+        if let nextStepTitle = progress.nextStepTitle {
+            return "次: \(nextStepTitle) / \(lineGateStatus.lastAction)"
+        }
+        return "全工程完了 / \(lineGateStatus.lastAction)"
+    }
+}
+
+private struct BoardModeStatusPill: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: PrepFlowSpacing.none) {
+            Text(title)
+                .font(PrepFlowFont.countdownLabel)
+                .foregroundStyle(PrepFlowColor.g2)
+            Text(value)
+                .font(PrepFlowFont.smallBold)
+                .foregroundStyle(PrepFlowColor.ink)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(PrepFlowMetric.textMinimumScale)
+        }
+        .frame(width: PrepFlowMetric.actionButtonHeight)
+        .frame(height: PrepFlowMetric.catalogFieldHeight)
+        .background(PrepFlowColor.ink.opacity(PrepFlowOpacity.selection))
+        .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous))
     }
 }
 
@@ -1287,44 +1498,56 @@ private struct DishTaskRow: View {
 // 正本: design/p1-wireframe-view-staff-liquidglass.png
 private struct StaffBoardContent: View {
     let completed: Set<String>
+    let progress: TodayPrepProgress
+    let lineGateStatus: LineGateStatus
     let impactItems: [TodayPrepImpactItem]
     let toggle: (String) -> Void
     let applyImpact: (String) -> Void
     let dismissImpact: (String) -> Void
 
     var body: some View {
-        HStack(spacing: PrepFlowSpacing.none) {
-            StaffColumn(initial: "シ", name: "シャリ場", done: shariDone ? 1 : 0, total: 1, tasks: [
-                StaffTask(
-                    id: "staff-shari-rice",
-                    dish: "おまかせ握り",
-                    title: "米を炊く・赤酢",
-                    quantity: "米 2.0升",
-                    time: "T−4:00",
-                    isDone: shariDone,
-                    isNow: false
-                ),
-            ], impacts: [], toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
-            StaffColumn(initial: "親", name: "親方", done: completed.intersection(["nikiri", "neta", "suiji"]).count, total: 3, tasks: [
-                StaffTask(
-                    id: "staff-chef-nikiri",
-                    dish: "おまかせ握り",
-                    title: "煮切り仕込み",
-                    quantity: "200ml",
-                    time: "15:00 ・ T−3:00 ・ NOW",
-                    isDone: completed.contains("nikiri"),
-                    isNow: true
-                ),
-                StaffTask(id: "staff-chef-neta", dish: "おまかせ握り", title: "ネタの仕込み", quantity: "各14貫", time: "T−4:30", isDone: completed.contains("neta"), isNow: false),
-                StaffTask(id: "staff-chef-suiji", dish: "椀物", title: "吸地を引く", quantity: "14杯", time: "17:00 ・ T−1:00", isDone: completed.contains("suiji"), isNow: false),
-            ], impacts: impactItems, toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
-            StaffColumn(initial: "ガ", name: "ガルド", done: completed.intersection(["wandane", "sauce"]).count, total: 2, tasks: [
-                StaffTask(id: "staff-garde-wandane", dish: "椀物", title: "椀種の準備", quantity: "14客", time: "16:30 ・ T−1:30", isDone: completed.contains("wandane"), isNow: false),
-                StaffTask(id: "staff-garde-sauce", dish: "水菓子", title: "ソースを炊く", quantity: "300ml", time: "16:00 ・ T−2:00", isDone: completed.contains("sauce"), isNow: false),
-            ], impacts: [], toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
-            StaffColumn(initial: "長", name: "シェフ", done: completed.contains("line-check") ? 1 : 0, total: 1, tasks: [
-                StaffTask(id: "line-check", dish: "全体", title: "ライン点検（全皿確認）", quantity: "", time: "17:30 ・ T−0:30", isDone: completed.contains("line-check"), isNow: false),
-            ], impacts: [], toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
+        VStack(spacing: PrepFlowSpacing.md) {
+            BoardModeStatusHeader(
+                title: "担当ごとの仕込み",
+                progress: progress,
+                lineGateStatus: lineGateStatus
+            )
+            .padding(.horizontal, PrepFlowSpacing.xl)
+            .padding(.top, PrepFlowSpacing.xs)
+
+            HStack(spacing: PrepFlowSpacing.none) {
+                StaffColumn(initial: "シ", name: "シャリ場", done: shariDone ? 1 : 0, total: 1, tasks: [
+                    StaffTask(
+                        id: "staff-shari-rice",
+                        dish: "おまかせ握り",
+                        title: "米を炊く・赤酢",
+                        quantity: "米 2.0升",
+                        time: "T−4:00",
+                        isDone: shariDone,
+                        isNow: false
+                    ),
+                ], impacts: [], toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
+                StaffColumn(initial: "親", name: "親方", done: completed.intersection(["nikiri", "neta", "suiji"]).count, total: 3, tasks: [
+                    StaffTask(
+                        id: "staff-chef-nikiri",
+                        dish: "おまかせ握り",
+                        title: "煮切り仕込み",
+                        quantity: "200ml",
+                        time: "15:00 ・ T−3:00 ・ NOW",
+                        isDone: completed.contains("nikiri"),
+                        isNow: true
+                    ),
+                    StaffTask(id: "staff-chef-neta", dish: "おまかせ握り", title: "ネタの仕込み", quantity: "各14貫", time: "T−4:30", isDone: completed.contains("neta"), isNow: false),
+                    StaffTask(id: "staff-chef-suiji", dish: "椀物", title: "吸地を引く", quantity: "14杯", time: "17:00 ・ T−1:00", isDone: completed.contains("suiji"), isNow: false),
+                ], impacts: impactItems, toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
+                StaffColumn(initial: "ガ", name: "ガルド", done: completed.intersection(["wandane", "sauce"]).count, total: 2, tasks: [
+                    StaffTask(id: "staff-garde-wandane", dish: "椀物", title: "椀種の準備", quantity: "14客", time: "16:30 ・ T−1:30", isDone: completed.contains("wandane"), isNow: false),
+                    StaffTask(id: "staff-garde-sauce", dish: "水菓子", title: "ソースを炊く", quantity: "300ml", time: "16:00 ・ T−2:00", isDone: completed.contains("sauce"), isNow: false),
+                ], impacts: [], toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
+                StaffColumn(initial: "長", name: "シェフ", done: completed.contains("line-check") ? 1 : 0, total: 1, tasks: [
+                    StaffTask(id: "line-check", dish: "全体", title: "ライン点検（全皿確認）", quantity: "", time: "17:30 ・ T−0:30", isDone: completed.contains("line-check"), isNow: false),
+                ], impacts: [], toggle: toggle, applyImpact: applyImpact, dismissImpact: dismissImpact)
+            }
         }
     }
 

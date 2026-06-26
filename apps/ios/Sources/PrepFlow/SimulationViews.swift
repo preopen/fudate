@@ -54,6 +54,7 @@ struct SimulationView: View {
             SimulationTopBar(
                 periodDays: store.simulationPeriodDays,
                 dateRange: store.simulationDateRange,
+                openBoard: openBoard,
                 changePeriod: {
                     store.changeSimulationPeriod()
                 },
@@ -190,6 +191,7 @@ struct ActivationSummaryView: View {
 private struct SimulationTopBar: View {
     let periodDays: Int
     let dateRange: String
+    let openBoard: (() -> Void)?
     let changePeriod: () -> Void
     let apply: () -> Void
 
@@ -214,6 +216,10 @@ private struct SimulationTopBar: View {
 
                 Spacer()
 
+                if let openBoard {
+                    Button("← 今日へ", action: openBoard)
+                        .buttonStyle(SimulationGlassButtonStyle())
+                }
                 Button("期間を変更", action: changePeriod)
                     .buttonStyle(SimulationGlassButtonStyle())
                 Button("本適用する", action: apply)

@@ -7,10 +7,12 @@ import SwiftUI
 struct ServiceSetupView: View {
     @StateObject private var store: BoardStore
     @State private var editingReservationID: String?
+    private let backToBoard: (() -> Void)?
     private let generateBoard: (() -> Void)?
 
-    init(store: BoardStore = BoardStore(), generateBoard: (() -> Void)? = nil) {
+    init(store: BoardStore = BoardStore(), backToBoard: (() -> Void)? = nil, generateBoard: (() -> Void)? = nil) {
         _store = StateObject(wrappedValue: store)
+        self.backToBoard = backToBoard
         self.generateBoard = generateBoard
     }
 
@@ -31,7 +33,7 @@ struct ServiceSetupView: View {
             .padding(.top, PrepFlowMetric.topInset + PrepFlowMetric.topBarHeight)
 
             VStack(spacing: PrepFlowSpacing.sm) {
-                ServiceTopBar()
+                ServiceTopBar(backToBoard: backToBoard)
                 ServiceControlStrip(store: store)
             }
             .padding(PrepFlowSpacing.md)
@@ -68,9 +70,16 @@ struct ServiceSetupView: View {
 
 // 正本: design/p0-wireframe-service-setup-liquidglass.png
 private struct ServiceTopBar: View {
+    let backToBoard: (() -> Void)?
+
     var body: some View {
         GlassEffectContainer {
             HStack {
+                if let backToBoard {
+                    Button("← 今日へ", action: backToBoard)
+                        .buttonStyle(ServiceTopBarButtonStyle())
+                }
+
                 VStack(alignment: .leading, spacing: PrepFlowSpacing.xxs) {
                     Text("本日のサービス設定")
                         .font(PrepFlowFont.topTitle)
@@ -101,6 +110,19 @@ private struct ServiceTopBar: View {
             .shadow(color: PrepFlowColor.ink.opacity(PrepFlowOpacity.glassShadow), radius: PrepFlowSpacing.lg, y: PrepFlowSpacing.sm)
             .glassEffect()
         }
+    }
+}
+
+private struct ServiceTopBarButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(PrepFlowFont.smallBold)
+            .foregroundStyle(PrepFlowColor.ink)
+            .padding(.horizontal, PrepFlowSpacing.md)
+            .frame(height: PrepFlowMetric.catalogFieldHeight)
+            .background(PrepFlowColor.white.opacity(PrepFlowOpacity.glass))
+            .clipShape(RoundedRectangle(cornerRadius: PrepFlowRadius.md, style: .continuous))
+            .opacity(configuration.isPressed ? PrepFlowOpacity.pressed : PrepFlowOpacity.solid)
     }
 }
 
